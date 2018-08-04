@@ -1,0 +1,916 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,随写," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="今天简单来聊一聊对象的两种属性：数据属性和访问器属性 数据属性数据属性包含一个数据值的位置，有4个描述其行为的特性。  [[Configurable]] : 表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特性，或者能否把属性修改为访问器属性。默认值为true。 [[Enumerable]] : 是否可枚举，表示能否通过 for-in 循环返回属性。默认值为true。 [[Wr">
+<meta name="keywords" content="JavaScript,随写">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS随写：数据属性和访问器属性">
+<meta property="og:url" content="http://yoursite.com/2017/08/17/JS随写：数数据属性和访问器属性/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="今天简单来聊一聊对象的两种属性：数据属性和访问器属性 数据属性数据属性包含一个数据值的位置，有4个描述其行为的特性。  [[Configurable]] : 表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特性，或者能否把属性修改为访问器属性。默认值为true。 [[Enumerable]] : 是否可枚举，表示能否通过 for-in 循环返回属性。默认值为true。 [[Wr">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS随写：数据属性和访问器属性">
+<meta name="twitter:description" content="今天简单来聊一聊对象的两种属性：数据属性和访问器属性 数据属性数据属性包含一个数据值的位置，有4个描述其行为的特性。  [[Configurable]] : 表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特性，或者能否把属性修改为访问器属性。默认值为true。 [[Enumerable]] : 是否可枚举，表示能否通过 for-in 循环返回属性。默认值为true。 [[Wr">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/17/JS随写：数数据属性和访问器属性/"/>
+
+
+
+
+
+  <title> JS随写：数据属性和访问器属性 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/17/JS随写：数数据属性和访问器属性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JS随写：数据属性和访问器属性
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-17T21:38:09+08:00">
+                2017-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天简单来聊一聊对象的两种属性：数据属性和访问器属性</p>
+<h3 id="数据属性"><a href="#数据属性" class="headerlink" title="数据属性"></a>数据属性</h3><p>数据属性包含一个数据值的位置，有4个描述其行为的特性。</p>
+<ul>
+<li>[[Configurable]] : 表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特性，或者能否把属性修改为访问器属性。默认值为true。</li>
+<li>[[Enumerable]] : 是否可枚举，表示能否通过 for-in 循环返回属性。默认值为true。</li>
+<li>[[Writable]] : 表示能否修改属性的值。默认值为true。</li>
+<li>[[Value]] : 包含这个属性的数据值。读取属性值的时候，从这个位置读；写入属性值时，把新值保存在这个位置。默认值是 undefined。<div class="tip">对于通过<code>new</code>关键字定义的对象的属性或者通过对象字面量直接在对象上定义的属性，它们的 [[Configurable]]、[[Enumerable]] 和 [[Writable]] 特性默认都被设置为 true，而 [[Value]] 特性被设置为指定的值。</div>
+
+</li>
+</ul>
+<h3 id="Object-defineProperty-obj-prop-descriptor"><a href="#Object-defineProperty-obj-prop-descriptor" class="headerlink" title="Object.defineProperty( obj, prop, descriptor)"></a>Object.defineProperty( obj, prop, descriptor)</h3><ul>
+<li>obj：需要定义属性的对象</li>
+<li>prop：需定义或修改的属性的名字。</li>
+<li>descriptor：一个包含设置特性的描述符对象<br>如果要修改属性默认的特性，必须使用 ECMAScript 的 <code>Object.defineProperty()</code> 方法。该方法接受3个参数：属性所在的对象，属性的名字和一个描述符对象。描述符对象的属性必须是：configurable、enumerable、writable和value。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">    name: <span class="string">'liyang'</span>,</span><br><span class="line">    age: <span class="string">'26'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">'name'</span>,&#123;</span><br><span class="line">    writable: <span class="literal">false</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(person.name);  <span class="comment">//liyang</span></span><br><span class="line">person.name = <span class="string">"miaomiao"</span>;  <span class="comment">//此时，严格模式下该赋值操作会抛出错误，非严格模式下会被忽略</span></span><br><span class="line"><span class="built_in">console</span>.log(person.name);  <span class="comment">//liyang</span></span><br><span class="line"><span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">'name'</span>); <span class="comment">//Object &#123;value: "liyang", writable: false, enumerable: true, configurable: true&#125;</span></span><br></pre></td></tr></table></figure>
+<p>注：一旦把属性定义为不可配置的，那么就再也不能把属性定义回可配置的了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">    name: <span class="string">'liyang'</span>,</span><br><span class="line">    age: <span class="string">'26'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">'name'</span>,&#123;</span><br><span class="line">    configurable: <span class="literal">false</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">'name'</span>,&#123;</span><br><span class="line">    configurable: <span class="literal">true</span></span><br><span class="line">&#125;);   <span class="comment">//Uncaught TypeError: Cannot redefine property: name</span></span><br></pre></td></tr></table></figure></p>
+<p>注：如果对一个空对象调用Object.defineProperty()方法时，如果不指定，configurable、enumerable和writable特性默认都将是false<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;&#125;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">'name'</span>,&#123;<span class="attr">value</span>:<span class="string">"liyang"</span>&#125;);</span><br><span class="line"><span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">'name'</span>);  <span class="comment">//Object &#123;value: "xx", writable: false, enumerable: false, configurable: false&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="Object-getOwnPropertyDescriptor-obj-prop"><a href="#Object-getOwnPropertyDescriptor-obj-prop" class="headerlink" title="Object.getOwnPropertyDescriptor( obj, prop)"></a>Object.getOwnPropertyDescriptor( obj, prop)</h3><p>该方法可以取得给定属性的描述符。接收两个参数：属性所在的对象和要读取其描述符的属性名称。如果是数据属性 ，则有configurable、enumerable、writable和value；若是访问器属性，则有configurable、enumerable、get和set;</p>
+<h3 id="访问器属性"><a href="#访问器属性" class="headerlink" title="访问器属性"></a>访问器属性</h3><p>访问器属性不包含数据值，它们包含一对儿<code>getter</code>和<code>setter</code>函数（不过，这两个函数都不是必需的）。在读取访问器属性时，会调用<code>getter</code>函数，在写入访问器属性时，又会调用<code>setter</code>函数并传入新值。</p>
+<ul>
+<li>[[Configurable]] : 表示能否通过 delete 删除属性从而重新定义属性，能否修改属性的特性，或者能否把属性修改为数据属性。默认值为true。</li>
+<li>[[Enumerable]] : 是否可枚举，表示能否通过 for-in 循环返回属性。默认值为true。</li>
+<li>[[Get]] : 在读取属性时调用的函数。默认值为 undefined。</li>
+<li>[[Set]] : 在写入属性时调用的函数。默认值为 undefined。<br>注：访问器属性不能直接定义，必须使用 Object.defineProperty() 来定义。<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> book = &#123;</span><br><span class="line">    _year : <span class="number">2004</span>,</span><br><span class="line">    edition : <span class="number">1</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">Object</span>.defineProperty(book,<span class="string">"year"</span>,&#123; </span><br><span class="line">    get : <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>._year;</span><br><span class="line">    &#125;,</span><br><span class="line">    set : <span class="function"><span class="keyword">function</span> (<span class="params">newValue</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (newValue &gt; <span class="number">2004</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>._year = newValue;</span><br><span class="line">            <span class="keyword">this</span>.edition += newValue - <span class="number">2004</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(book.year);  <span class="comment">// 2004</span></span><br><span class="line">book.year = <span class="number">2005</span>;</span><br><span class="line"><span class="built_in">console</span>.log(book.edition);  <span class="comment">//2</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>getter函数返回_year的值，setter函数通过计算来得到正确的edition值。属性year的值修改为2005会导致_year的值变为2005，而edition变成2。这就是访问器属性的常见方式，即设置一个属性的值会导致其他属性发生变化。<br>getter和setter不一定非得同时指定，只指定getter意味着属性不能写，尝试写入属性会被忽略。没有指定setter属性也不能读，否则在非严格模式下会返回undefined，严格模式下抛出错误。</p>
+<h3 id="定义多个属性-Object-defineProperties"><a href="#定义多个属性-Object-defineProperties" class="headerlink" title="定义多个属性 Object.defineProperties()"></a>定义多个属性 Object.defineProperties()</h3><p>该方法可一次性定义多个属性。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> book = &#123;&#125;;</span><br><span class="line"><span class="built_in">Object</span>.defineProperties(book,&#123;</span><br><span class="line">    _year:&#123;</span><br><span class="line">        value: <span class="number">2004</span></span><br><span class="line">    &#125;,</span><br><span class="line">    edition:&#123;</span><br><span class="line">        value: <span class="number">1</span></span><br><span class="line">    &#125;,</span><br><span class="line">    year:&#123;</span><br><span class="line">        get:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>._year;</span><br><span class="line">        &#125;,</span><br><span class="line">        set:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (newValue &gt; <span class="number">2004</span>) &#123;</span><br><span class="line">                <span class="keyword">this</span>._year = newValue;</span><br><span class="line">                <span class="keyword">this</span>.edition += newValue - <span class="number">2004</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>前几天百度编辑器bug修复之后，还是被市场同事抱怨编辑器屎一样难用。想了想决定把项目中的编辑器换掉，初步确定使用ckEditor编辑器，需要自定义一些功能：基于阿里OSS的图片上传功能和腾讯视频的iframe视频上传功能。而且编辑器编辑成文后是要在移动端展示，目标是做一个移动端的“所见即所得”编辑器，最近有得搞了。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/随写/" rel="tag"># 随写</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/10/百度编辑器UMeditor图片缩放bug/" rel="next" title="百度编辑器UMeditor图片缩放bug">
+                <i class="fa fa-chevron-left"></i> 百度编辑器UMeditor图片缩放bug
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/22/ckeditor自定义按钮及阿里oss上传/" rel="prev" title="ckeditor自定义按钮及阿里oss上传">
+                ckeditor自定义按钮及阿里oss上传 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据属性"><span class="nav-number">1.</span> <span class="nav-text">数据属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-defineProperty-obj-prop-descriptor"><span class="nav-number">2.</span> <span class="nav-text">Object.defineProperty( obj, prop, descriptor)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Object-getOwnPropertyDescriptor-obj-prop"><span class="nav-number">3.</span> <span class="nav-text">Object.getOwnPropertyDescriptor( obj, prop)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问器属性"><span class="nav-number">4.</span> <span class="nav-text">访问器属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义多个属性-Object-defineProperties"><span class="nav-number">5.</span> <span class="nav-text">定义多个属性 Object.defineProperties()</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

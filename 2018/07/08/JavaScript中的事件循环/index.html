@@ -1,0 +1,975 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,知识积累," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="作为前端，提起JS，都知道它是一门单线程的语言，只能从上到下顺序执行JS任务，而任务又分为同步任务和异步任务，常见的如Ajax请求、setTimeout、setInterval、点击事件的回调函数等等都是异步任务。当我们的JS逻辑写的越来越复杂，可能会发现一些逻辑的执行顺序跟我们预想的不一样，或者压根就没执行，这时候深入理解一下JS中事件循环的逻辑就显得势在必行了，更不用提现今前端框架如此流行，弄">
+<meta name="keywords" content="JavaScript,知识积累">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript中的事件循环">
+<meta property="og:url" content="http://yoursite.com/2018/07/08/JavaScript中的事件循环/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="作为前端，提起JS，都知道它是一门单线程的语言，只能从上到下顺序执行JS任务，而任务又分为同步任务和异步任务，常见的如Ajax请求、setTimeout、setInterval、点击事件的回调函数等等都是异步任务。当我们的JS逻辑写的越来越复杂，可能会发现一些逻辑的执行顺序跟我们预想的不一样，或者压根就没执行，这时候深入理解一下JS中事件循环的逻辑就显得势在必行了，更不用提现今前端框架如此流行，弄">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/event-loop.jpg">
+<meta property="og:image" content="http://yoursite.com/images/event-loop2.jpg">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript中的事件循环">
+<meta name="twitter:description" content="作为前端，提起JS，都知道它是一门单线程的语言，只能从上到下顺序执行JS任务，而任务又分为同步任务和异步任务，常见的如Ajax请求、setTimeout、setInterval、点击事件的回调函数等等都是异步任务。当我们的JS逻辑写的越来越复杂，可能会发现一些逻辑的执行顺序跟我们预想的不一样，或者压根就没执行，这时候深入理解一下JS中事件循环的逻辑就显得势在必行了，更不用提现今前端框架如此流行，弄">
+<meta name="twitter:image" content="http://yoursite.com/images/event-loop.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/08/JavaScript中的事件循环/"/>
+
+
+
+
+
+  <title> JavaScript中的事件循环 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/08/JavaScript中的事件循环/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JavaScript中的事件循环
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-08T22:13:47+08:00">
+                2018-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>作为前端，提起JS，都知道它是一门<code>单线程</code>的语言，只能从上到下顺序执行JS任务，而任务又分为<code>同步任务</code>和<code>异步任务</code>，常见的如<code>Ajax</code>请求、<code>setTimeout</code>、<code>setInterval</code>、点击事件的回调函数等等都是异步任务。当我们的JS逻辑写的越来越复杂，可能会发现一些逻辑的执行顺序跟我们预想的不一样，或者压根就没执行，这时候深入理解一下JS中事件循环的逻辑就显得势在必行了，更不用提现今前端框架如此流行，弄清了事件循环机制，才能对框架的生命周期，数据更新策略等有更深入的理解。<br><a id="more"></a></p>
+<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>浏览器是<code>多进程</code>的（注意不是<code>线程</code>），这里面包括Browser进程（主进程）、第三方插件进程、GPU进程和浏览器渲染进程，而渲染进程又称为浏览器内核，这个就跟我们前端有比较大的联系了。当我们在浏览器中每开一个tab页面，就相当于起了一个新的进程，该页面的渲染、js执行、事件的执行都是在这一个进程内。而每个<code>渲染进程</code>内可以包含多个<code>线程</code>，主要有：<code>GUI渲染线程</code>、<code>JS引擎线程</code>、<code>事件触发线程</code>、<code>定时器触发线程</code>、<code>异步请求线程</code>等。其中，GUI渲染线程和JS引擎线程是互斥的，两者同时只能有一个在运行，这就是为什么常说JS的执行会卡住页面，影响页面渲染（JS可能会操作dom元素）。说了这些，其实还没涉及到今天的主角，而浏览器的进程机制又是一些更深入的知识点了，今天不展开（也展不开，还没弄明白），下面我们进入今天的主角，JS事件循环。</p>
+<h2 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h2><p>这部分我们来搞清楚什么是一个完整的事件循环？每一个循环内的任务执行顺序是怎样的？下一次循环中的任务从哪里来？</p>
+<p>首先，JS分为同步任务和异步任务，同步任务在主线程上进行，形成一个<code>执行栈</code>，异步任务进入<code>Event Table</code>并注册函数，将注册函数（回调函数）放入到<code>Event Queue</code>事件队列中，供下一次循环来取用。如下思维图：</p>
+<p><img src="/images/event-loop.jpg" alt=""></p>
+<p>当执行栈内的任务执行完毕（执行栈为空），系统就会去<code>Event Queue</code>中读取最顶部的异步任务，添加到执行栈中进行执行。JS引擎存在<code>monitoring process</code>进程，会持续不断的检查主线程执行栈是否为空，一旦为空，就会去<code>Event Queue</code>那里检查是否有等待被调用的函数。 </p>
+<p>我们结合一个例子来看：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'1'</span>);</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">   <span class="built_in">console</span>.log(<span class="string">'2'</span>); </span><br><span class="line">&#125;, <span class="number">2000</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'3'</span>);</span><br></pre></td></tr></table></figure>
+<p>执行顺序：</p>
+<ol>
+<li>整段scripts开始执行，首先同步执行<code>console.log(&#39;1&#39;)</code>；</li>
+<li>setTimeout作为异步任务，进入<code>Event Table</code>，2s后将<code>console.log(&#39;2&#39;)</code>放进事件队列，待执行；</li>
+<li>执行<code>console.log(&#39;3&#39;)</code>，接下来看有没有<code>微任务</code>（下面马上讲），没有，第一次事件循环结束；</li>
+<li>执行栈为空，从<code>Event Queue</code>中将<code>console.log(&#39;2&#39;)</code>（宏任务）取过来，放到执行栈内执行，第二次事件循环结束；</li>
+<li>执行栈再次为空，<code>Event Queue</code>内没有其他任务，等待下一次检查…</li>
+</ol>
+<p><code>setTimeout</code>是作为异步任务进入到<code>Event Table</code>中的，所以即使说<code>setTimeout(fn, 0)</code>也是进入到<code>Event Table</code>中，等下一次循环再执行<code>fn</code>，不会立即执行。而且这样写的意思是一旦执行栈为空，就将回调<code>fn</code>置入主线程，无需等待，但根据HTML的标准，最低是4毫秒，也达不到0ms。</p>
+<p>写到这里，我们还明白了为什么有时候明明写的延迟3s执行的<code>fn</code>却没有按时执行，那就是因为3s后虽然<code>fn</code>已经到了<code>Event Queue</code>中，但是执行栈并没有空下来，必须等到执行栈为空，才能将<code>fn</code>取出来放到执行栈去执行，这也是为什么进程内要单独开一个<code>定时器触发线程</code>来处理这类倒计时事件，这样才能保证延迟时间的准确性。</p>
+<h3 id="宏任务（macrotask）"><a href="#宏任务（macrotask）" class="headerlink" title="宏任务（macrotask）"></a>宏任务（macrotask）</h3><p>宏任务主要包括主代码块，<code>setTimeout</code>、<code>setInterval</code>等，浏览器为了能够使得JS内部事件循环与DOM任务能够有序的执行，会在一个事件循环结束后，在下一个 task 执行开始前，对页面进行重新渲染 （task-&gt;渲染-&gt;task-&gt;…） ，setTimeout的作用是等待给定的时间后为它的回调产生一个新的宏任务。 </p>
+<h3 id="微任务（microtask）"><a href="#微任务（microtask）" class="headerlink" title="微任务（microtask）"></a>微任务（microtask）</h3><p>微任务主要包括<code>promise.then()</code>，<code>process.nextTick</code>，<code>mutation observe的回调</code>等。微任务会在<code>这一次事件循环</code>中的宏任务执行完成后执行，比如对一系列动作做出反馈，或或者是需要异步的执行任务而又不需要分配一个新的 task，这样便可以减小一点性能的开销。只要执行栈中没有其他的js代码正在执行且每个宏任务执行完，微任务队列会立即执行。如果在微任务执行期间微任务队列加入了新的微任务，会将新的微任务加入队列尾部，之后也会被执行。 </p>
+<p>简单总结下，宏任务（macrotask）事件都被放到了一个事件队列（Event Queue）中，这个队列由<code>事件触发线程</code>维护；微任务（microtask）事件放到了微任务队列（Job Queues）中，等待宏任务（在当前事件循环）执行完成后执行，这个队列由<code>JS引擎线程</code>维护。</p>
+<p>总结下运行机制：</p>
+<ul>
+<li>执行一个宏任务（没有的话就去事件队列中取一个任务）</li>
+<li>执行过程中遇到异步任务（setTimeout,ajax），走<code>Event Table</code>-<code>Event Queue</code>流程</li>
+<li>执行过程中遇到微任务，就先将微任务添加到微任务队列中</li>
+<li>宏任务执行完毕后，立即执行当前循环中微任务队列里所有的微任务（按添加顺序依次执行）</li>
+<li>当前事件循环执行完毕，开始检查渲染，然后GUI线程接管渲染</li>
+<li>渲染完毕后，JS引擎线程继续接管，开始下一个宏任务（从事件队列中取）</li>
+</ul>
+<p><img src="/images/event-loop2.jpg" alt=""></p>
+<p>来看几个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'1'</span>);</span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'setTimeout'</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'promise'</span>);</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'then'</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'2'</span>);</span><br></pre></td></tr></table></figure>
+<p>分析：</p>
+<ol>
+<li>代码块作为宏任务，进入进程栈，执行<code>console.log(&#39;1&#39;)</code>；</li>
+<li>遇到<code>setTimeout</code>，将其回调函数注册后分发到<code>Event Queue</code>（宏任务），等待下一次事件循环取用；</li>
+<li>遇到<code>promise</code>，注意，这里直接执行<code>console.log(&#39;promise&#39;)</code>，而<code>.then()</code>回调被分发到了该次循环的<code>Job Queue</code>（微任务），等待执行；</li>
+<li>遇到<code>console.log(&#39;2&#39;)</code>，打印；</li>
+<li>该次循环宏任务执行完毕，然后在微任务列表发现了<code>console.log(&#39;then&#39;)</code>，执行；</li>
+<li>第一次事件循环执行完毕，进程栈为空，开始去<code>Event Queue</code>拉取任务，进行第二次事件循环，<code>console.log(&#39;setTimeout&#39;)</code>进入进程栈，执行，第二次事件循环宏任务执行完毕，没有微任务，循环结束。</li>
+<li>所以打印顺序为<code>&#39;1&#39;-&gt;&#39;promise&#39;-&gt;&#39;2&#39;-&gt;&#39;then&#39;-&gt;&#39;setTimeout&#39;</code>；</li>
+</ol>
+<p>再来看一个复杂的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'1'</span>);</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'2'</span>);</span><br><span class="line">    process.nextTick(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'3'</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'4'</span>);</span><br><span class="line">        resolve();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'5'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br><span class="line">process.nextTick(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'6'</span>);</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'7'</span>);</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'8'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'9'</span>);</span><br><span class="line">    process.nextTick(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'10'</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'11'</span>);</span><br><span class="line">        resolve();</span><br><span class="line">    &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'12'</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>分析：</p>
+<ol>
+<li>首先整段scripts作为宏任务进入第一次事件循环，执行<code>console.log(&#39;1&#39;)</code>。</li>
+<li>遇到<code>setTimeout</code>，将其回调函数注册后分发到<code>Event Queue</code>（宏任务），等待下一次事件循环取用。</li>
+<li>遇到微任务<code>process.nextTick</code>，将其放入第一次事件的微任务队列。</li>
+<li>遇到<code>promise</code>，直接执行<code>console.log(&#39;7&#39;)</code>，<code>.then()</code>回调作为微任务被放入微任务队列。</li>
+<li>又遇到<code>setTimeout</code>，不管，将其回调函数注册后分发到<code>Event Queue</code>（宏任务），等待取用，注意这时候事件队列<code>Event Queue</code>已有两个宏任务。</li>
+<li>第一次事件循环的宏任务执行完毕，开始执行微任务列表，依次执行<code>console.log(&#39;6&#39;)</code>、<code>console.log(&#39;8&#39;)</code>，微任务执行完毕，第一次事件循环结束，所以第一次事件循环执行过程：<code>&#39;1&#39;-&gt;&#39;7&#39;-&gt;&#39;6&#39;-&gt;&#39;8&#39;</code>。</li>
+<li>进程栈为空，开始从事件队列拉取任务，首先取出来第一个任务，作为宏任务进入第二次事件循环。</li>
+<li>先遇到<code>console.log(&#39;2&#39;)</code>，直接执行。</li>
+<li>接着遇到微任务<code>process.nextTick</code>，将其放入第二次事件的微任务队列。</li>
+<li>遇到<code>promise</code>，直接执行<code>console.log(&#39;4&#39;)</code>，<code>.then()</code>回调作为微任务被放入微任务队列。</li>
+<li>第二次循环宏任务执行完毕，开始执行微任务队列任务，依次执行<code>console.log(&#39;3&#39;)</code>、<code>console.log(&#39;5&#39;)</code>，微任务执行完毕，第二次事件循环结束，所以第二次事件循环执行过程：<code>&#39;2&#39;-&gt;&#39;4&#39;-&gt;&#39;3&#39;-&gt;&#39;5&#39;</code>。</li>
+<li>进程栈为空，继续从事件队列拉取任务，取出下一个任务，作为宏任务进入第三次事件循环。</li>
+<li>先遇到<code>console.log(&#39;9&#39;)</code>，直接执行。</li>
+<li>接着遇到微任务<code>process.nextTick</code>，将其放入第三次事件的微任务队列。</li>
+<li>遇到<code>promise</code>，直接执行<code>console.log(&#39;11&#39;)</code>，<code>.then()</code>回调作为微任务被放入微任务队列。</li>
+<li>第三次循环宏任务执行完毕，开始执行微任务队列任务，依次执行<code>console.log(&#39;10&#39;)</code>、<code>console.log(&#39;12&#39;)</code>，微任务执行完毕，第二次事件循环结束，所以第二次事件循环执行过程：<code>&#39;9&#39;-&gt;&#39;11&#39;-&gt;&#39;10&#39;-&gt;&#39;12&#39;</code>。</li>
+<li>整个事件循环结束。</li>
+</ol>
+<p>说到这里，基本上我们对事件循环就有了一个比较清晰的了解，当然更复杂的情况下就需要我们抽丝剥茧一点一点分析，再查阅更详细的资料去理解了，下面有两个比较复杂的demo，是从外文文章里找到的，有兴趣可以看一下，具体地址在文章末尾。</p>
+<h2 id="进阶Demo"><a href="#进阶Demo" class="headerlink" title="进阶Demo"></a>进阶Demo</h2><p>示例1：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"outer"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Let's get hold of those elements</span></span><br><span class="line"><span class="keyword">var</span> outer = <span class="built_in">document</span>.querySelector(<span class="string">'.outer'</span>);</span><br><span class="line"><span class="keyword">var</span> inner = <span class="built_in">document</span>.querySelector(<span class="string">'.inner'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Let's listen for attribute changes on the</span></span><br><span class="line"><span class="comment">// outer element</span></span><br><span class="line"><span class="keyword">new</span> MutationObserver(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'mutate'</span>);</span><br><span class="line">&#125;).observe(outer, &#123;</span><br><span class="line">  attributes: <span class="literal">true</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Here's a click listener…</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onClick</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'click'</span>);</span><br><span class="line"></span><br><span class="line">  setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'timeout'</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'promise'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  outer.setAttribute(<span class="string">'data-random'</span>, <span class="built_in">Math</span>.random());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// …which we'll attach to both elements</span></span><br><span class="line">inner.addEventListener(<span class="string">'click'</span>, onClick);</span><br><span class="line">outer.addEventListener(<span class="string">'click'</span>, onClick);</span><br></pre></td></tr></table></figure>
+<p>当点击内层<code>inner</code>div块时：</p>
+<ol>
+<li>因为冒泡，会将outer的点击事件放入到事件队列<code>Event Queue</code>，等待取用执行；</li>
+<li>进程栈（JS stack）执行<code>onClick()</code>函数，直接打印<code>console.log(&#39;click&#39;)</code>；</li>
+<li>接下来遇到<code>setTimeout</code>，将其回调注册到<code>Event Queue</code>，等待取用执行；</li>
+<li>遇到微任务<code>promise.then()</code>，放入微任务队列；</li>
+<li>接下来的<code>MutationObserver</code>也是微任务，放入微任务队列；</li>
+<li>宏任务执行完，依次执行微任务，本次循环结束，打印顺序：<code>&#39;click&#39;-&gt;&#39;promise&#39;-&gt;&#39;mutate&#39;</code>；</li>
+<li>接下来从事件队列中取第二次点击事件任务，再次执行2-6；</li>
+<li>此时进程栈为空，事件队列里还有两次的<code>setTimeout</code>回调事件，依次执行，完毕；</li>
+<li>打印顺序：<code>&#39;click&#39;-&gt;&#39;promise&#39;-&gt;&#39;mutate&#39;-&gt;&#39;click&#39;-&gt;&#39;promise&#39;-&gt;&#39;mutate&#39;-&gt;&#39;timeout&#39;-&gt;&#39;timeout&#39;</code>；</li>
+</ol>
+<p>示例2：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"outer"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Let's get hold of those elements</span></span><br><span class="line"><span class="keyword">var</span> outer = <span class="built_in">document</span>.querySelector(<span class="string">'.outer'</span>);</span><br><span class="line"><span class="keyword">var</span> inner = <span class="built_in">document</span>.querySelector(<span class="string">'.inner'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Let's listen for attribute changes on the</span></span><br><span class="line"><span class="comment">// outer element</span></span><br><span class="line"><span class="keyword">new</span> MutationObserver(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'mutate'</span>);</span><br><span class="line">&#125;).observe(outer, &#123;</span><br><span class="line">  attributes: <span class="literal">true</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Here's a click listener…</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">onClick</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'click'</span>);</span><br><span class="line"></span><br><span class="line">  setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'timeout'</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Promise</span>.resolve().then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'promise'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  outer.setAttribute(<span class="string">'data-random'</span>, <span class="built_in">Math</span>.random());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// …which we'll attach to both elements</span></span><br><span class="line">inner.addEventListener(<span class="string">'click'</span>, onClick);</span><br><span class="line">outer.addEventListener(<span class="string">'click'</span>, onClick);</span><br><span class="line"></span><br><span class="line">inner.click();</span><br></pre></td></tr></table></figure>
+<p>示例2跟示例1基本一样，只有一点不同：示例2最后多了一行<code>inner.click()</code>，通过脚本来执行点击事件。这个就不分析了，可以去看<a href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/?utm_source=html5weekly" target="_blank" rel="noopener">Tasks, microtasks, queues and schedules</a>，里面有详细的步骤动画，一步步分析。</p>
+<p>参考链接：<a href="https://juejin.im/post/59e85eebf265da430d571f89" target="_blank" rel="noopener">这一次，彻底弄懂 JavaScript 执行机制</a>，<a href="https://juejin.im/post/5a6547d0f265da3e283a1df7" target="_blank" rel="noopener">从浏览器多进程到JS单线程，JS运行机制最全面的一次梳理</a>，<a href="https://segmentfault.com/a/1190000014940904" target="_blank" rel="noopener">译文：JS事件循环机制（event loop）之宏任务、微任务</a>。本文图片和例子很多都来自于此，多谢各位牛人的分享，受益匪浅。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/15/由-0与NaN的判断来看Array的元素识别/" rel="next" title="由-0与NaN的判断来看Array的元素识别">
+                <i class="fa fa-chevron-left"></i> 由-0与NaN的判断来看Array的元素识别
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/10/GIT中关于换行符CRLF和LF的探究/" rel="prev" title="GIT中关于换行符CRLF和LF的探究">
+                GIT中关于换行符CRLF和LF的探究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#写在前面"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件循环"><span class="nav-number">2.</span> <span class="nav-text">事件循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#宏任务（macrotask）"><span class="nav-number">2.1.</span> <span class="nav-text">宏任务（macrotask）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微任务（microtask）"><span class="nav-number">2.2.</span> <span class="nav-text">微任务（microtask）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进阶Demo"><span class="nav-number">3.</span> <span class="nav-text">进阶Demo</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

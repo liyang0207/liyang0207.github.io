@@ -1,0 +1,919 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="工作积累,小程序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="路由概述小程序框架使用栈的形式来维护了所有展示页面，当页面进行打开、前进、返回、关闭、tab切换等操作时，都是页面的不断出栈进栈的过程。当然这个栈的层级是有数量限制的，官方规定最多5层页面，多了之后将无法打开下一级的页面。需要说明一点的是官方提供了navigator这个组件和wx.navigateTo()、wx.redirectTo()等多个方法来供开发者来实现实现的页面的跳转，重定向。而且两者是">
+<meta name="keywords" content="工作积累,小程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《微信小程序开发之路由思考》">
+<meta property="og:url" content="http://yoursite.com/2017/12/04/《微信小程序开发之路由思考》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="路由概述小程序框架使用栈的形式来维护了所有展示页面，当页面进行打开、前进、返回、关闭、tab切换等操作时，都是页面的不断出栈进栈的过程。当然这个栈的层级是有数量限制的，官方规定最多5层页面，多了之后将无法打开下一级的页面。需要说明一点的是官方提供了navigator这个组件和wx.navigateTo()、wx.redirectTo()等多个方法来供开发者来实现实现的页面的跳转，重定向。而且两者是">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.863Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《微信小程序开发之路由思考》">
+<meta name="twitter:description" content="路由概述小程序框架使用栈的形式来维护了所有展示页面，当页面进行打开、前进、返回、关闭、tab切换等操作时，都是页面的不断出栈进栈的过程。当然这个栈的层级是有数量限制的，官方规定最多5层页面，多了之后将无法打开下一级的页面。需要说明一点的是官方提供了navigator这个组件和wx.navigateTo()、wx.redirectTo()等多个方法来供开发者来实现实现的页面的跳转，重定向。而且两者是">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/04/《微信小程序开发之路由思考》/"/>
+
+
+
+
+
+  <title> 《微信小程序开发之路由思考》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/04/《微信小程序开发之路由思考》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《微信小程序开发之路由思考》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-04T19:24:32+08:00">
+                2017-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="路由概述"><a href="#路由概述" class="headerlink" title="路由概述"></a>路由概述</h3><p>小程序框架使用栈的形式来维护了所有展示页面，当页面进行打开、前进、返回、关闭、tab切换等操作时，都是页面的不断出栈进栈的过程。当然这个栈的层级是有数量限制的，官方规定最多5层页面，多了之后将无法打开下一级的页面。<br>需要说明一点的是官方提供了<code>navigator</code>这个<code>组件</code>和<code>wx.navigateTo()</code>、<code>wx.redirectTo()</code>等多个方法来供开发者来实现实现的页面的跳转，重定向。而且两者是有对应关系的，下面来简单描述一下，更详细的讲解请查阅官方API文档。</p>
+<h4 id="导航API方法"><a href="#导航API方法" class="headerlink" title="导航API方法"></a>导航API方法</h4><p>小程序官方提供了5种导航方式，其中4种都带有丰富的回调接口满足开发者的使用。</p>
+<ul>
+<li><p><code>wx.navigateTo(object)</code>:保留当前页面（栈），跳转到另外某个页面（新进栈）。注意当前页面不会出栈，下个页面使用<code>wx.navigateBack</code>可以返回到该页面。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wx.navigateTo(&#123;</span><br><span class="line">  url: <span class="string">'test?id=1'</span>,  <span class="comment">//不能是tabBar里定义过的链接</span></span><br><span class="line">  success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  fail: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  complete: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>wx.redirectTo(object)</code>:关闭当前页面（出栈），跳转到另外某个页面（新进栈）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wx.redirectTo(&#123;</span><br><span class="line">  url: <span class="string">'test?id=1'</span>,  <span class="comment">//不能是tabBar里定义过的链接</span></span><br><span class="line">  success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  fail: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  complete: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>wx.reLaunch(object)</code>:关闭其他所有栈内的页面，打开到某个页面（唯一在栈内页面）。调用该方法，左上角返回箭头也会消失。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wx.reLaunch(&#123;</span><br><span class="line">  url: <span class="string">'test?id=1'</span>,</span><br><span class="line">  success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  fail: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  complete: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>wx.switchTab(object)</code>: 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wx.reLaunch(&#123;</span><br><span class="line">  url: <span class="string">'test?id=1'</span>,   <span class="comment">//需在app.json中定义过</span></span><br><span class="line">  success: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  fail: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;,</span><br><span class="line">  complete: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; ... &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>wx.navigateBack(object)</code>:关闭当前页面，返回上一页面或多级页面。可通过<code>getCurrentPages()</code>获取当前的页面栈，决定需要返回几层。接受唯一参数delta</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wx.navigateBack(&#123;</span><br><span class="line">  delta: <span class="number">2</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<div class="tip">wx.navigateTo 和 wx.redirectTo 不允许跳转到 tabbar 页面，只能用 wx.switchTab 跳转到 tabbar 页面</div>
+
+<h4 id="navigator组件"><a href="#navigator组件" class="headerlink" title="navigator组件"></a>navigator组件</h4><p>这个组件或者说标签是用在 <code>.wxml</code>文件中的，其实就相当于一个带<code>href</code>属性的<code>a标签</code>。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">navigator</span> <span class="attr">url</span>=<span class="string">"/page/index/index"</span> <span class="attr">open-type</span>=<span class="string">"navigate"</span> <span class="attr">hover-class</span>=<span class="string">"other-navigator-hover"</span>&gt;</span>切换 Tab<span class="tag">&lt;/<span class="name">navigator</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>最常用的属性有：<code>url</code>指向要跳转的链接；<code>open-type</code>定义跳转的方式，这个马上下面介绍；<code>hover-class</code>规定点击该标签时的样式类。<br><code>open-type</code>有5个有效值：</p>
+<ul>
+<li><code>navigate</code>:对应于<code>wx.navigateTo()</code></li>
+<li><code>redirect</code>:对应<code>wx.redirectTo()</code></li>
+<li><code>switchTab</code>:对应<code>wx.switchTab()</code></li>
+<li><code>reLanch</code>:对应<code>wx.reLaunch</code></li>
+<li><code>navigateBack</code>:对应<code>wx.navigateBack</code></li>
+</ul>
+<h4 id="实际使用"><a href="#实际使用" class="headerlink" title="实际使用"></a>实际使用</h4><p><code>navigator</code>组件和<code>wx.navigateTo()</code>等方法其实是一样的，需要具体情况具体分析选择，做几个页面其实基本上就可以掌握用法。我这次做到的项目中，具体是这样的一种页面层级关系：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- tab1首页 --&gt;</span></span><br><span class="line">index ==&gt; goodsList ==&gt; goodsInfo ==&gt; buy(redirectTo) ==&gt; orderList</span><br><span class="line">(1)       (2)           (3)                               (4)</span><br><span class="line"><span class="comment">&lt;!-- tab2我的 --&gt;</span></span><br><span class="line">userInfo ==&gt; orderList</span><br><span class="line">(1)          (2)</span><br></pre></td></tr></table></figure>
+<p>其中goodsInfo页面有一个直达orderList的按钮，tabBar中<code>我的</code>页面有个人订单项，可以查看我的订单。<br>有一个需求是在orderList页面中实现点击商品跳转至对应的goodsInfo页面，这样其实形成了一种闭环的页面跳转，如果直接使用<code>wx.navigateTo()</code>方法，则新打开的goodsInfo页面便会是第五层，其中的任何链接将无法再点击打开；如果使用<code>wx.redirectTo()</code>打开，则用户无法通过右滑再次返回orderList页面，用户体验不好。<br>思考最后，最终的解决方案是在orderList页中为商品绑定点击事件，通过<code>getCurrentPages()</code>获取当前层级，若层级大于2，则return掉点击事件，同时新做了一个订单详情的页面作为备选方案，可以查看订单的一些信息；若层级等于2，则点击商品跳转至对应的商品详情goodsInfo页中。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">toGoodsInfo: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">let</span> pages = getCurrentPages();</span><br><span class="line">  <span class="keyword">if</span>(pages.length == <span class="number">2</span>)&#123;</span><br><span class="line">    wx.navgateTo(&#123;</span><br><span class="line">      url: <span class="string">`/pages/goodsInfo/goodsInfo?id=<span class="subst">$&#123;<span class="keyword">this</span>.goods.id&#125;</span>`</span></span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/工作积累/" rel="tag"># 工作积累</a>
+          
+            <a href="/tags/小程序/" rel="tag"># 小程序</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/03/《微信小程序开发之自定义tips组件》/" rel="next" title="《微信小程序开发之自定义tips组件》">
+                <i class="fa fa-chevron-left"></i> 《微信小程序开发之自定义tips组件》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/12/《微信小程序开发之异步转同步》/" rel="prev" title="《微信小程序开发之异步转同步》">
+                《微信小程序开发之异步转同步》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#路由概述"><span class="nav-number">1.</span> <span class="nav-text">路由概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#导航API方法"><span class="nav-number">1.1.</span> <span class="nav-text">导航API方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#navigator组件"><span class="nav-number">1.2.</span> <span class="nav-text">navigator组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实际使用"><span class="nav-number">1.3.</span> <span class="nav-text">实际使用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

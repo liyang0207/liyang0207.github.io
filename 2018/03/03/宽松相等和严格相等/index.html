@@ -1,0 +1,926 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,知识积累," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上次总结了一些强制类型转换的问题，今天来讲一讲与之相关的一个知识点：宽松相等和严格相等。一般说法是“==检查值是否相等，===检查值和类型是否相等”，这个说法咋一听没有问题，但是还不够严谨，正确的解释应该是：“==允许在相等比较中进行强制类型转换，而===不允许”。">
+<meta name="keywords" content="JavaScript,知识积累">
+<meta property="og:type" content="article">
+<meta property="og:title" content="宽松相等和严格相等">
+<meta property="og:url" content="http://yoursite.com/2018/03/03/宽松相等和严格相等/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="上次总结了一些强制类型转换的问题，今天来讲一讲与之相关的一个知识点：宽松相等和严格相等。一般说法是“==检查值是否相等，===检查值和类型是否相等”，这个说法咋一听没有问题，但是还不够严谨，正确的解释应该是：“==允许在相等比较中进行强制类型转换，而===不允许”。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.864Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="宽松相等和严格相等">
+<meta name="twitter:description" content="上次总结了一些强制类型转换的问题，今天来讲一讲与之相关的一个知识点：宽松相等和严格相等。一般说法是“==检查值是否相等，===检查值和类型是否相等”，这个说法咋一听没有问题，但是还不够严谨，正确的解释应该是：“==允许在相等比较中进行强制类型转换，而===不允许”。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/03/宽松相等和严格相等/"/>
+
+
+
+
+
+  <title> 宽松相等和严格相等 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/03/宽松相等和严格相等/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                宽松相等和严格相等
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-03T21:52:23+08:00">
+                2018-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上次总结了一些强制类型转换的问题，今天来讲一讲与之相关的一个知识点：宽松相等和严格相等。<br>一般说法是“<code>==</code>检查值是否相等，<code>===</code>检查值和类型是否相等”，这个说法咋一听没有问题，但是还不够严谨，正确的解释应该是：“<code>==</code>允许在相等比较中进行强制类型转换，而<code>===</code>不允许”。<br><a id="more"></a></p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>首先有两个特例要牢记：</p>
+<ul>
+<li>NaN 不等于 NaN</li>
+<li>+0 等于 -0</li>
+</ul>
+<p>还规定：两个对象（包括数组和函数）指向同一个值时即视为相等，不发生强制类型转化；<code>==</code>在比较两个不同类型的值时会发生隐式强制类型转化，会将其一或者两者都转换为相同的类型之后再进行比较。</p>
+<h3 id="字符串和数字之间的相等比较"><a href="#字符串和数字之间的相等比较" class="headerlink" title="字符串和数字之间的相等比较"></a>字符串和数字之间的相等比较</h3><p>规定：字符串和数字比较，先将<code>字符串</code>转换为<code>数字</code>之后再进行相等比较。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">42</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">'42'</span>;</span><br><span class="line"></span><br><span class="line">a === b;  <span class="comment">// false</span></span><br><span class="line">a == b;  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>字符串<code>b</code>会先转换为数字之后再跟<code>a</code>进行比较。</p>
+<h3 id="其他类型和布尔类型之间的相等比较"><a href="#其他类型和布尔类型之间的相等比较" class="headerlink" title="其他类型和布尔类型之间的相等比较"></a>其他类型和布尔类型之间的相等比较</h3><p>规定：其他类型和布尔类型比较，先将<code>布尔类型</code>转换为<code>数字</code>之后再进行比较。<br><code>==</code>最容易出错的地方就是<code>true</code>和<code>false</code>与其他类型的比较：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">'42'</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="literal">true</span>;</span><br><span class="line"><span class="keyword">var</span> c = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">a == b;  <span class="comment">// false</span></span><br><span class="line">a == c;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure></p>
+<p>字符串a既不是<code>true</code>也不是<code>false</code>，但字符串a确实是个真值。注意，这里的<code>==</code>比较并不涉及对于a的<code>ToBoolean</code>操作，所以字符串<code>a</code>是真值还是假值跟 <code>==</code> 本身没有关系！<br>强烈建议：无论什么情况下都不要使用 <code>== true</code> 和 <code>== false</code>。这里面会有很多坑，一定不要手贱使用这种比较方式。</p>
+<h3 id="null和undefined之间的相等比较"><a href="#null和undefined之间的相等比较" class="headerlink" title="null和undefined之间的相等比较"></a>null和undefined之间的相等比较</h3><p>规定：在 <code>==</code> 中 <code>null</code> 和 <code>undefined</code> 相等（它们也跟其自身相等），除此之外其他值都不存在这种情况。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">null</span> == <span class="literal">undefined</span>;  <span class="comment">// true</span></span><br><span class="line"><span class="literal">undefined</span> == <span class="literal">null</span>;  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">var</span> b;</span><br><span class="line"></span><br><span class="line">a == b;  <span class="comment">// true</span></span><br><span class="line">a == <span class="literal">null</span>;  <span class="comment">// true</span></span><br><span class="line">b == <span class="literal">null</span>;  <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">a == <span class="literal">false</span>;  <span class="comment">// false</span></span><br><span class="line">b == <span class="literal">false</span>;  <span class="comment">// false    记得上面的建议吗？</span></span><br><span class="line">a == <span class="string">''</span>;  <span class="comment">// false</span></span><br><span class="line">b == <span class="string">''</span>;  <span class="comment">// false</span></span><br><span class="line">a == <span class="number">0</span>;  <span class="comment">// false</span></span><br><span class="line">b == <span class="number">0</span>;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>平时代码判断中：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a == doSomething();</span><br><span class="line"><span class="keyword">if</span>(a == <span class="literal">null</span>)&#123;</span><br><span class="line">    <span class="comment">//..</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>条件判断 <code>a == null</code> 只有在 <code>doSomething</code> 返回 <code>null</code>和<code>undefined</code> 时才成立，除此之外其他值都不成立，包括 <code>0</code>、<code>false</code>和<code>&quot;&quot;</code>这样的值。<br>如果使用显式判断，就要使用严格相等 <code>===</code><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a == doSomething();</span><br><span class="line"><span class="keyword">if</span>(a === <span class="literal">null</span> || a === <span class="literal">undefined</span>)&#123;</span><br><span class="line">    <span class="comment">//..</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="对象和非对象之间的相等比较"><a href="#对象和非对象之间的相等比较" class="headerlink" title="对象和非对象之间的相等比较"></a>对象和非对象之间的相等比较</h3><p>规定：字符串或数字与对象比较，先将对象进行<code>ToPrimitive</code>操作后再进行比较。<br>注意，布尔类型与对象比较，根据上面定义的规则，布尔类型会转换为数字，再进行比较。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="string">'abc'</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>(a);   <span class="comment">//和 new String(a) 一样</span></span><br><span class="line"></span><br><span class="line">a === b;  <span class="comment">// false</span></span><br><span class="line">a == b;  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p><code>a == b</code> 结果为true，因为 b 通过 <code>ToPrimitive</code> 操作进行强制类型转换，并返回标量基本类型值 ‘abc’，与 a 相等。<br>还有一些特例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>(a);  <span class="comment">// 和Object()一样</span></span><br><span class="line">a == b;  <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> c = <span class="literal">undefined</span>;</span><br><span class="line"><span class="keyword">var</span> d = <span class="built_in">Object</span>(c);  <span class="comment">// 和Object()一样</span></span><br><span class="line">c == d;  <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> e = <span class="literal">NaN</span>;</span><br><span class="line"><span class="keyword">var</span> f = <span class="built_in">Object</span>(e);  <span class="comment">// 和 new Number(e) 一样</span></span><br><span class="line">e == f;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure></p>
+<p>因为没有对应的封装对象，所以<code>null</code>和<code>undefined</code>不能够被封装，<code>Object(null)</code>和<code>Object()</code>均返回一个常规对象。<br><code>NaN</code>能够被封装为数字封装对象，但拆封之后 <code>NaN == NaN</code> 返回<code>false</code>，因为<code>NaN不自等</code>。</p>
+<h3 id="一些特例及比较策略"><a href="#一些特例及比较策略" class="headerlink" title="一些特例及比较策略"></a>一些特例及比较策略</h3><p>有一些比较难绕的例子，列出来希望能记住：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"0"</span> ==  <span class="literal">false</span>;  <span class="comment">// true</span></span><br><span class="line"><span class="literal">false</span> == <span class="number">0</span>;     <span class="comment">// true</span></span><br><span class="line"><span class="literal">false</span> == <span class="string">""</span>;    <span class="comment">// true</span></span><br><span class="line"><span class="literal">false</span> == [];    <span class="comment">// true</span></span><br><span class="line"><span class="string">""</span> == <span class="number">0</span>;        <span class="comment">// true</span></span><br><span class="line"><span class="string">""</span> == [];       <span class="comment">// true</span></span><br><span class="line"><span class="number">0</span>  == [];       <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>以上有四种涉及 <code>== false</code>，我们说过要避免，所以不难掌握。我们总结两条比较规则，就能避开以上奇葩的情况：</p>
+<ul>
+<li>如果两边的值中有 <code>true</code>或<code>false</code>，千万不要使用 <code>==</code>。</li>
+<li>如果两边的值中有 <code>[]</code>、<code>&quot;&quot;</code>或<code>0</code>，尽量不要使用 <code>==</code>，可以使用 <code>===</code>。</li>
+</ul>
+<p>注意：相等比较不要跟<code>if(..){..}</code>中条件判断式弄混，如<code>if([]){ .. }</code>中，<code>[]</code>是真值，跟<code>false == []</code>是不同的概念，不要弄晕！</p>
+<h3 id="抽象关系比较"><a href="#抽象关系比较" class="headerlink" title="抽象关系比较"></a>抽象关系比较</h3><p>这里简单介绍一下 <code>a &lt; b</code>这种大小比较。<br>规则：</p>
+<ul>
+<li>比较双方先调用<code>ToPrimitive</code>，如果出现非字符串，就根据 <code>ToNumber</code> 规则将双方强制类型转换为数字进行比较。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [ <span class="number">42</span> ];</span><br><span class="line"><span class="keyword">var</span> b = [ <span class="string">"43"</span> ];</span><br><span class="line">a &lt; b;  <span class="comment">// true</span></span><br><span class="line">b &lt; a;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果比较双方都是字符串，则按字母顺序来进行比较。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [ <span class="string">"42"</span> ];</span><br><span class="line"><span class="keyword">var</span> b = [ <span class="string">"043"</span> ];</span><br><span class="line">a &lt; b;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>a和b并没有转换成数字，这里<code>ToPrimitive</code>返回的是字符串，进行了字符串的比较，’0’小于’4’。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">4</span>,<span class="number">2</span>];</span><br><span class="line"><span class="keyword">var</span> b = [<span class="number">0</span>,<span class="number">4</span>,<span class="number">3</span>];</span><br><span class="line">a &lt; b;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>这里a转换为”4,2”，b转换为”0,4,3”，字符串比较。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = &#123; <span class="attr">b</span>: <span class="number">42</span> &#125;;</span><br><span class="line"><span class="keyword">var</span> b = &#123; <span class="attr">b</span>: <span class="number">43</span> &#125;;</span><br><span class="line">a &lt; b;  <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>这里 a和b都转换成了 <code>[Object Object]</code>，故<code>a&lt;b</code>不成立，这里要注意，看下面的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = &#123; <span class="attr">b</span>: <span class="number">42</span> &#125;;</span><br><span class="line"><span class="keyword">var</span> b = &#123; <span class="attr">b</span>: <span class="number">43</span> &#125;;</span><br><span class="line">a &lt; b;  <span class="comment">// false</span></span><br><span class="line">a == b;  <span class="comment">// false    相等操作的话要看上面！</span></span><br><span class="line">a &gt; b;  <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line">a &lt;= b;  <span class="comment">// true</span></span><br><span class="line">a &gt;= b;  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>注意最后两条，根据规定：<code>a &lt;= b</code>会被处理为 <code>b &lt; a</code> 然后将结果反转。因为 <code>b &lt; a</code> 的结果是 <code>false</code>，所以 <code>a &lt;= b</code> 的结果是 <code>true</code>。<br>JavaScript中 <code>&lt;=</code> 是不大于的意思，即 <code>!(a &gt; b)</code>，处理为 <code>!(b &lt; a)</code>。同理，<code>a &gt;= b</code>处理为 <code>b &lt;= a</code>。<br>相等比较有严格相等，但关系比较却没有“严格关系比较”，也就是说要避免 <code>a &lt; b</code> 中发生隐式强制类型转换，为了保证安全，应该对关系比较中的值进行显式强制类型转换：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [ <span class="number">42</span> ];</span><br><span class="line"><span class="keyword">var</span> b = <span class="string">"043"</span>;</span><br><span class="line">a &lt; b;  <span class="comment">// false     字符串的比较</span></span><br><span class="line"><span class="built_in">Number</span>(a) &lt; <span class="built_in">Number</span>(b);  <span class="comment">// true   数字比较</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/27/强制类型转换/" rel="next" title="强制类型转换">
+                <i class="fa fa-chevron-left"></i> 强制类型转换
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/11/《ES6总结之Generator与Iterator上》/" rel="prev" title="《ES6总结之Generator与Iterator上》">
+                《ES6总结之Generator与Iterator上》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串和数字之间的相等比较"><span class="nav-number">2.</span> <span class="nav-text">字符串和数字之间的相等比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他类型和布尔类型之间的相等比较"><span class="nav-number">3.</span> <span class="nav-text">其他类型和布尔类型之间的相等比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#null和undefined之间的相等比较"><span class="nav-number">4.</span> <span class="nav-text">null和undefined之间的相等比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象和非对象之间的相等比较"><span class="nav-number">5.</span> <span class="nav-text">对象和非对象之间的相等比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些特例及比较策略"><span class="nav-number">6.</span> <span class="nav-text">一些特例及比较策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象关系比较"><span class="nav-number">7.</span> <span class="nav-text">抽象关系比较</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

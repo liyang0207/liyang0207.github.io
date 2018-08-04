@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,知识积累," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="平时在使用hexo写博客，提交发布的时候，总会在命令行报warning，大量的CRLF、LF、CR等字眼，而在使用WebStorm开发项目时，右下角除了编码模式，分支切换，行号等提示外，总会不经意间扫到CRLF的配置，点开看看还有LF - Unix and OS X(\n)和CR - CLassic Mac(\r)这样的配置项。本来以为是键盘按键的设置（win 和 mac有几个键不一样），今天随手">
+<meta name="keywords" content="JavaScript,知识积累">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GIT中关于换行符CRLF和LF的探究">
+<meta property="og:url" content="http://yoursite.com/2018/07/10/GIT中关于换行符CRLF和LF的探究/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="平时在使用hexo写博客，提交发布的时候，总会在命令行报warning，大量的CRLF、LF、CR等字眼，而在使用WebStorm开发项目时，右下角除了编码模式，分支切换，行号等提示外，总会不经意间扫到CRLF的配置，点开看看还有LF - Unix and OS X(\n)和CR - CLassic Mac(\r)这样的配置项。本来以为是键盘按键的设置（win 和 mac有几个键不一样），今天随手">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.857Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GIT中关于换行符CRLF和LF的探究">
+<meta name="twitter:description" content="平时在使用hexo写博客，提交发布的时候，总会在命令行报warning，大量的CRLF、LF、CR等字眼，而在使用WebStorm开发项目时，右下角除了编码模式，分支切换，行号等提示外，总会不经意间扫到CRLF的配置，点开看看还有LF - Unix and OS X(\n)和CR - CLassic Mac(\r)这样的配置项。本来以为是键盘按键的设置（win 和 mac有几个键不一样），今天随手">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/10/GIT中关于换行符CRLF和LF的探究/"/>
+
+
+
+
+
+  <title> GIT中关于换行符CRLF和LF的探究 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/10/GIT中关于换行符CRLF和LF的探究/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                GIT中关于换行符CRLF和LF的探究
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-10T21:06:57+08:00">
+                2018-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>平时在使用<code>hexo</code>写博客，提交发布的时候，总会在命令行报<code>warning</code>，大量的<code>CRLF</code>、<code>LF</code>、<code>CR</code>等字眼，而在使用<code>WebStorm</code>开发项目时，右下角除了编码模式，分支切换，行号等提示外，总会不经意间扫到<code>CRLF</code>的配置，点开看看还有<code>LF - Unix and OS X(\n)</code>和<code>CR - CLassic Mac(\r)</code>这样的配置项。本来以为是键盘按键的设置（win 和 mac有几个键不一样），今天随手一搜，发现原来是另外一回事儿，花半小时简单总结一下，写篇小博客。<br><a id="more"></a></p>
+<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p><code>CR</code>(Carriage Return)代表的是回车，使用<code>\r</code>来表示；<code>LF</code>（Line Feed）代表换行，使用<code>\n</code>来表示，由于历史的原因，各操作系统的文本换行符号是不一致的，<code>windows</code>系统使用<code>CRLF</code>，即<code>\r\n</code>来表示换行，<code>Uninx</code>和近些年的<code>OS X</code>使用<code>LF</code>，即<code>\n</code>来表示换行，更早的<code>Mac</code>系统则使用<code>CR</code>，即<code>\r</code>来表示换行，不过这系统现在已经很少人用了。</p>
+<p>现在问题来了，多人协作开发时，不可能保证每个人使用的系统一致，这就会导致换行编码的不同，虽然说“换行”在人眼看来没有区别，但是<code>git</code>面前可就不一样了，在推拉代码的过程中，如果换行符不一样，我是给你显示文件有修改呢还是直接默认没有任何更改？</p>
+<p>好在<code>git</code>提供了一个“换行符自动转换”功能帮我们处理了这个问题。默认情况下，<code>git</code>在远程仓库保存代码使用<code>Unix风格</code>，即换行符统一使用<code>LF</code>模式（<code>\n</code>），在推-拉代码的过程中，则有以下的规则：</p>
+<ul>
+<li>提交代码时，<code>git</code>会将文本文件中的换行符转换为<code>LF</code>模式，这个过程也叫<code>标准化过程</code>；</li>
+<li>拉取代码时，<code>git</code>会将试图将仓库中的代码转换为<code>CRLF</code>模式，这个过程也叫<code>转换</code>；</li>
+</ul>
+<p>通过这样的<code>拉-推</code>自动转换，<code>git</code>不仅保持了远程仓库代码的一致性（Unix风格），而且保证了本地文件的兼容性（Windows系统）。</p>
+<h3 id="GIT个性化配置"><a href="#GIT个性化配置" class="headerlink" title="GIT个性化配置"></a>GIT个性化配置</h3><p>既然有默认配置，那就有个性化的选择，<code>git</code>提供了<code>core.autocrlf</code>和<code>core.safecrlf</code>两个配置项来供开发者自由配置。两者都支持<code>全局</code>、<code>本地</code>设置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.autocrlf [<span class="literal">true</span> | input | <span class="literal">false</span>]   #全局设置</span><br><span class="line">git config --local core.autocrlf [<span class="literal">true</span> | input | <span class="literal">false</span>]    #针对本项目设置</span><br><span class="line"></span><br><span class="line">git config --global core.safecrlf [<span class="literal">true</span> | warn | <span class="literal">false</span>]    #全局设置</span><br><span class="line">git config --local core.safecrlf [<span class="literal">true</span> | warn | <span class="literal">false</span>]     #针对本项目设置</span><br></pre></td></tr></table></figure>
+<h4 id="core-autocrlf"><a href="#core-autocrlf" class="headerlink" title="core.autocrlf"></a>core.autocrlf</h4><p><code>core.autocrlf</code>有三个值，默认是 <code>true</code>。这个配置用来决定要不要转换，怎么转换。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认设置，拉取时转换为CRLF，提交时转换为LF</span></span><br><span class="line">git config --global core.autocrlf <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 拉取时不转换，提交时转换为LF</span></span><br><span class="line">git config --global core.autocrlf input</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拉取时不转换，提交时也不转换</span></span><br><span class="line">git config --global core.autocrlf <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h4 id="core-safecrlf"><a href="#core-safecrlf" class="headerlink" title="core.safecrlf"></a>core.safecrlf</h4><p><code>core.safecrlf</code>也有三个值，默认是 <code>false</code>。这个配置用来决定<code>add</code>代码时是否禁止提交混合换行符的文本文件。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 禁止提交混合换行符的文本文件(git add 的时候会被拦截，提示异常)</span></span><br><span class="line">git config --global core.safecrlf <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 提交混合换行符的文本文件的时候发出警告，但是不会阻止 git add 操作</span></span><br><span class="line">git config --global core.safecrlf warn</span><br><span class="line"></span><br><span class="line"><span class="comment">//  默认配置，不禁止提交混合换行符的文本文件</span></span><br><span class="line">git config --global core.safecrlf <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h3 id="延深知识"><a href="#延深知识" class="headerlink" title="延深知识"></a>延深知识</h3><p>上面的两个配置文件都是个人在本机的个性化设置，如果对于比较大的项目，多人协作的情况下不可能让每个人都去更改一下自己的配置，这个时候我们就可以在项目的根目录下添加一个<code>.gitattributes</code>文件，它的优先级高于<code>core.autocrlf</code>配置，它类似于 <code>.gitignore</code> 文件，随提交修改生效，一个项目中可以维持一份相同的配置。 当然，<code>.gitattributes</code>文件可不只有配置换行符，还有一些其他的复杂配置。 具体更深入的了解就等以后遇到了再去探究吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/08/JavaScript中的事件循环/" rel="next" title="JavaScript中的事件循环">
+                <i class="fa fa-chevron-left"></i> JavaScript中的事件循环
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/04/webpack4-0-从入门到进阶一/" rel="prev" title="webpack4.0 从入门到进阶一">
+                webpack4.0 从入门到进阶一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIT个性化配置"><span class="nav-number">2.</span> <span class="nav-text">GIT个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#core-autocrlf"><span class="nav-number">2.1.</span> <span class="nav-text">core.autocrlf</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#core-safecrlf"><span class="nav-number">2.2.</span> <span class="nav-text">core.safecrlf</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延深知识"><span class="nav-number">3.</span> <span class="nav-text">延深知识</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

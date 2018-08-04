@@ -1,0 +1,982 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="随写,Webpack," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="webpack4.0 从入门到进阶一好久没写博客了，一方面是最近在努力刷LeetCode题目，想通过做题来提升一下自己在算法方面的弱势，另一方面确实有点懒散了，公司的事情不多但是很杂。不管怎么说，这两天又静下来，准备深度学习一下webpack的相关知识，写几篇心得。说来惭愧，vue项目写过一两个，angular项目也写过几个，可对webpack基本上还是0的认知，vue-cli生成的项目基本上不需">
+<meta name="keywords" content="随写,Webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack4.0 从入门到进阶一">
+<meta property="og:url" content="http://yoursite.com/2018/08/04/webpack4-0-从入门到进阶一/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="webpack4.0 从入门到进阶一好久没写博客了，一方面是最近在努力刷LeetCode题目，想通过做题来提升一下自己在算法方面的弱势，另一方面确实有点懒散了，公司的事情不多但是很杂。不管怎么说，这两天又静下来，准备深度学习一下webpack的相关知识，写几篇心得。说来惭愧，vue项目写过一两个，angular项目也写过几个，可对webpack基本上还是0的认知，vue-cli生成的项目基本上不需">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/wp1.png">
+<meta property="og:image" content="http://yoursite.com/images/wp2.png">
+<meta property="og:image" content="http://yoursite.com/images/wp3.png">
+<meta property="og:image" content="http://yoursite.com/images/wp4.png">
+<meta property="og:image" content="http://yoursite.com/images/wp5.png">
+<meta property="og:image" content="http://yoursite.com/images/wp6.1.png">
+<meta property="og:image" content="http://yoursite.com/images/wp6.2.png">
+<meta property="og:updated_time" content="2018-08-04T14:51:45.478Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack4.0 从入门到进阶一">
+<meta name="twitter:description" content="webpack4.0 从入门到进阶一好久没写博客了，一方面是最近在努力刷LeetCode题目，想通过做题来提升一下自己在算法方面的弱势，另一方面确实有点懒散了，公司的事情不多但是很杂。不管怎么说，这两天又静下来，准备深度学习一下webpack的相关知识，写几篇心得。说来惭愧，vue项目写过一两个，angular项目也写过几个，可对webpack基本上还是0的认知，vue-cli生成的项目基本上不需">
+<meta name="twitter:image" content="http://yoursite.com/images/wp1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/08/04/webpack4-0-从入门到进阶一/"/>
+
+
+
+
+
+  <title> webpack4.0 从入门到进阶一 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/04/webpack4-0-从入门到进阶一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                webpack4.0 从入门到进阶一
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-04T22:46:15+08:00">
+                2018-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="webpack4-0-从入门到进阶一"><a href="#webpack4-0-从入门到进阶一" class="headerlink" title="webpack4.0 从入门到进阶一"></a>webpack4.0 从入门到进阶一</h2><p>好久没写博客了，一方面是最近在努力刷LeetCode题目，想通过做题来提升一下自己在算法方面的弱势，另一方面确实有点懒散了，公司的事情不多但是很杂。不管怎么说，这两天又静下来，准备深度学习一下webpack的相关知识，写几篇心得。说来惭愧，<code>vue</code>项目写过一两个，<code>angular</code>项目也写过几个，可对<code>webpack</code>基本上还是0的认知，<code>vue-cli</code>生成的项目基本上不需要自己去过多的配置，<code>angular</code>呢又找不到明显<code>webpack</code>配置文件，这就少了挑战自己的机会（还是懒），这次可要好好补上这个技能点。</p>
+<h3 id="webpack安装"><a href="#webpack安装" class="headerlink" title="webpack安装"></a>webpack安装</h3><p>首先新建一个文件夹，命名<code>webpack4.0</code>，在文件内命令行运行：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init -y</span><br></pre></td></tr></table></figure>
+<p>先生成一个默认配置的<code>package.json</code>，然后运行：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install webpack webpack-cli --save-dev</span><br></pre></td></tr></table></figure>
+<p>这一步我们安装<code>webpack</code>和<code>webpack-cli</code>，需要注意的是<code>webpack4+</code>将<code>webpack-cli</code>单独拆了出来，所以要安装两个。这样就给项目安装好了<code>webpack</code>。</p>
+<h3 id="webpack-config-js"><a href="#webpack-config-js" class="headerlink" title="webpack.config.js"></a>webpack.config.js</h3><p>接下来在目录下新建<code>webpack.config.js</code>配置文件，这里面就是<code>webpack</code>的基础和核心配置了，大致有这些配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    entry: <span class="string">''</span>,				<span class="comment">//入口文件</span></span><br><span class="line">    output: &#123;&#125;,  			<span class="comment">//出口</span></span><br><span class="line">    <span class="built_in">module</span>: &#123;&#125;,				<span class="comment">//处理模块，loader都在这里</span></span><br><span class="line">    plugin: &#123;&#125;,				<span class="comment">//强大的插件配置</span></span><br><span class="line">    devServer: &#123;&#125;,		    <span class="comment">//开发服务器配置</span></span><br><span class="line">    mode: <span class="string">''</span>,                <span class="comment">//模式配置， webpack4新增特性，有development/production</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>新建一个文件夹<code>src</code>，在里面新建一个<code>index.js</code>文件，作为我们的入口文件。这个文件其实不陌生，就是<code>vue</code>项目里的<code>src-&gt;main.js</code>文件，其实我们想想，项目的一切都是从这个文件开始的，<code>main.js</code>内<code>import</code>了许多文件（js，css…），然后这些<code>js</code>文件内又引入了其他文件，这样一层一层下去，所以这个文件就是一切开始的地方，<code>webpack</code>将从这里开始，一层一层将依赖找下去。</p>
+<p>这个时候我们还需要一个<code>devServer</code>，来跑起来本地服务，运行以下命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install webpack-dev-server --save-dev</span><br></pre></td></tr></table></figure>
+<p>接下里配置两条<code>npm scripts</code>，在<code>package.json</code>中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">  <span class="string">"dev"</span>: <span class="string">"webpack-dev-server"</span>,</span><br><span class="line">  <span class="string">"build"</span>: <span class="string">"webpack"</span></span><br><span class="line">&#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>这样就开发环境<code>run dev</code>，生成线上打包资源<code>run build</code>。</p>
+<p>现在准备工作差不多了，来从零手写<code>webpack.config.js</code>！</p>
+<h3 id="entry-amp-amp-output"><a href="#entry-amp-amp-output" class="headerlink" title="entry &amp;&amp; output"></a>entry &amp;&amp; output</h3><p>我们先从最基础的地方入手，先来看看入口和出口的配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    entry: <span class="string">'./src/index.js'</span>,</span><br><span class="line">    output: &#123;</span><br><span class="line">        path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">        filename: <span class="string">'[chunkhash].bundle.js'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大部分情况下，可以直接使用字符串的形式来实现单入口，路径基于当前项目根目录。如果有多个入口，则可使用<code>entry: { app: &#39;./src/app.js&#39;, vendor: &#39;./src/vendor.js&#39;}</code>这种对象形式。</p>
+<p>入口可以多个，但是输出配置只能指定一个。<code>filename</code>指定了输出文件的文件名，有多种形式可选：</p>
+<table>
+<thead>
+<tr>
+<th>模板</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[hash]</td>
+<td>模块标识符(module identifier)的 hash</td>
+</tr>
+<tr>
+<td>[chunkhash]</td>
+<td>chunk 内容的 hash</td>
+</tr>
+<tr>
+<td>[name]</td>
+<td>模块名称</td>
+</tr>
+<tr>
+<td>[id]</td>
+<td>模块标识符(module identifier)</td>
+</tr>
+<tr>
+<td>[query]</td>
+<td>模块的 query，例如，文件名 <code>?</code> 后面的字符串</td>
+</tr>
+</tbody>
+</table>
+<p>可以根据情况随心所欲的拼接。而输出目录<code>path</code>必须为绝对路径，这里使用了<code>node</code>的<code>path</code>（又一个盲点）来指定输出，这里指根目录下新建一个<code>dist</code>文件夹存放输出文件。</p>
+<p>接下来就可以运行试一试了，我们先随便往<code>index.js</code>文件内写一些代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> str = <span class="string">'Hello Webpack'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(str);</span><br></pre></td></tr></table></figure>
+<p>现在我们的目录长这样：</p>
+<p><img src="/images/wp1.png" alt="wp1"></p>
+<p>命令行运行<code>npm run build</code>，可以看到在根目录下生成了<code>dist</code>文件夹，里面有根据我们在<code>output</code>内制定的文件名称格式的bundle文件：</p>
+<p><img src="/images/wp2.png" alt="wp2"></p>
+<h3 id="配置Html模板"><a href="#配置Html模板" class="headerlink" title="配置Html模板"></a>配置Html模板</h3><p>可以想象，我们最后打包好的文件都将是<code>js</code>、<code>css</code>、<code>image</code>形式的，我们需要一个承载这些资源的文件，就是我们的<code>html</code>文件，我们需要实现<code>html</code>打包功能，我们引入<code>html-webpack-plugin</code>插件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i html-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+<p>这是一个插件，我们在<code>plugins</code>内引用一下，同时在根目录下新建一个<code>index.html</code>文件作为模板：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">"[chunkhash].bundle.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      <span class="comment">// 选择一个html文件作为模板</span></span><br><span class="line">      template: <span class="string">'./index.html'</span>,</span><br><span class="line">      <span class="comment">// 在打包好的bundle.js后面添加hash</span></span><br><span class="line">      hash: <span class="literal">true</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再次运行<code>npm run build</code>，看看<code>dist</code>内生成的<code>index.html</code>文件。</p>
+<p><img src="/images/wp3.png" alt="wp3"></p>
+<p>可以看到页面内引入了<code>chunkhash.bundle.js</code>文件，同时页面也是使用我们在根目录下建的<code>index.html</code>作为模板。</p>
+<p>现在来回想一下使用<code>vue-cli</code>起的脚手架，是不是有点感悟呢？</p>
+<h3 id="配置CSS文件"><a href="#配置CSS文件" class="headerlink" title="配置CSS文件"></a>配置CSS文件</h3><p>这里有两点需要知道，首先，如果我们想要将css文件单独拆出来，需要使用<code>extract-text-webpack-plugin</code>插件；其次，<code>webpack</code>打包css需要使用能解析css的<code>loader</code>，不同的<code>css</code>编译语言需要使用不同的<code>loader</code>，如<code>less-loader</code>、<code>sass-loader</code>等。</p>
+<p>我们先来安装两个基础的样式<code>loader</code>:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i css-loader style-loader -D</span><br></pre></td></tr></table></figure>
+<p>这两个<code>loader</code>各有分工：<code>css-loader</code>负责解释(interpret) <code>@import</code> 和 <code>url()</code> ，会 <code>import/require()</code> 后再解析(resolve)它们，<code>style-loader</code>负责将样式放入<code>style</code>标签内，放入<code>DOM</code>内。所以，我们需要先引入<code>css-loader</code>，再使用<code>style-loader</code>。</p>
+<h4 id="css文件css-loader-amp-style-loader-amp-less-loader"><a href="#css文件css-loader-amp-style-loader-amp-less-loader" class="headerlink" title="css文件css-loader&amp;style-loader&amp;less-loader"></a>css文件css-loader&amp;style-loader&amp;less-loader</h4><p>在<code>src</code>文件夹内新建<code>css-&gt;reset.css</code>文件，里面随便写点样式，在<code>src/index.js</code>内通过import ‘./css/reset.css’引入，然后我们来配置<code>loader</code>:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">"[chunkhash].bundle.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        use: [<span class="string">'style-loader'</span>, <span class="string">'css-loader'</span>]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      <span class="comment">// 选择一个html文件作为模板</span></span><br><span class="line">      template: <span class="string">'./index.html'</span>,</span><br><span class="line">      <span class="comment">// 在打包好的bundle.js后面添加hash</span></span><br><span class="line">      hash: <span class="literal">true</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>module</code>内的<code>rules</code>是创建模块时，匹配请求的规则数组，里面是对不同类型文件的处理方式，即对什么类型的文件使用什么<code>loader</code>，<code>test</code>用来匹配文件，<code>use</code>是使用的<code>loader</code>，可以多个<code>loader</code>同时生效，顺序从右向左。这里<code>loader</code>有多种写法，比较灵活：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        use: [<span class="string">'style-loader'</span>, <span class="string">'css-loader'</span>]</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'style-loader'</span>,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'css-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              ...</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        loader: <span class="string">'style-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          ...</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p>单个<code>laoder</code>可以直接写出来，多个<code>loader</code>可以使用<code>use</code>方法，同时也可以根据是否有<code>options</code>选项来决定怎么写。</p>
+<p>这些搞定后，运行<code>npm run build</code>，使用浏览器打开<code>dist/index.html</code>，切到控制台，可以看到样式以<code>&lt;style&gt;...&lt;/style&gt;</code>形式引入了：</p>
+<p><img src="/images/wp4.png" alt="wp4"></p>
+<p>接下来我们再来个<code>less示例</code>，在<code>src-&gt;css</code>文件夹内新建<code>style.less</code>文件，里面随便写点样式，在<code>src/index.js</code>内通过import ‘./css/style.less’引入，同时安装<code>less-loader</code>来解析<code>.less</code>文件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i less less-loader -D</span><br></pre></td></tr></table></figure>
+<p>接下来编写<code>rule</code>，这里要主要<code>loader</code>的顺序，需要先使用<code>less-loader</code>解析<code>.less</code>样式：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        use: [<span class="string">'style-loader'</span>, <span class="string">'css-loader'</span>]</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.less$/</span>,</span><br><span class="line">        use: [<span class="string">'style-loader'</span>, <span class="string">'css-loader'</span>, <span class="string">'less-loader'</span>]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p>运行<code>npm run build</code>，来浏览器里看看结果：</p>
+<p><img src="/images/wp5.png" alt="wp5"></p>
+<p>看到我们的<code>.less</code>文件也引入到了页面中。</p>
+<h4 id="拆分css"><a href="#拆分css" class="headerlink" title="拆分css"></a>拆分css</h4><p>上面的样式都是通过<code>&lt;style&gt;</code>标签引入的，如果想以样式文件的方式引入，就需要用到<code>extract-text-webpack-plugin</code>插件，这里要注意，到目前为止，该插件的稳定版还不支持<code>webpack4.0</code>，需要安装它的beta版：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i extract-text-webpack-plugin@next -D</span><br></pre></td></tr></table></figure>
+<p>引入插件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> ExtractTextPlugin = <span class="built_in">require</span>(<span class="string">'extract-text-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">"[chunkhash].bundle.js"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">        use: ExtractTextPlugin.extract(&#123;</span><br><span class="line">          <span class="comment">// 将css用link的方式引入就不再需要style-loader了</span></span><br><span class="line">          use: <span class="string">'css-loader'</span></span><br><span class="line">        &#125;),</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.less$/</span>,</span><br><span class="line">        use: [<span class="string">'style-loader'</span>, <span class="string">'css-loader'</span>, <span class="string">'less-loader'</span>]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      <span class="comment">// 选择一个html文件作为模板</span></span><br><span class="line">      template: <span class="string">'./index.html'</span>,</span><br><span class="line">      <span class="comment">// 在打包好的bundle.js后面添加hash</span></span><br><span class="line">      hash: <span class="literal">true</span></span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="comment">// 拆分后会把css文件放到dist目录下的css/style.css</span></span><br><span class="line">    <span class="keyword">new</span> ExtractTextPlugin(<span class="string">'css/reset.css'</span>)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行<code>npm run build</code>，看看<code>dist</code>内生成的文件，再看看浏览器：</p>
+<p><img src="/images/wp6.1.png" alt="wp6"></p>
+<p><img src="/images/wp6.2.png" alt="wp6.2"></p>
+<p><code>.less</code>没有拆分，故还是以标签的形式引入页面。当然我们也可以同时拆分成多个css：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 正常写入的less</span></span><br><span class="line"><span class="keyword">let</span> styleLess = <span class="keyword">new</span> ExtractTextWebpackPlugin(<span class="string">'css/style.css'</span>);</span><br><span class="line"><span class="comment">// reset</span></span><br><span class="line"><span class="keyword">let</span> resetCss = <span class="keyword">new</span> ExtractTextWebpackPlugin(<span class="string">'css/reset.css'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">    <span class="built_in">module</span>: &#123;</span><br><span class="line">        rules: [</span><br><span class="line">            &#123;</span><br><span class="line">                test: <span class="regexp">/\.css$/</span>,</span><br><span class="line">                use: resetCss.extract(&#123;</span><br><span class="line">                    use: <span class="string">'css-loader'</span></span><br><span class="line">                &#125;)</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                test: <span class="regexp">/\.less$/</span>,</span><br><span class="line">                use: styleLess.extract(&#123;</span><br><span class="line">                    use: <span class="string">'css-loader'</span></span><br><span class="line">                &#125;)</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    plugins: [</span><br><span class="line">        styleLess,</span><br><span class="line">        resetCss</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>未完待续。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随写/" rel="tag"># 随写</a>
+          
+            <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/10/GIT中关于换行符CRLF和LF的探究/" rel="next" title="GIT中关于换行符CRLF和LF的探究">
+                <i class="fa fa-chevron-left"></i> GIT中关于换行符CRLF和LF的探究
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack4-0-从入门到进阶一"><span class="nav-number">1.</span> <span class="nav-text">webpack4.0 从入门到进阶一</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#webpack安装"><span class="nav-number">1.1.</span> <span class="nav-text">webpack安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webpack-config-js"><span class="nav-number">1.2.</span> <span class="nav-text">webpack.config.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#entry-amp-amp-output"><span class="nav-number">1.3.</span> <span class="nav-text">entry &amp;&amp; output</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Html模板"><span class="nav-number">1.4.</span> <span class="nav-text">配置Html模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置CSS文件"><span class="nav-number">1.5.</span> <span class="nav-text">配置CSS文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#css文件css-loader-amp-style-loader-amp-less-loader"><span class="nav-number">1.5.1.</span> <span class="nav-text">css文件css-loader&amp;style-loader&amp;less-loader</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#拆分css"><span class="nav-number">1.5.2.</span> <span class="nav-text">拆分css</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

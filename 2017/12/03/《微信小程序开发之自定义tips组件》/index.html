@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="工作积累,小程序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="目前小程序官方提供的交互反馈组件只有Toast、Loading、Modal这3种。 wx.showToast()默认有success和loading两种图标可选，也可以自定义图标，设置好duration持续时间后可自动消失，或者主动调用wx.hideToast()来关闭。title设置过长会被隐藏部分内容。12345wx.showToast(&amp;#123;  title: &apos;成功&apos;,  icon:">
+<meta name="keywords" content="工作积累,小程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《微信小程序开发之自定义tips组件》">
+<meta property="og:url" content="http://yoursite.com/2017/12/03/《微信小程序开发之自定义tips组件》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="目前小程序官方提供的交互反馈组件只有Toast、Loading、Modal这3种。 wx.showToast()默认有success和loading两种图标可选，也可以自定义图标，设置好duration持续时间后可自动消失，或者主动调用wx.hideToast()来关闭。title设置过长会被隐藏部分内容。12345wx.showToast(&amp;#123;  title: &apos;成功&apos;,  icon:">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-74b7491f6c846995.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-c61685043f471b59.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.863Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《微信小程序开发之自定义tips组件》">
+<meta name="twitter:description" content="目前小程序官方提供的交互反馈组件只有Toast、Loading、Modal这3种。 wx.showToast()默认有success和loading两种图标可选，也可以自定义图标，设置好duration持续时间后可自动消失，或者主动调用wx.hideToast()来关闭。title设置过长会被隐藏部分内容。12345wx.showToast(&amp;#123;  title: &apos;成功&apos;,  icon:">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/6589697-74b7491f6c846995.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/03/《微信小程序开发之自定义tips组件》/"/>
+
+
+
+
+
+  <title> 《微信小程序开发之自定义tips组件》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/03/《微信小程序开发之自定义tips组件》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《微信小程序开发之自定义tips组件》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-03T15:45:50+08:00">
+                2017-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>目前小程序官方提供的交互反馈组件只有Toast、Loading、Modal这3种。</p>
+<h4 id="wx-showToast"><a href="#wx-showToast" class="headerlink" title="wx.showToast()"></a>wx.showToast()</h4><p>默认有success和loading两种图标可选，也可以自定义图标，设置好duration持续时间后可自动消失，或者主动调用wx.hideToast()来关闭。title设置过长会被隐藏部分内容。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wx.showToast(&#123;</span><br><span class="line">  title: <span class="string">'成功'</span>,</span><br><span class="line">  icon: <span class="string">'success'</span>,</span><br><span class="line">  duration: <span class="number">2000</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h4 id="wx-showLoading"><a href="#wx-showLoading" class="headerlink" title="wx.showLoading()"></a>wx.showLoading()</h4><p>loading组件无图标可选，只有转圈圈的图标可用，而且必须调用wx.hideLoading()来关闭。同样title设置过长文字会被隐藏。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wx.showLoading(&#123;</span><br><span class="line">  title: <span class="string">'加载中'</span>,</span><br><span class="line">&#125;)</span><br><span class="line">...</span><br><span class="line">wx.hideLoading()</span><br></pre></td></tr></table></figure></p>
+<h4 id="wx-showModal"><a href="#wx-showModal" class="headerlink" title="wx.showModal()"></a>wx.showModal()</h4><p>Modale组件功能就更丰富了一些。可以设置title、content、confirm和cancel按钮的内容和颜色，还有各自的回调函数等等。title和content设置过长也会被完整显示。在上一篇的《微信小程序开发之授权逻辑》中就用到了这种弹窗来让用户进行选择操作。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">wx.showModal(&#123;</span><br><span class="line">  title: <span class="string">'提示'</span>,</span><br><span class="line">  content: <span class="string">'这是一个模态弹窗'</span>,</span><br><span class="line">  success: <span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (res.confirm) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'用户点击确定'</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (res.cancel) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'用户点击取消'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>不过在开发过程中，总有一些提示性的信息需要一个更舒服的提示组件来展示。比如提示用户电话号码输入错误、搜索内容不能为空、无法打开地图等等。这些提示如果用上述的3种组件来展示，会很难受，也不优美，所以需要我们自己去开发一个新的提示组件，来满足我们项目的需求。</p>
+<h4 id="个人提示组件myTopTips"><a href="#个人提示组件myTopTips" class="headerlink" title="个人提示组件myTopTips"></a>个人提示组件myTopTips</h4><p>网上其实有很多大厂开发的微信组件ui，可以直接集成到项目中，或者只提取出我们需要的部分，以下我使用的topTips组件来源于有赞开源的组件，<a href="https://github.com/youzan/zanui-weapp" target="_blank" rel="noopener">zanui-weapp</a>，基于其topTips组件，我将其样式做了修改，添加了3种不同的提示类型：success、warning、error，基本上满足了我在项目中的使用。<br>项目中新建一个page，命名为mytips，记得将其引用路径从<code>app.json</code>中删除，不然会有很多错误。参看我的另一篇博客《微信小程序开发之踩坑记录》。然后编辑<code>mytips.js</code>文件<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- mytips.js文件 --&gt;</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  showMyTips(content = <span class="string">''</span>, icon = <span class="string">''</span>, options = &#123;&#125;) &#123;</span><br><span class="line">    <span class="keyword">let</span> MyTips = <span class="keyword">this</span>.data.MyTips || &#123;&#125;;</span><br><span class="line">    <span class="comment">// 如果已经有一个计时器在了，就清理掉先</span></span><br><span class="line">    <span class="keyword">if</span> (MyTips.timer) &#123;</span><br><span class="line">      clearTimeout(MyTips.timer);</span><br><span class="line">      MyTips.timer = <span class="literal">undefined</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> options === <span class="string">'number'</span>) &#123;</span><br><span class="line">      options = &#123;</span><br><span class="line">        duration: options</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// options参数默认参数扩展</span></span><br><span class="line">    options = <span class="built_in">Object</span>.assign(&#123;</span><br><span class="line">      duration: <span class="number">3000</span></span><br><span class="line">    &#125;, options);</span><br><span class="line">    <span class="comment">// 设置定时器，定时关闭topTips</span></span><br><span class="line">    <span class="keyword">let</span> timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.setData(&#123;</span><br><span class="line">        <span class="string">'MyTips.show'</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="string">'MyTips.timer'</span>: <span class="literal">undefined</span></span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;, options.duration);</span><br><span class="line">    <span class="comment">// 展示出topTips</span></span><br><span class="line">    <span class="keyword">this</span>.setData(&#123;</span><br><span class="line">      MyTips: &#123;</span><br><span class="line">        show: <span class="literal">true</span>,</span><br><span class="line">        content,</span><br><span class="line">        icon,</span><br><span class="line">        options,</span><br><span class="line">        timer</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>接下来编辑wxml和wxss文件<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- mytips.wxml文件 --&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">template</span> <span class="attr">name</span>=<span class="string">'mytips'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">"mytips &#123;&#123; MyTips.show ? 'mytips-show' : '' &#125;&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">'mytips-box'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">text</span> <span class="attr">class</span>=<span class="string">'mytips-&#123;&#123;MyTips.icon&#125;&#125;'</span>&gt;</span>&#123;&#123; MyTips.content&#125;&#125;<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">view</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!<span class="selector-tag">--</span> <span class="selector-tag">mytips</span><span class="selector-class">.wxss</span>文件 <span class="selector-tag">--</span>&gt;</span><br><span class="line">&lt;!<span class="selector-tag">--</span> 图标使用了<span class="selector-tag">base64</span>的背景图 <span class="selector-tag">--</span>&gt;</span><br><span class="line"><span class="selector-class">.mytips</span>&#123;<span class="attribute">position</span>:fixed;<span class="attribute">top</span>:<span class="number">10</span>rpx;<span class="attribute">left</span>:<span class="number">0</span>;<span class="attribute">right</span>: <span class="number">0</span>;<span class="attribute">z-index</span>: <span class="number">999</span>;<span class="attribute">display</span>: flex;<span class="attribute">justify-content</span>: center;<span class="attribute">-webkit-transform</span>:<span class="built_in">translateZ</span>(0) <span class="built_in">translateY</span>(-150%);<span class="attribute">transition</span>:all .<span class="number">3s</span> ease&#125;</span><br><span class="line"><span class="selector-class">.mytips-show</span>&#123;<span class="attribute">-webkit-transform</span>:<span class="built_in">translateZ</span>(0) <span class="built_in">translateY</span>(0)&#125;</span><br><span class="line"><span class="selector-class">.mytips</span> <span class="selector-class">.mytips-box</span>&#123;<span class="attribute">padding</span>: <span class="number">12</span>rpx <span class="number">28</span>rpx;<span class="attribute">background</span>: <span class="number">#fff</span>;<span class="attribute">box-shadow</span>:<span class="number">0</span> <span class="number">2px</span> <span class="number">8px</span> <span class="built_in">rgba</span>(0,0,0,.2);<span class="attribute">border-radius</span>: <span class="number">8</span>rpx;<span class="attribute">height</span>:<span class="number">36</span>rpx;&#125;</span><br><span class="line"><span class="selector-class">.mytips</span> <span class="selector-class">.mytips-box</span> <span class="selector-tag">text</span>&#123;<span class="attribute">padding-left</span>:<span class="number">40</span>rpx; <span class="attribute">font-size</span>: <span class="number">24</span>rpx;<span class="attribute">line-height</span>: <span class="number">36</span>rpx;<span class="attribute">height</span>: <span class="number">36</span>rpx;<span class="attribute">display</span>: block&#125;</span><br><span class="line"><span class="selector-class">.mytips</span> <span class="selector-class">.mytips-box</span> <span class="selector-tag">text</span><span class="selector-class">.mytips-success</span>&#123;<span class="attribute">background</span>: <span class="built_in">url</span>(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAADh0lEQVRIia2WPYhcVRTHf+fc92ZXO4PBRkgsYiOaQIxEEXaJ4LIrCTbpIgQJiYQtLaIgBCstbCyCBsRCbbYJISQbP4gs+AEaggS2iIKspQEVETTz3rvnbzGzyc5zZrNj5hQP3rn3/H/349x7j00vA4CZY14CggiyQd3JlE2BZz+gFPOG7THZLmBbL4rfZfpJ6AfLvhwprtRFQ1klkgB3wFDUSNHjjAYKJTuZwk8a9phhCDHM1tuEVrPHGcs6k2RbA0oC6VGMs25phpGYYeDeN5RXEMcx+9FsEOiDIQJYMPfrZj6jMWDr0UKY+Yy5XwcWaCm0gMyZ2UVgagzOKJvqa82NAu4EX54AqGW+3NPu/3WnoeoY5sUSyCaBMBl3hGTmxVLVMbrT4Erg+FHH900K1njzeiaeA/4CcHyf40eVwMovCsrwNcN2jJMgw8zldFP1du35VKcpKfCbwHYDhH6pPXZ6yj5r+ARgRjdV79RFPlU0hSfsG4Pt0MtTw3ek7LOuFAftHmkmo0r1W3XKrxZVaR2lrx17WgN9QCkOeor0ZNwD0TCyxwdVmV9D0In0lRn724phIkXa68CO/w+DkD6uLR9DMB3leTOe2WT4DzvwYMv5pyz2GizaJqekB+PDypuXcspM1eX5IqdD2ny1HiqGOLPgWmNxzbHHHTvRlliHdb15OcrMVFOeK6M4FBabwQCSA7+1nNtc6dtMwz9F9UqWPt04TwMy+uTWbVhxrszFi1uAAfzqwFrba7C/UPoIoPGYB1bXoULLQkfcxVRTLI0BA1jz7Pmqt/ZKCCcduS933nRQtjgg1AhdDbSQMKZz+V6Ri8NbzXCXkT1fc8t+YVRuJPkbKfzYrdTcrFLzhIlnvXdLnhWcuEuCDE7CwLJfuOvV5jL+LqrnMX1+f90hTO+DHd8yid6+377a6k5DlfLpjff74MjEVBQXy5wOC94dF9YDGlXKp+tOg9mXYGFM5/I7sKEvhvXIjLOErWF/fyvVT8k1UNPsNO/8PKk38Y4ZiuoRKdZg8MVfg1iYLAwg5thw9No1zWVJLwDdCZC6SPPAZxudLaABXJJitxQrxqhUGm5Gv0ZVrEixG7hMS6E9w16QdCMsZmtvFgOt0hcaDeq1BVqtvVkMi1mTbgzt+5/KWwIF2aFOmVL9Ut9iwbA9hu0CHujH/yH6pb78UqS4UltDmRMpAHNoFcL/AsvcwfKVBFWTAAAAAElFTkSuQmCC) no-repeat left center/<span class="number">28</span>rpx <span class="number">28</span>rpx;&#125; </span><br><span class="line"><span class="selector-class">.mytips</span> <span class="selector-class">.mytips-box</span> <span class="selector-tag">text</span><span class="selector-class">.mytips-warning</span>&#123;<span class="attribute">background</span>: <span class="built_in">url</span>(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAACRElEQVRIib3WT2sVZxTH8c95xpCWFhQVuilo6Z9dVUQQRBClatNFuyt05dK2vom8iuJWXGRtF9WWkGwtFFp1JdJE6KoLS7spGuc+x8Xca9Jrkju3cvODgZnnnPN8zzwzz3lO5JKXqhVJFCLxHPvI4oJqQTiBD3FwGPIXHkm/KW5HtaLFHIKanVMpm4zYFTjwbRZfCx+LzratRrb0IKrrGt9NC/xIuo7zOyAmaTXC1ZoejQPLK67hU+n+a8DgfKZ7uDRuGAdeCm5jfpfJ2kjHo3VGGuzi92bwIz7ZOrh1Sd/Lam1i7vyDAxLhb+yf4F+j+ADrUDzFBlkt7R63mSQaRTO8n6SS1ZINPKUYkFwRTvcEdtrpj90+xdPJFQOKeeyzONUE0yqHjHlKNs7h6AxxIx3Nxrli4PNeX+J1FRj4oihOzXQ5R0oUJwuO7AFupHcLDu8h8J1XS9ts1RQ82UPgnwWP9xD4uKh+mXJbdCdld9XeUYHq16Lx/ZTb4m2cxUm8NVWajVuRN8li3eyrzVpU7xfP0FqcabUpGFi0oTtkItzAzz3D2+BIdAWj7RVR3Y3qpqB4A3NE+Eq/nyAzNZka/Q6pNlpfqnTATa0nl3tMMCesCWtdqhOyYwF/jJ7LmHU50wKe9QBP0r+ZLmN56+B2pe2OcFxY/V+YrkddVh0Tfho371RLH0a6oLqGB1Pg7qm+iXRR+n3bfP7TCA+bvlHnnc+JZtjqp8+EY7pW/9Aw5Imu1b8v/BDVStYuPpNshm/V6upS8AJ22r+NeHvxEQAAAABJRU5ErkJggg==) no-repeat left center/<span class="number">28</span>rpx <span class="number">28</span>rpx;&#125;</span><br><span class="line"><span class="selector-class">.mytips</span> <span class="selector-class">.mytips-box</span> <span class="selector-tag">text</span><span class="selector-class">.mytips-error</span>&#123;<span class="attribute">background</span>: <span class="built_in">url</span>(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAACD0lEQVRIibWWz0tVQRTHP5NCJLoIqk3/RxBEUGKLQCjaFrgICWwhlBKC4KqNv/BHqzZFIChoi1qGC1dCLdpFi+CBYaKIiIqrOafFnZvXaaY743sNfLmPmXPO587c884co/w9yjlTPC4o9AI9wHXgKtBWMd8G1g2sKnwwsFPGMIHYaEBS6LzAoMCGgCZqX2FUoUsisWPAWwI/MkC+fgrcSQX2NQE6JYUndcBHrYJVoANBoMC1VsMq0B4f2Caw6Rl+FVg6A+CjwGdv7lCLbP+zu8GA44J7mRepMAszzud1YP1lCewQ2I8cxUgqtAIbjthYhcsI3K85/1EpAj1vAlaqH4E3CW8/5aDPAmtzsbWA3iPwLfX7iLcLC/MZMBXYQGAvJykcYM7Covs9lOovcITAUYaDWli2J3+n+RxfgYP2UEGvGca4Ag9cCt4I/xq5R6onR7pgAQuTGTs8ROB7JqyaNNMOOpEIbCDwNgEWTX0LUw46nQBcROBBDexVDFaxGXfQmRrgQwQ6Y5lqYVYSU9/CRM1OjxUulu1EKOCy1JS0AHTSxov3WPV6Oiew7Rl80YSyF9A7hU/e3N6p68ldUTfOEDxJCt2xFuPxf4A9rWui+lsIG/Djx9rEboFGE7CGwt2cvhQpOoFhgV8ZoC2BEYGOUFwFjAbqqzfXCdwDbgM3gSue+S6wBqwaWFE4gEibD/wGOu7Ykd5d0vYAAAAASUVORK5CYII=) no-repeat left center/<span class="number">28</span>rpx <span class="number">28</span>rpx;&#125;</span><br></pre></td></tr></table></figure>
+<p>文件编辑完之后，就是页面的引用了，其实现在来看，引入自定义组件还是比较麻烦的一件事，每个用到的页面都需单个引入，异常麻烦。不过我现在也没有更好的解决方案，只能先这样使用了。<br>假如我们要在index页面中使用这tips组件，则需要分别在<code>index.wxml</code>和<code>index.js</code>中引入该组件的内容，样式文件<code>mytips.wxss</code>直接放到了<code>app.wxss</code>中进行引入，所以该组件的样式会在所有小程序页面中覆盖到，建议取的class类名个性一点，防止影响页面样式。<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!<span class="selector-tag">--</span> <span class="selector-tag">app</span><span class="selector-class">.wxss</span>文件中全局引入<span class="selector-tag">mytips</span><span class="selector-class">.wxss</span>样式 <span class="selector-tag">--</span>&gt;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">"/component/mytips/mytips.wxss"</span>;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- index.wxml中引入mytips的模板 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">import</span> <span class="attr">src</span>=<span class="string">"path/to/component/mytips/mytips"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span> <span class="attr">is</span>=<span class="string">"mytips"</span> <span class="attr">data</span>=<span class="string">"&#123;&#123; MyTips &#125;&#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">view</span> <span class="attr">class</span>=<span class="string">'container'</span>&gt;</span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">view</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- index.js中需要这样引入，修改Page(&#123;&#125;)为如下，其他数据不会受到影响 --&gt;</span><br><span class="line"><span class="keyword">const</span> MyTips = <span class="built_in">require</span>(<span class="string">'path/to/component/mytips/mytips'</span>);</span><br><span class="line">Page(<span class="built_in">Object</span>.assign(&#123;&#125;, MyTips, &#123;</span><br><span class="line">  data:&#123;  &#125;,</span><br><span class="line">  onLoad: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;  &#125;</span><br><span class="line">&#125;))</span><br></pre></td></tr></table></figure>
+<p>如上引入完毕后，在页面中要使用该tips提示时，只需在js方法中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 第二个参数可选为：success,warning,error；第三个参数为显示的时间 --&gt;</span><br><span class="line">showTips: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.showMyTips(<span class="string">'这里填需要提示内容'</span>, <span class="string">'warning'</span>, <span class="number">2000</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后的提示效果如下：<br><img src="http://upload-images.jianshu.io/upload_images/6589697-74b7491f6c846995.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="warning.png"><br><img src="http://upload-images.jianshu.io/upload_images/6589697-c61685043f471b59.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="error.jpg"><br>还有一个success的样式没有截到（因为这个很少使用到，就不找了），为一个绿色背景的白色对勾图标。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/工作积累/" rel="tag"># 工作积累</a>
+          
+            <a href="/tags/小程序/" rel="tag"># 小程序</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/25/《微信小程序开发之授权逻辑》/" rel="next" title="《微信小程序开发之授权逻辑》">
+                <i class="fa fa-chevron-left"></i> 《微信小程序开发之授权逻辑》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/04/《微信小程序开发之路由思考》/" rel="prev" title="《微信小程序开发之路由思考》">
+                《微信小程序开发之路由思考》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#wx-showToast"><span class="nav-number">1.</span> <span class="nav-text">wx.showToast()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#wx-showLoading"><span class="nav-number">2.</span> <span class="nav-text">wx.showLoading()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#wx-showModal"><span class="nav-number">3.</span> <span class="nav-text">wx.showModal()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#个人提示组件myTopTips"><span class="nav-number">4.</span> <span class="nav-text">个人提示组件myTopTips</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

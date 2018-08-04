@@ -1,0 +1,931 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,工作积累," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="啰嗦需求公司的百度编辑器已经千疮百孔了，各种bug层出不穷，因为公司图片这块的处理全是oss直传阿里的，上个前端也是费了巨力重新编辑修改了百度编辑器的图片上传功能，来贴合公司的实际需求。但是我觉得编辑器这块最重要是需要贴合用户的实际使用体验，编辑出来的页面是要在移动端展示的，最好能实现真正的“所见即所得”，傻瓜式的编辑体验，简单粗暴，够用就好，花里胡哨的功能我们也暂时用不到。参考了微信公众号编辑界">
+<meta name="keywords" content="JavaScript,工作积累">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ckeditor自定义按钮及阿里oss上传">
+<meta property="og:url" content="http://yoursite.com/2017/08/22/ckeditor自定义按钮及阿里oss上传/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="啰嗦需求公司的百度编辑器已经千疮百孔了，各种bug层出不穷，因为公司图片这块的处理全是oss直传阿里的，上个前端也是费了巨力重新编辑修改了百度编辑器的图片上传功能，来贴合公司的实际需求。但是我觉得编辑器这块最重要是需要贴合用户的实际使用体验，编辑出来的页面是要在移动端展示的，最好能实现真正的“所见即所得”，傻瓜式的编辑体验，简单粗暴，够用就好，花里胡哨的功能我们也暂时用不到。参考了微信公众号编辑界">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-ecd5ffcf1382bca0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-5a53946920c5043e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-98457a20dd53ea72.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-e45566e99a1382e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6589697-3f9c2d2dd0cb97df.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.859Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ckeditor自定义按钮及阿里oss上传">
+<meta name="twitter:description" content="啰嗦需求公司的百度编辑器已经千疮百孔了，各种bug层出不穷，因为公司图片这块的处理全是oss直传阿里的，上个前端也是费了巨力重新编辑修改了百度编辑器的图片上传功能，来贴合公司的实际需求。但是我觉得编辑器这块最重要是需要贴合用户的实际使用体验，编辑出来的页面是要在移动端展示的，最好能实现真正的“所见即所得”，傻瓜式的编辑体验，简单粗暴，够用就好，花里胡哨的功能我们也暂时用不到。参考了微信公众号编辑界">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/6589697-ecd5ffcf1382bca0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/22/ckeditor自定义按钮及阿里oss上传/"/>
+
+
+
+
+
+  <title> ckeditor自定义按钮及阿里oss上传 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/22/ckeditor自定义按钮及阿里oss上传/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ckeditor自定义按钮及阿里oss上传
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-22T22:08:22+08:00">
+                2017-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="啰嗦需求"><a href="#啰嗦需求" class="headerlink" title="啰嗦需求"></a>啰嗦需求</h4><p>公司的百度编辑器已经千疮百孔了，各种bug层出不穷，因为公司图片这块的处理全是oss直传阿里的，上个前端也是费了巨力重新编辑修改了百度编辑器的图片上传功能，来贴合公司的实际需求。但是我觉得编辑器这块最重要是需要贴合用户的实际使用体验，编辑出来的页面是要在移动端展示的，最好能实现真正的“所见即所得”，傻瓜式的编辑体验，简单粗暴，够用就好，花里胡哨的功能我们也暂时用不到。参考了微信公众号编辑界面，知乎文章编辑界面，发现都是“简单”的界面实现了很“实用”的功能。<br>接下来就是现有编辑器的选择了，毕竟自己现写个编辑器根本不现实（听说知乎的编辑器是30人的团队维护的…）。查阅了几家编辑器：wangEditor、bootstrap-wysiwyg、tinymce…感觉都对不上，不是文档太少，就是感觉“弱不经风”，官网的编辑器随手试试都能搞一两个bug出来，优化体验太差。应了知乎大神那句“编辑器是个坑，你们千万别往里跳”，一个好的编辑器真是需要精力去维护和更新的。<br>最后选择了比较稳重的ckeditor，文档很全，支持插件，配置什么的也很友好，先给个文档链接感受一下：ckeditor在线文档<a href="https://docs.ckeditor.com/#!/guide/dev_installation。" target="_blank" rel="noopener">https://docs.ckeditor.com/#!/guide/dev_installation。</a></p>
+<h4 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h4><p>官网下载文件，下载界面可选：Basic Package、Standard Package、Full Package、Customize。根据自己需求下载不同的安装包，而且每种都有压缩版和源码版可选。其中Customize版本顾名思义可自定义选择自己需要的模块，官方也推荐使用这种方式自定义下载，免得像我一样傻呵呵的自己下载需要的插件，结果安装依赖包安装到怀疑人生。<br>接下来很简单，傻瓜式安装：</p>
+<ul>
+<li><p>html页面引入ckeditor.js文件，也可以使用官方CDN</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=<span class="string">"text/javascript"</span> src=<span class="string">"ckeditor/ckeditor.js /&gt;</span></span><br><span class="line"><span class="string">//&lt;script src="</span>https:<span class="comment">//cdn.ckeditor.com/4.7.2/standard/ckeditor.js"&gt;&lt;/script&gt;  //官方CDN</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>替换textarea</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;textarea name=<span class="string">"editor1"</span> id=<span class="string">"editor1"</span> rows=<span class="string">"10"</span> cols=<span class="string">"80"</span>&gt;This is my textarea to be replaced <span class="keyword">with</span> CKEditor.&lt;<span class="regexp">/textarea&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>实例化ckeditor</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">    <span class="comment">// Replace the &lt;textarea id="editor1"&gt; with a CKEditor</span></span><br><span class="line">    <span class="comment">// instance, using default configuration.</span></span><br><span class="line">    CKEDITOR.replace( <span class="string">'editor1'</span> );</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这样，一个基本可以使用的编辑器就搞好了，大概如下图：<br><img src="http://upload-images.jianshu.io/upload_images/6589697-ecd5ffcf1382bca0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="截图1.png"></p>
+<h4 id="个性化配置"><a href="#个性化配置" class="headerlink" title="个性化配置"></a>个性化配置</h4><ul>
+<li><p>ckeditor的个性化配置功能很人性化，打开下载好的ckeditor文件夹，ckeditor/samples/index.html打开，点击右上TOOLBAR CONFIGURATOR，切换到配置功能页，勾选自己需要的功能块儿，也可以调整显示顺序，上方是预览。<br><img src="http://upload-images.jianshu.io/upload_images/6589697-5a53946920c5043e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="截图2.png"></p>
+</li>
+<li><p>点击右边的<code>Get toolbar config</code>按钮，切换至我们配置好的config源码部分，复制该配置代码至ckeditor/config.js，直接覆盖就好。基本上所做的个性化配置都在这个文件里定义（还有另外两种配置方式，具体可以查看文档）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">CKEDITOR.editorConfig = <span class="function"><span class="keyword">function</span>(<span class="params"> config </span>) </span>&#123;</span><br><span class="line">    config.toolbarGroups = [</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'document'</span>, <span class="attr">groups</span>: [ <span class="string">'mode'</span>, <span class="string">'document'</span>, <span class="string">'doctools'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'clipboard'</span>, <span class="attr">groups</span>: [ <span class="string">'clipboard'</span>, <span class="string">'undo'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'editing'</span>, <span class="attr">groups</span>: [ <span class="string">'find'</span>, <span class="string">'selection'</span>, <span class="string">'spellchecker'</span>, <span class="string">'editing'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'forms'</span>, <span class="attr">groups</span>: [ <span class="string">'forms'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'styles'</span>, <span class="attr">groups</span>: [ <span class="string">'styles'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'basicstyles'</span>, <span class="attr">groups</span>: [ <span class="string">'basicstyles'</span>, <span class="string">'cleanup'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'colors'</span>, <span class="attr">groups</span>: [ <span class="string">'colors'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'paragraph'</span>, <span class="attr">groups</span>: [ <span class="string">'list'</span>, <span class="string">'indent'</span>, <span class="string">'blocks'</span>, <span class="string">'align'</span>, <span class="string">'bidi'</span>, <span class="string">'paragraph'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'links'</span>, <span class="attr">groups</span>: [ <span class="string">'links'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'insert'</span>, <span class="attr">groups</span>: [ <span class="string">'insert'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'tools'</span>, <span class="attr">groups</span>: [ <span class="string">'tools'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'others'</span>, <span class="attr">groups</span>: [ <span class="string">'others'</span> ] &#125;,</span><br><span class="line">        &#123; <span class="attr">name</span>: <span class="string">'about'</span>, <span class="attr">groups</span>: [ <span class="string">'about'</span> ] &#125;</span><br><span class="line">    ];</span><br><span class="line">    config.removeButtons = <span class="string">'Image,Source,Save,NewPage,Print,Templates,PasteFromWord,PasteText,Paste,Copy,Cut,Find,Replace,SelectAll,Scayt,Form,Subscript,Superscript,CopyFormatting,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Outdent,Indent,CreateDiv,BidiLtr,BidiRtl,Language,Anchor,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,ShowBlocks,Blockquote,Styles,Font,Preview,Flash,Link,Unlink,Maximize,Format,About,Iframe'</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>刷新页面，就可以看到配置完的个性化编辑器了。</p>
+</li>
+</ul>
+<h4 id="自定义按钮（功能）"><a href="#自定义按钮（功能）" class="headerlink" title="自定义按钮（功能）"></a>自定义按钮（功能）</h4><p>毕竟每个人的需求都是不一样的，这时候一个编辑器的“可扩展性”就必不可少了。上面说道，图片功能需要结合阿里的oss上传，policy,signature等等的验证，同时需要能有微信公众号编辑界面一样，实现图片的100%显示和原尺寸显示的自由切换。</p>
+<ul>
+<li><p>在ckeditor/plugins文件夹下，新建一个名为oss的文件夹：内含dialogs文件夹，存放我们的弹窗内容；images文件夹，用来存放用到的小图标；plugin.js文件，定义oss插件的入口。方便起见我就用代码模拟一下，不传图了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">oss</span><br><span class="line">...dialogs</span><br><span class="line">......oss.js</span><br><span class="line">...images</span><br><span class="line">......xxx.jpg</span><br><span class="line">......xxx.png</span><br><span class="line">...plugin.js</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置oss/plugin.js文件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">( <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    CKEDITOR.plugins.add( <span class="string">'oss'</span>, &#123;</span><br><span class="line">        onLoad: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;,</span><br><span class="line">        init: <span class="function"><span class="keyword">function</span>(<span class="params"> editor </span>) </span>&#123;   <span class="comment">//上传图片插件初始化</span></span><br><span class="line">            editor.addCommand(<span class="string">'ossupload'</span>, <span class="keyword">new</span> CKEDITOR.dialogCommand(<span class="string">'ossupload'</span>));   <span class="comment">//基于dialog弹窗插件</span></span><br><span class="line">            editor.ui.addButton(<span class="string">'oss'</span>,</span><br><span class="line">            &#123;</span><br><span class="line">                label: <span class="string">'插入图片'</span>,   <span class="comment">//鼠标hover到按钮上显示文字</span></span><br><span class="line">                icon: <span class="string">'plugins/oss/images/oss.png'</span>,   <span class="comment">//自定义按钮的图标</span></span><br><span class="line">                command: <span class="string">'ossupload'</span>  <span class="comment">//点击按钮执行的命令</span></span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="comment">// 注册右键菜单</span></span><br><span class="line">            <span class="keyword">if</span> ( editor.contextMenu ) &#123;</span><br><span class="line">                editor.addMenuGroup( <span class="string">'oss'</span>);</span><br><span class="line">                editor.addMenuItem( <span class="string">'image'</span>, &#123;</span><br><span class="line">                    label: <span class="string">'修改图片'</span>,</span><br><span class="line">                    command: <span class="string">'ossupload'</span>,</span><br><span class="line">                    group: <span class="string">'oss'</span></span><br><span class="line">                &#125; );</span><br><span class="line">            &#125;</span><br><span class="line">            CKEDITOR.dialog.add( <span class="string">'ossupload'</span>, <span class="keyword">this</span>.path + <span class="string">'dialogs/oss.js'</span> );  <span class="comment">//弹窗文件，指向dialogs文件夹下的oss.js</span></span><br><span class="line">        &#125;,</span><br><span class="line">        afterInit: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">    &#125; );</span><br><span class="line">&#125; )();</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>接下来定义弹窗的内容，即dialogs内的oss.js文件，先看下实际效果<br><img src="http://upload-images.jianshu.io/upload_images/6589697-98457a20dd53ea72.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="编辑器1.png"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">CKEDITOR.dialog.add( <span class="string">'ossupload'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"> editor </span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 图片尺寸html模板</span></span><br><span class="line">    <span class="keyword">var</span> sizeHtml = <span class="keyword">new</span> CKEDITOR.template(</span><br><span class="line">            <span class="string">'&lt;div class="myradio"&gt;'</span> +</span><br><span class="line">                <span class="string">'&lt;div class="item" style="padding-bottom:5px;"&gt;'</span>+</span><br><span class="line">                    <span class="string">'&lt;input type="radio" name="size" value="100%" id="100" checked style="vertical-align:middle;margin:0 5px 0 0;"&gt;'</span> +</span><br><span class="line">                    <span class="string">'&lt;label for="100"&gt;图片满屏显示&lt;/label&gt;'</span>+</span><br><span class="line">                <span class="string">'&lt;/div&gt;'</span>+</span><br><span class="line">                <span class="string">'&lt;div class="item"&gt;'</span>+</span><br><span class="line">                    <span class="string">'&lt;input type="radio" name="size" value="auto" id="auto" style="vertical-align:middle;margin:0 5px 0 0;"&gt;'</span> +</span><br><span class="line">                    <span class="string">'&lt;label for="auto"&gt;图片原尺寸显示&lt;/label&gt;'</span>+</span><br><span class="line">                <span class="string">'&lt;/div&gt;'</span>+</span><br><span class="line">            <span class="string">'&lt;/div&gt;'</span>).output();</span><br><span class="line">    <span class="keyword">var</span> currentSrc = <span class="literal">null</span>;  <span class="comment">//编辑时图片源地址</span></span><br><span class="line">    <span class="comment">// 阿里oss图片上传</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">plupload1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">//阿里oss上传组件，使用了官网的例子，基于plupload组件</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        title: <span class="string">'插入图片'</span>,</span><br><span class="line">        width: <span class="number">302</span>,   <span class="comment">//弹窗的宽px</span></span><br><span class="line">        minHeight: <span class="number">302</span>,   <span class="comment">//弹窗的最小高度px,上传图片高度大于300自动撑开</span></span><br><span class="line">        contents: [</span><br><span class="line">            &#123;</span><br><span class="line">                id: <span class="string">'ossimage'</span>,</span><br><span class="line">                label: <span class="string">'上传图片'</span>,</span><br><span class="line">                elements: [    <span class="comment">//自定义弹窗的内容，可以使用模板，也可自定义html及样式</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        id: <span class="string">'myimage'</span>,    <span class="comment">//选择图片按钮</span></span><br><span class="line">                        type: <span class="string">'html'</span>,</span><br><span class="line">                        html: <span class="string">'&lt;a href="javascript:;" id="selectfile"&gt;选择图片&lt;/a&gt;'</span>,  <span class="comment">//plupload按钮</span></span><br><span class="line">                        style: <span class="string">'display:block;width:82px;line-height:34px;background-color:#3366b7;font-size:14px;color:#fff;text-align:center;border-radius:4px;'</span>,  <span class="comment">//html的样式，直接作用于上面的a元素</span></span><br><span class="line">                        onShow: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;  <span class="comment">//当该元素show的时候执行的方法</span></span><br><span class="line">                            <span class="keyword">if</span>(currentSrc &amp;&amp; currentSrc !== <span class="string">'undefined'</span>)&#123;   <span class="comment">//当右键编辑图片时执行，下篇说</span></span><br><span class="line">                                $(<span class="string">'#selectfile'</span>).hide();</span><br><span class="line">                                $(<span class="string">'.moxie-shim'</span>).hide();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        onLoad: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                            plupload1();  <span class="comment">//加载时实例化plupload上传组件</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &#123;</span><br><span class="line">                        type: <span class="string">'html'</span>,    <span class="comment">//图片上传成功后的容器</span></span><br><span class="line">                        html: <span class="string">'&lt;div class="container"&gt;&lt;div class="imgbox"&gt;&lt;/div&gt;&lt;a style="display:none;position:absolute;top:0;left:0;z-index:1;width:16px;height:16px;background-image:url(/assets/js/ckeditor/skins/moono-lisa/images/close2.png)"&gt;&lt;/a&gt;&lt;/div&gt;'</span>,</span><br><span class="line">                        style: <span class="string">'width:300px;height:auto;position:relative;'</span>,  <span class="comment">//对应的样式</span></span><br><span class="line">                        onShow: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                            <span class="keyword">if</span>(currentSrc &amp;&amp; currentSrc !== <span class="string">'undefined'</span>)&#123;</span><br><span class="line">                                <span class="comment">//右键编辑图片时，将图片src传入容器，同时注册关闭图片事件</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        commit: <span class="function"><span class="keyword">function</span>(<span class="params"> editor </span>)</span>&#123;  <span class="comment">//点击确定按钮时，将图片src传入全局src中</span></span><br><span class="line">                            src = $(<span class="string">'.imgbox img'</span>).attr(<span class="string">'src'</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &#123;</span><br><span class="line">                        id: <span class="string">'size'</span>,   <span class="comment">//图片全屏显示及按实际尺寸显示radio</span></span><br><span class="line">                        type: <span class="string">'html'</span>,</span><br><span class="line">                        html: sizeHtml,   <span class="comment">//html写到了上面</span></span><br><span class="line">                        commit: <span class="function"><span class="keyword">function</span>(<span class="params"> editor </span>)</span>&#123;</span><br><span class="line">                            <span class="keyword">var</span> tt = <span class="built_in">document</span>.getElementsByName(<span class="string">'size'</span>); <span class="comment">//取radio选项</span></span><br><span class="line">                            <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; tt.length ; i++ )&#123;    </span><br><span class="line">                                <span class="keyword">if</span>(tt[i].checked)&#123;</span><br><span class="line">                                    imgsize = tt[i].value;    </span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">if</span>(src != <span class="literal">undefined</span>)&#123;</span><br><span class="line">                                <span class="comment">//创建element,即确定后填到编辑器中的代码，此处最好使用p标签包裹img标签，ckeditor都是使用p标签包裹元素，保持一致</span></span><br><span class="line">                                <span class="keyword">var</span> ele = CKEDITOR.dom.element.createFromHtml( <span class="string">'&lt;p style="padding:5px 0;"&gt;&lt;img style="max-width: 100%;width:'</span>+imgsize+<span class="string">'" src="'</span>+src+<span class="string">'"/&gt;&lt;/p&gt;'</span> );  </span><br><span class="line">                                editor.insertElement(ele);   <span class="comment">//将element插入editor</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">            ],</span><br><span class="line">        onShow: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            currentSrc = <span class="literal">null</span>;   <span class="comment">//弹窗显示的时候判断‘选中元素’的currentSrc是否存在</span></span><br><span class="line">            <span class="keyword">var</span> element = editor.getSelection().getSelectedElement();</span><br><span class="line">            <span class="keyword">if</span>(element)&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(element);</span><br><span class="line">                <span class="built_in">console</span>.log(element.$.currentSrc);</span><br><span class="line">                currentSrc = element.$.currentSrc;<span class="comment">//源图片地址</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        onOk: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.commitContent(editor);</span><br><span class="line">            <span class="comment">//点击确定时dom操作</span></span><br><span class="line">            currentSrc = <span class="literal">null</span>; </span><br><span class="line">        &#125;,</span><br><span class="line">        onCancel: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="comment">//取消时dom操作</span></span><br><span class="line">            currentSrc = <span class="literal">null</span>;  <span class="comment">//取消或者确定时清空currentSrc</span></span><br><span class="line">        &#125;</span><br><span class="line">   &#125;;</span><br><span class="line">&#125; );</span><br></pre></td></tr></table></figure>
+<p>看下上传图片后的实际效果<br><img src="http://upload-images.jianshu.io/upload_images/6589697-e45566e99a1382e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="编辑器2.png"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/6589697-3f9c2d2dd0cb97df.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="编辑器3.png"></p>
+<p>图片满屏显示会将图片宽度设为100%，高度自动；图片原尺寸显示会显示图片原本的尺寸。这里注意所谓图片原尺寸是指图片的实际大小，假若图片宽度200px,那么图片不管在什么设备下，宽度始终为200px，不过若是图片原尺寸超过了设备的实际宽度，那么图片的最大宽度就是设备的宽度，不会出现左右滚动条。</p>
+<p>最后记得将我们自定义的组件注册到config.js中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.extraPlugins = <span class="string">'myiframe,oss,dialog,dialogui,lineheight,richcombo,floatpanel,panel,listblock'</span>;  <span class="comment">//除了oss,myiframe,lineheight外，其他都为依赖组件</span></span><br></pre></td></tr></table></figure></p>
+<p>最后是编辑器的一些其他优化，如使用rem使编辑器宽度，字体大小等比例显示，行高组件的添加等，都是为了真正的实现所见即所得的个性化移动编辑器，真正做到了pc端编辑出来的效果就是在移动展示的实际比例效果。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">config.fontSize_defaultLabel = <span class="string">'12'</span>;</span><br><span class="line">config.fontSize_sizes=<span class="string">'12/0.24rem;14/0.28rem;16/0.32rem;18/0.36rem;20/0.4rem;22/0.44rem;24/0.48rem;26/0.52rem;28/0.56rem;36/0.72rem;48/0.96rem;72/1.44rem'</span>;</span><br><span class="line">CKEDITOR.config.menu_groups = <span class="string">''</span>; <span class="comment">//编辑器内的右键菜单设为空。搜索关键字menuitem，查看源码</span></span><br><span class="line">config.line_height = <span class="string">'1;1.2;1.5;2;2.2;2.5;3;3.5;4;5'</span>;  <span class="comment">//定义行高</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/工作积累/" rel="tag"># 工作积累</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/17/JS随写：数数据属性和访问器属性/" rel="next" title="JS随写：数据属性和访问器属性">
+                <i class="fa fa-chevron-left"></i> JS随写：数据属性和访问器属性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/27/ckeditor编辑器视频插入及右键事件处理/" rel="prev" title="ckeditor编辑器视频插入及右键事件处理">
+                ckeditor编辑器视频插入及右键事件处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#啰嗦需求"><span class="nav-number">1.</span> <span class="nav-text">啰嗦需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装配置"><span class="nav-number">2.</span> <span class="nav-text">安装配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#个性化配置"><span class="nav-number">3.</span> <span class="nav-text">个性化配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义按钮（功能）"><span class="nav-number">4.</span> <span class="nav-text">自定义按钮（功能）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

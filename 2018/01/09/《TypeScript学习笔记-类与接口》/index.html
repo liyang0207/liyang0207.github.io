@@ -1,0 +1,937 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,TypeScript," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="今天的进阶篇主要来说一下类与接口。 概述传统方法中，JavaScript通过构造函数实现类的概念，通过原型链实现继承。而在ES6中有了class。TypeScript除了实现了所有ES6中的类的功能外，还添加了一些新的用法。 类的概念先说下几个重要的概念：  类(class): 定义了一件事件的抽象特点，包含它的属性和方法 对象(Object): 类的实例，通过new生成 面向对象(OPP)的三大">
+<meta name="keywords" content="知识积累,TypeScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《TypeScript学习笔记-类与接口》">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/《TypeScript学习笔记-类与接口》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="今天的进阶篇主要来说一下类与接口。 概述传统方法中，JavaScript通过构造函数实现类的概念，通过原型链实现继承。而在ES6中有了class。TypeScript除了实现了所有ES6中的类的功能外，还添加了一些新的用法。 类的概念先说下几个重要的概念：  类(class): 定义了一件事件的抽象特点，包含它的属性和方法 对象(Object): 类的实例，通过new生成 面向对象(OPP)的三大">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.862Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《TypeScript学习笔记-类与接口》">
+<meta name="twitter:description" content="今天的进阶篇主要来说一下类与接口。 概述传统方法中，JavaScript通过构造函数实现类的概念，通过原型链实现继承。而在ES6中有了class。TypeScript除了实现了所有ES6中的类的功能外，还添加了一些新的用法。 类的概念先说下几个重要的概念：  类(class): 定义了一件事件的抽象特点，包含它的属性和方法 对象(Object): 类的实例，通过new生成 面向对象(OPP)的三大">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/09/《TypeScript学习笔记-类与接口》/"/>
+
+
+
+
+
+  <title> 《TypeScript学习笔记-类与接口》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/09/《TypeScript学习笔记-类与接口》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《TypeScript学习笔记-类与接口》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-09T20:09:29+08:00">
+                2018-01-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天的进阶篇主要来说一下类与接口。</p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>传统方法中，JavaScript通过构造函数实现类的概念，通过原型链实现继承。而在ES6中有了<code>class</code>。<br>TypeScript除了实现了所有ES6中的类的功能外，还添加了一些新的用法。</p>
+<h3 id="类的概念"><a href="#类的概念" class="headerlink" title="类的概念"></a>类的概念</h3><p>先说下几个重要的概念：</p>
+<ul>
+<li>类(class): 定义了一件事件的抽象特点，包含它的属性和方法</li>
+<li>对象(Object): 类的实例，通过<code>new</code>生成</li>
+<li>面向对象(OPP)的三大特点: 封装、继承、多态</li>
+<li>封装(Encapsulation): 将对数据的操作细节隐藏起来，只暴露对外的接口。外界调用端不需要（也不可能）知道细节，就能通过对外提供的接口来访问该对象，同时也保证了外界无法任意更改对象内部的数据。</li>
+<li>继承(Inheritance): 子类继承父类，子类除了有父类的所有特性外，还有一些更具体的特性</li>
+<li>多态(Polymorphism): 由继承而产生了相关的不同的类，对同一个方法可以有不同的响应。比如<code>Cat</code>和<code>Dog</code>都是继承自<code>Animal</code>,但是分别实现了自己的<code>eat</code>方法。此时针对某一个实例，我们无需了解它是<code>Cat</code>还是<code>Dog</code>，就可以直接调用<code>eat</code>方法，程序会自动判断出来应该如何执行<code>eat</code></li>
+<li>存取器(getter &amp; setter): 用以改变属性的读取和赋值行为</li>
+<li>修饰符(Modifiers): 修饰符是一些关键字，用于限定成员或类型的性质。比如<code>public</code>表示公有属性或方法</li>
+<li>抽象类(Abstract Class): 抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中实现</li>
+<li>接口(Interfaces): 不同类之间公有的属性或者方法，可以抽象成一个接口。接口可以被实现(implements)。一个类只能继承自另一个类，但是可以实现多个接口</li>
+</ul>
+<h3 id="ES6中类的用法"><a href="#ES6中类的用法" class="headerlink" title="ES6中类的用法"></a>ES6中类的用法</h3><p>先简单介绍一下ES6中类的用法，具体可参照阮一峰老师的<a href="http://es6.ruanyifeng.com/#docs/class" target="_blank" rel="noopener">ECMAScript 6 入门 - Class</a></p>
+<h4 id="属性和方法"><a href="#属性和方法" class="headerlink" title="属性和方法"></a>属性和方法</h4><p>使用<code>class</code>定义类，使用<code>constructor</code>定义构造函数。<br>通过<code>new</code>生成新实例的时候，会自动调用构造函数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(name)&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    sayHi() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">`My name is <span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>`</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(a.sayHi());  <span class="comment">//My name is Jack</span></span><br></pre></td></tr></table></figure>
+<h4 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承"></a>类的继承</h4><p>使用<code>extends</code>关键字实现继承，子类中使用<code>super</code>关键字来调用父类的构造函数和方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cat</span> <span class="keyword">extends</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(name)&#123;</span><br><span class="line">        <span class="keyword">super</span>(name);</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</span><br><span class="line">    &#125;</span><br><span class="line">    sayHi() &#123;</span><br><span class="line">        retrun <span class="string">'Meow,'</span> + <span class="keyword">super</span>.sayHi();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> c = <span class="keyword">new</span> Cat(<span class="string">'Tom'</span>); <span class="comment">// Tom</span></span><br><span class="line"><span class="built_in">console</span>.log(c.sayHi()); <span class="comment">// Meow, My name is Tom</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="存取器"><a href="#存取器" class="headerlink" title="存取器"></a>存取器</h4><p>使用<code>getter</code>和<code>setter</code>可以改变属性的赋值和读取行为:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(name)&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    get name()&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'Jack'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    set name()&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'setter:'</span> + value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'kitty'</span>);  <span class="comment">//setter: kitty</span></span><br><span class="line">a.name = <span class="string">'Tom'</span>;  <span class="comment">//setter: Tom</span></span><br><span class="line"><span class="built_in">console</span>.log(a.name);  <span class="comment">//Jack</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h4><p>使用<code>static</code>修饰符修饰的方法称为静态方法，它们不需要实例化，而是直接通过类来调用：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> isAnimal(a) &#123;</span><br><span class="line">    <span class="keyword">return</span> a <span class="keyword">instanceof</span> Animal;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line">Animal.isAnimal(a); <span class="comment">// true</span></span><br><span class="line">a.isAnimal(a); <span class="comment">// TypeError: a.isAnimal is not a function</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="ES7中类的用法"><a href="#ES7中类的用法" class="headerlink" title="ES7中类的用法"></a>ES7中类的用法</h3><p>ES7 中有一些关于类的提案，TypeScript 也实现了它们，这里做一个简单的介绍。</p>
+<h4 id="实例属性"><a href="#实例属性" class="headerlink" title="实例属性"></a>实例属性</h4><p>ES6 中实例的属性只能通过构造函数中的 this.xxx 来定义，ES7 提案中可以直接在类里面定义：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">    name = <span class="string">'Jack'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>()&#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal();</span><br><span class="line"><span class="built_in">console</span>.log(a.name);  <span class="comment">// Jack</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="静态属性"><a href="#静态属性" class="headerlink" title="静态属性"></a>静态属性</h4><p>ES7 提案中，可以使用 static 定义一个静态属性：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> num =  <span class="number">42</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span> () &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(Animal.name);  <span class="comment">// 42</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="TypeScript中类的用法"><a href="#TypeScript中类的用法" class="headerlink" title="TypeScript中类的用法"></a>TypeScript中类的用法</h3><h4 id="public-private-和-protected"><a href="#public-private-和-protected" class="headerlink" title="public private 和 protected"></a>public private 和 protected</h4><p>TypeScript 可以使用三种访问修饰符（Access Modifiers），分别是 public、private 和 protected。</p>
+<ul>
+<li>public修饰的属性或方法是公有的，可以在任何地方被访问到，默认所有的属性和方法都是<code>public</code>的</li>
+<li>private修饰的属性或方法私有的，不能在声明它的类的外部访问</li>
+<li>protected修饰的属性或方法是受保护的，它和<code>private</code>类似，区别是它在子类中也是允许访问的</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(a.name); <span class="comment">// Jack</span></span><br><span class="line">a.name = <span class="string">'Tom'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(a.name); <span class="comment">// Tom</span></span><br></pre></td></tr></table></figure>
+<p>上面的例子中，<code>name</code>被设置为了<code>public</code>，所以直接访问实例的<code>name</code>属性是允许的。<br>很多时候，我们希望有的属性是无法直接存取的，这时候就可以用<code>private</code>了：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  private name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(a.name); <span class="comment">// Jack</span></span><br><span class="line">a.name = <span class="string">'Tom'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.ts(9,13): error TS2341: Property 'name' is private and only accessible within class 'Animal'.</span></span><br><span class="line"><span class="comment">// index.ts(10,1): error TS2341: Property 'name' is private and only accessible within class 'Animal'.</span></span><br></pre></td></tr></table></figure>
+<p>需要注意的是，TypeScript 编译之后的代码中，并没有限制<code>private</code>属性在外部的可访问性。<br>上面的例子编译后的代码是：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Animal = (<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Animal;</span><br><span class="line">&#125;());</span><br><span class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(a.name);</span><br><span class="line">a.name = <span class="string">'Tom'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>private</code>修饰的属性或方法，在子类中也是不允许访问的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  private name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">extends</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">super</span>(name);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.ts(11,17): error TS2341: Property 'name' is private and only accessible within class 'Animal'.</span></span><br></pre></td></tr></table></figure>
+<p>而如果是用<code>protected</code>修饰，则允许在子类中访问：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  protected name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">extends</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">super</span>(name);</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h4><p><code>abstract</code>用于定义抽象类和其中的抽象方法。<br>首先，抽象类不允许被实例化：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">abstract <span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">  public abstract sayHi();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.ts(9,11): error TS2511: Cannot create an instance of the abstract class 'Animal'.</span></span><br></pre></td></tr></table></figure>
+<p>上面的例子中，我们定义了一个抽象类<code>Animal</code>，并且定义了一个抽象方法<code>sayHi</code>。在实例化抽象类的时候报错了。<br>其次，抽象类中的抽象方法必须被子类实现：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">abstract <span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">  public abstract sayHi();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">extends</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public eat() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span> is eating.`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> cat = <span class="keyword">new</span> Cat(<span class="string">'Tom'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.ts(9,7): error TS2515: Non-abstract class 'Cat' does not implement inherited abstract member 'sayHi' from class 'Animal'.</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的例子中，我们定义了一个类 Cat 继承了抽象类 Animal，但是没有实现抽象方法 sayHi，所以编译报错了。<br>下面是一个正确使用抽象类的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">abstract <span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public name;</span><br><span class="line">  public <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">  public abstract sayHi();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">extends</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  public sayHi() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`Meow, My name is <span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> cat = <span class="keyword">new</span> Cat(<span class="string">'Tom'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>上面的例子中，我们实现了抽象方法 sayHi，编译通过了。<br>需要注意的是，即使是抽象方法，TypeScript 的编译结果中，仍然会存在这个类。</p>
+<h4 id="类的类型"><a href="#类的类型" class="headerlink" title="类的类型"></a>类的类型</h4><p>给类加上 TypeScript 的类型很简单，与接口类似：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> </span>&#123;</span><br><span class="line">  name: string;</span><br><span class="line">  <span class="keyword">constructor</span>(name: string) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">  sayHi(): string &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`My name is <span class="subst">$&#123;<span class="keyword">this</span>.name&#125;</span>`</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a: Animal = <span class="keyword">new</span> Animal(<span class="string">'Jack'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(a.sayHi()); <span class="comment">// My name is Jack</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="类与接口"><a href="#类与接口" class="headerlink" title="类与接口"></a>类与接口</h3><h4 id="类实现接口"><a href="#类实现接口" class="headerlink" title="类实现接口"></a>类实现接口</h4><p>实现（implements）是面向对象中的一个重要概念。一般来讲，一个类只能继承自另一个类，有时候不同类之间可以有一些共有的特性，这时候就可以把特性提取成接口（interfaces），用<code>implements</code>关键字来实现。这个特性大大提高了面向对象的灵活性。<br>举例来说，门是一个类，防盗门是门的子类。如果防盗门有一个报警器的功能，我们可以简单的给防盗门添加一个报警方法。这时候如果有另一个类，车，也有报警器的功能，就可以考虑把报警器提取出来，作为一个接口，防盗门和车都去实现它：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">interface Alarm &#123;</span><br><span class="line">    alert();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Door</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SecurityDoor</span> <span class="keyword">extends</span> <span class="title">Door</span> <span class="title">implements</span> <span class="title">Alarm</span> </span>&#123;</span><br><span class="line">    alert()&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'SecurityDoor alert'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Car</span> <span class="title">implements</span> <span class="title">Alarm</span> </span>&#123;</span><br><span class="line">    alert() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Car alert'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一个类可以实现多个接口：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">interface Alarm &#123;</span><br><span class="line">    alert();</span><br><span class="line">&#125;</span><br><span class="line">interface Light &#123;</span><br><span class="line">    lightOn();</span><br><span class="line">    ligntOff();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Car</span> <span class="title">implements</span> <span class="title">Alarm</span>, <span class="title">Light</span> </span>&#123;</span><br><span class="line">    alert() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Car alert'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    lightOn() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Car light on'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    lightOff() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Car light off'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上例中，<code>Car</code>实现了<code>Alarm</code>和<code>Light</code>接口，既能报警，也能开关车灯。</p>
+<h4 id="接口继承接口"><a href="#接口继承接口" class="headerlink" title="接口继承接口"></a>接口继承接口</h4><p>接口与接口之间可以是继承的关系：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">interface Alarm &#123;</span><br><span class="line">    alert();</span><br><span class="line">&#125;</span><br><span class="line">interface LightableAlarm extends Alarm &#123;</span><br><span class="line">    lightOn();</span><br><span class="line">    lightOff();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上例中，我们使用<code>extends</code>使<code>LightableAlarm</code>继承<code>Alarm</code>。</p>
+<h4 id="接口继承类"><a href="#接口继承类" class="headerlink" title="接口继承类"></a>接口继承类</h4><p>接口也可以继承类：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span> </span>&#123;</span><br><span class="line">    x: number;</span><br><span class="line">    y: number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface Point3d extends Point &#123;</span><br><span class="line">    z:number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> point3d: Point3d = &#123;<span class="attr">x</span>: <span class="number">1</span>, <span class="attr">y</span>: <span class="number">2</span>, <span class="attr">z</span>: <span class="number">3</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="混合类型"><a href="#混合类型" class="headerlink" title="混合类型"></a>混合类型</h4><p>可以使用接口的方式来定义一个函数需要符合的形状：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">interface SearchFunc &#123;</span><br><span class="line">    (source: string, <span class="attr">subString</span>: string): boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> mySearch: SearchFunc;</span><br><span class="line">mySearch = <span class="function"><span class="keyword">function</span>(<span class="params">source: string, subString: string</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> source.search(subString) !== <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有时候，一个函数还可以有自己的属性和方法：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">interface Counter &#123;</span><br><span class="line">    (start: number): string;</span><br><span class="line">    interval: number;</span><br><span class="line">    reset(): <span class="keyword">void</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getCounter</span>(<span class="params"></span>): <span class="title">Counter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> counter = <span class="xml"><span class="tag">&lt;<span class="name">Counter</span>&gt;</span>function (start: number) &#123; &#125;;</span></span><br><span class="line"><span class="xml">    counter.interval = 123;</span></span><br><span class="line"><span class="xml">    counter.reset = function () &#123; &#125;;</span></span><br><span class="line"><span class="xml">    return counter;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml">let c = getCounter();</span></span><br><span class="line"><span class="xml">c(10);</span></span><br><span class="line"><span class="xml">c.reset();</span></span><br><span class="line"><span class="xml">c.interval = 5.0;</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/07/《TypeScript学习笔记-进阶一》/" rel="next" title="《TypeScript学习笔记-进阶一》">
+                <i class="fa fa-chevron-left"></i> 《TypeScript学习笔记-进阶一》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/10/《TypeScript学习笔记-枚举》/" rel="prev" title="《TypeScript学习笔记-枚举》">
+                《TypeScript学习笔记-枚举》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类的概念"><span class="nav-number">2.</span> <span class="nav-text">类的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES6中类的用法"><span class="nav-number">3.</span> <span class="nav-text">ES6中类的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#属性和方法"><span class="nav-number">3.1.</span> <span class="nav-text">属性和方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类的继承"><span class="nav-number">3.2.</span> <span class="nav-text">类的继承</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#存取器"><span class="nav-number">3.3.</span> <span class="nav-text">存取器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#静态方法"><span class="nav-number">3.4.</span> <span class="nav-text">静态方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES7中类的用法"><span class="nav-number">4.</span> <span class="nav-text">ES7中类的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#实例属性"><span class="nav-number">4.1.</span> <span class="nav-text">实例属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#静态属性"><span class="nav-number">4.2.</span> <span class="nav-text">静态属性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TypeScript中类的用法"><span class="nav-number">5.</span> <span class="nav-text">TypeScript中类的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#public-private-和-protected"><span class="nav-number">5.1.</span> <span class="nav-text">public private 和 protected</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抽象类"><span class="nav-number">5.2.</span> <span class="nav-text">抽象类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类的类型"><span class="nav-number">5.3.</span> <span class="nav-text">类的类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类与接口"><span class="nav-number">6.</span> <span class="nav-text">类与接口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类实现接口"><span class="nav-number">6.1.</span> <span class="nav-text">类实现接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接口继承接口"><span class="nav-number">6.2.</span> <span class="nav-text">接口继承接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接口继承类"><span class="nav-number">6.3.</span> <span class="nav-text">接口继承类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#混合类型"><span class="nav-number">6.4.</span> <span class="nav-text">混合类型</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

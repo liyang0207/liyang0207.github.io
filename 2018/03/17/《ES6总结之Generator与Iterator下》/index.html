@@ -1,0 +1,962 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,ES6," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上篇博客归纳总结了一些关于Generator生成器的知识点，这些天又查阅了许多资料和书籍，包括《你不知道的JavaScript》及阮一峰老师写的《ECMAScript 6 入门》，着重理解和思考了关于Iterator迭代器的知识点，总结于此，方便以后查阅。">
+<meta name="keywords" content="JavaScript,ES6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《ES6总结之Generator与Iterator下》">
+<meta property="og:url" content="http://yoursite.com/2018/03/17/《ES6总结之Generator与Iterator下》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="上篇博客归纳总结了一些关于Generator生成器的知识点，这些天又查阅了许多资料和书籍，包括《你不知道的JavaScript》及阮一峰老师写的《ECMAScript 6 入门》，着重理解和思考了关于Iterator迭代器的知识点，总结于此，方便以后查阅。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.860Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《ES6总结之Generator与Iterator下》">
+<meta name="twitter:description" content="上篇博客归纳总结了一些关于Generator生成器的知识点，这些天又查阅了许多资料和书籍，包括《你不知道的JavaScript》及阮一峰老师写的《ECMAScript 6 入门》，着重理解和思考了关于Iterator迭代器的知识点，总结于此，方便以后查阅。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/17/《ES6总结之Generator与Iterator下》/"/>
+
+
+
+
+
+  <title> 《ES6总结之Generator与Iterator下》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/《ES6总结之Generator与Iterator下》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《ES6总结之Generator与Iterator下》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T20:00:47+08:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上篇博客归纳总结了一些关于<code>Generator</code>生成器的知识点，这些天又查阅了许多资料和书籍，包括《你不知道的JavaScript》及阮一峰老师写的《ECMAScript 6 入门》，着重理解和思考了关于<code>Iterator</code>迭代器的知识点，总结于此，方便以后查阅。<br><a id="more"></a></p>
+<h1 id="Iterator-迭代器"><a href="#Iterator-迭代器" class="headerlink" title="Iterator 迭代器"></a>Iterator 迭代器</h1><p>迭代器（iterator）是一个结构化的模式，用于从“源”以一次一个的方式提取数据，是一种有序的、连续的、基于拉取的用于“消耗数据”的组织方式。通俗的来讲，<code>Iterator</code>为不同的数据结构（例如数组，字符串等）提供了一个统一的访问机制，可以对数据结构进行遍历操作（只要该数据结构部署了Iterator接口）。<br>其作用主要有3个：</p>
+<ol>
+<li>为各种数据结构，提供一个统一的、简便的访问接口；</li>
+<li>使得数据结构的成员能够按某种次序排列；</li>
+<li>ES6 创造了一种新的遍历命令<code>for..of</code>循环，<code>Iterator</code> 接口主要供<code>for..of</code>消费。</li>
+</ol>
+<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><p>首先要明确一点，<code>Iterable</code>和<code>Iterator</code>两个概念是不同的，<code>Iterable</code>是一种类型，意为“可迭代的”，<code>Array</code>、<code>String</code>、<code>Map</code>和<code>Set</code>等类型都原生实现了<code>@@iterator</code>方法，也就是说这些类型可以迭代，相比于<code>Object</code>就必须我们自己去实现迭代的方法（后面再讲）。</p>
+<h3 id="接口要求"><a href="#接口要求" class="headerlink" title="接口要求"></a>接口要求</h3><p>《你不知道的JavaScript》一书中简单介绍了一下<code>Iterator</code>的接口，标准是否调整我并没有查到相关资料，但是列在这里可以更清晰的理解<code>Iterator</code>的接口，其要求如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Iterator [required]</span><br><span class="line">  next() &#123;method&#125;: 取得下一个IteratorResult</span><br></pre></td></tr></table></figure></p>
+<p>有些迭代器还扩展支持两个可选成员：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Iterator [optional]</span><br><span class="line">  <span class="keyword">return</span>() &#123;method&#125;: 停止迭代器并返回IteratorResult</span><br><span class="line">  <span class="keyword">throw</span>() &#123;method&#125;: 报错并返回IteratorResult</span><br></pre></td></tr></table></figure></p>
+<p>IteratorResult接口的指定如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IteratorResult</span><br><span class="line">  value() &#123;property&#125;: 当前迭代值或者最终返回值</span><br><span class="line">  done() &#123;property&#125;: 布尔值，指示完成状态</span><br></pre></td></tr></table></figure></p>
+<p>还有一个<code>Iterable</code>接口，用来表述必需能够提供生成器的对象：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Iterable</span><br><span class="line">  @@iterator() &#123;method&#125;: 产生一个 Iterator</span><br></pre></td></tr></table></figure></p>
+<p><code>IteratorResult</code>接口指定了从任何迭代器操作返回的值必须是下面这种形式的对象：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">value</span>: .. , <span class="attr">done</span>: <span class="literal">true</span>/<span class="literal">false</span> &#125;</span><br></pre></td></tr></table></figure></p>
+<p>内置的迭代器总是返回这种形式的值，自定义迭代器可以在结果对象上增加额外的元数据（如数据的来源，获取数据的时间长度，缓存过期时长，下次请求的适当频率等…）</p>
+<h3 id="接口目的"><a href="#接口目的" class="headerlink" title="接口目的"></a>接口目的</h3><p><code>Iterator</code>接口的目的，就是为所有数据结构，提供了一种统一的访问机制，即<code>for..of</code>循环（详见下文）。当使用<code>for..of</code>循环遍历某种数据结构时，该循环会自动去寻找<code>Iterator</code>接口。一种数据结构只要部署了<code>Iterator</code>接口，我们就称这种数据结构是“可遍历的”（iterable）。ES6规定，默认的<code>Iterator</code>接口部署在数据结构的<code>Symbol.iterator</code>属性上，只要一个数据接口有<code>Symbol.iterator</code>属性，就可以认为该数据接口“可遍历”，<code>Symbol.iterator</code>属性本身是一个函数，执行这个函数，就返回一个遍历器。属性名<code>Symbol.iterator</code>需要放在方括号内：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      next() &#123; </span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">          value: <span class="number">1</span>,</span><br><span class="line">          done: <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;   </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，对象obj是可遍历的（iterable），因为具有<code>Symbol.iterator</code>属性。执行这个属性，会返回一个遍历器对象。该对象的根本特征就是具有<code>next</code>方法。每次调用<code>next</code>方法，都会返回一个代表当前成员的信息对象，具有<code>value</code>和<code>done</code>两个属性。</p>
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><p>ES6中一些数据结构原生具备了<code>Iterator</code>接口，直接调用这个接口，就会返回一个遍历器对象，这些数据结构有：</p>
+<ul>
+<li>Array</li>
+<li>Map</li>
+<li>Set</li>
+<li>String</li>
+<li>TypedArray</li>
+<li>函数的arguments对象</li>
+<li>NodeList对象</li>
+</ul>
+<p>例如数组的<code>Symbol.iterator</code>属性:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>];</span><br><span class="line"><span class="keyword">var</span> it = arr[<span class="built_in">Symbol</span>.iterator]();</span><br><span class="line">it.next();   <span class="comment">// &#123;value: 1, done: false&#125;</span></span><br><span class="line">it.next();   <span class="comment">// &#123;value: 2, done: false&#125;</span></span><br><span class="line">it.next();   <span class="comment">// &#123;value: 3, done: false&#125;</span></span><br><span class="line">it.next();   <span class="comment">// &#123;value: 4, done: false&#125;</span></span><br><span class="line">it.next();   <span class="comment">// &#123;value: undefined, done: true&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>变量arr是一个数组，原生就具有遍历器接口，部署在arr的<code>Symbol.iterator</code>属性上面。所以，调用这个属性，就得到遍历器对象。</p>
+<p>对于原生部署<code>Iterator</code>接口的数据结构，不用自己写遍历器生成函数，<code>for..of</code>循环会自动遍历它们。除此之外，其他数据结构（主要是对象）的<code>Iterator</code>接口，都需要自己在<code>Symbol.iterator</code>属性上面部署，这样才会被<code>for..of</code>循环遍历。<br>对象（Object）之所以没有默认部署<code>Iterator</code>接口，是因为对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。一个对象如果要具备可被<code>for..of</code>循环调用的<code>Iterator</code> 接口，就必须在<code>Symbol.iterator</code>的属性上部署遍历器生成方法（原型链上的对象具有该方法也可）。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//实现一个斐波那契序列</span></span><br><span class="line"><span class="keyword">var</span> Fib = &#123;</span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]() &#123;</span><br><span class="line">    <span class="keyword">var</span> n1 = <span class="number">1</span>, n2 = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="comment">//使迭代器成为iterable</span></span><br><span class="line">      [<span class="built_in">Symbol</span>.itertor]() &#123; <span class="keyword">return</span> <span class="keyword">this</span>; &#125;,</span><br><span class="line">      next() &#123;</span><br><span class="line">        <span class="keyword">var</span> current = n2;</span><br><span class="line">        n2 = n1;</span><br><span class="line">        n1 = n1 + current;</span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="attr">value</span>: current, <span class="attr">done</span>: <span class="literal">false</span> &#125;;</span><br><span class="line">      &#125;,</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span>(v) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"Fibonacci sequence abandoned."</span>);</span><br><span class="line">        <span class="keyword">return</span> &#123; <span class="attr">value</span>: v, <span class="attr">done</span>: <span class="literal">true</span> &#125;;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>( <span class="keyword">var</span> v <span class="keyword">of</span> Fib )&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(v);</span><br><span class="line">  <span class="keyword">if</span>(v &gt; <span class="number">50</span>) <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 1 1 2 3 5 8 13 21 34 55</span></span><br><span class="line"><span class="comment">// Fibonacci sequence abandoned.</span></span><br></pre></td></tr></table></figure></p>
+<p>调用<code>Fib[Symbol.iterator]()</code>方法时，会返回带有 <code>next()</code>和 <code>return()</code>方法的迭代器对象。</p>
+<p>一个需要注意的地方是类数组对象调用<code>Symbol.iterator</code>的情况：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> iterable = &#123;</span><br><span class="line">  <span class="number">0</span>: <span class="string">'a'</span>,</span><br><span class="line">  <span class="number">1</span>: <span class="string">'b'</span>,</span><br><span class="line">  <span class="number">2</span>: <span class="string">'c'</span>,</span><br><span class="line">  length: <span class="number">3</span>,</span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]: <span class="built_in">Array</span>.prototype[<span class="built_in">Symbol</span>.iterator]</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">for</span>( <span class="keyword">let</span> item <span class="keyword">of</span> iterable )&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(item);   <span class="comment">// 'a' 'b' 'c'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用场合"><a href="#使用场合" class="headerlink" title="使用场合"></a>使用场合</h2><h3 id="解构赋值"><a href="#解构赋值" class="headerlink" title="解构赋值"></a>解构赋值</h3><p>对数组和 Set 结构进行解构赋值时，会默认调用<code>Symbol.iterator</code>方法。结构赋值会有专门的一篇博客来总结。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> set = <span class="keyword">new</span> <span class="built_in">Set</span>().add(<span class="string">'a'</span>).add(<span class="string">'b'</span>).add(<span class="string">'c'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> [x,y] = set;</span><br><span class="line"><span class="comment">// x='a'; y='b'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> [first, ...rest] = set;</span><br><span class="line"><span class="comment">// first='a'; rest=['b','c'];</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="扩展预算符"><a href="#扩展预算符" class="headerlink" title="扩展预算符"></a>扩展预算符</h3><p>扩展运算符（…）也会调用默认的<code>Iterator</code>接口。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 例一</span></span><br><span class="line"><span class="keyword">var</span> str = <span class="string">'hello'</span>;</span><br><span class="line">[...str] <span class="comment">//  ['h','e','l','l','o']</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 例二</span></span><br><span class="line"><span class="keyword">let</span> arr = [<span class="string">'b'</span>, <span class="string">'c'</span>];</span><br><span class="line">[<span class="string">'a'</span>, ...arr, <span class="string">'d'</span>]</span><br><span class="line"><span class="comment">// ['a', 'b', 'c', 'd']</span></span><br></pre></td></tr></table></figure></p>
+<p>实际上，这提供了一种简便机制，可以将任何部署了<code>Iterator</code>接口的数据结构，转为数组。也就是说，只要某个数据结构部署了<code>Iterator</code>接口，就可以对它使用扩展运算符，将其转为数组。</p>
+<h3 id="yield"><a href="#yield" class="headerlink" title="yield*"></a>yield*</h3><p>如果<code>yield*</code>后面跟的是一个可遍历的结构，它会调用该结构的遍历器接口。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> generator = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">yield</span>* [<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>];</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">5</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> iterator = generator();</span><br><span class="line"></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: 1, done: false &#125;</span></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: 2, done: false &#125;</span></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: 3, done: false &#125;</span></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: 4, done: false &#125;</span></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: 5, done: false &#125;</span></span><br><span class="line">iterator.next() <span class="comment">// &#123; value: undefined, done: true &#125;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="其他场合"><a href="#其他场合" class="headerlink" title="其他场合"></a>其他场合</h3><p>由于数组的遍历会调用遍历器接口，所以任何接受数组作为参数的场合，其实都调用了遍历器接口。下面是一些例子。</p>
+<ul>
+<li>for…of</li>
+<li>Array.from()</li>
+<li>Map(), Set(), WeakMap(), WeakSet()（比如new Map([[‘a’,1],[‘b’,2]])）</li>
+<li>Promise.all()</li>
+<li>Promise.race()</li>
+</ul>
+<h2 id="可选的return-和throw"><a href="#可选的return-和throw" class="headerlink" title="可选的return(..)和throw(..)"></a>可选的return(..)和throw(..)</h2><p><code>return</code>方法的使用场合是，如果<code>for..of</code>循环提前退出（通常是因为出错，或者有<code>break</code>语句或<code>continue</code>语句），就会调用<code>return</code>方法。如果一个对象在完成遍历前，需要清理或释放资源，就可以部署<code>return</code>方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">readLinesSync</span>(<span class="params">file</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    [<span class="built_in">Symbol</span>.iterator]() &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        next() &#123;</span><br><span class="line">          <span class="keyword">return</span> &#123; <span class="attr">done</span>: <span class="literal">false</span> &#125;;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="keyword">return</span>() &#123;</span><br><span class="line">          file.close();</span><br><span class="line">          <span class="keyword">return</span> &#123; <span class="attr">done</span>: <span class="literal">true</span> &#125;;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，函数<code>readLinesSync</code>接受一个文件对象作为参数，返回一个遍历器对象，其中除了<code>next</code>方法，还部署了<code>return</code>方法。下面的三种情况，都会触发执行<code>return</code>方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 情况一</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> line <span class="keyword">of</span> readLinesSync(fileName)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(line);</span><br><span class="line">  <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 情况二</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> line <span class="keyword">of</span> readLinesSync(fileName)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(line);</span><br><span class="line">  <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 情况三</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> line <span class="keyword">of</span> readLinesSync(fileName)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(line);</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，情况一输出文件的第一行以后，就会执行<code>return</code>方法，关闭这个文件；情况二输出所有行以后，执行<code>return</code>方法，关闭该文件；情况三会在执行<code>return</code>方法关闭文件之后，再抛出错误。<br>注意，<code>return</code>方法必须返回一个对象，这是<code>Generator</code>规格决定的。</p>
+<p><code>throw(..)</code>方法用于向迭代器报告一个异常/错误，主要是配合<code>Generator</code>函数使用。</p>
+<h2 id="迭代器循环"><a href="#迭代器循环" class="headerlink" title="迭代器循环"></a>迭代器循环</h2><p>ES6的<code>for..of</code>循环直接消耗一个符合规范的iterable。如果一个迭代器iterator也是一个iterable，那么它可以直接用于<code>for..of</code>循环，可以通过为迭代器提供一个<code>Symbol.iterator</code>方法简单的返回这个迭代器本身使它成为iterable:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> it = &#123;</span><br><span class="line">  <span class="comment">//使迭代器成为iterable</span></span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]() &#123; <span class="keyword">return</span> <span class="keyword">this</span>; &#125;,</span><br><span class="line">  next() &#123; .. &#125;,</span><br><span class="line">  ..</span><br><span class="line">&#125;</span><br><span class="line">it[<span class="built_in">Symbol</span>.iterator]() === it;  <span class="comment">// true</span></span><br></pre></td></tr></table></figure></p>
+<p>现在可以使用<code>for..of</code>循环消耗这个it迭代器：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> v <span class="keyword">of</span> it)&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>参照下面的例子和上面的<code>Fib</code>对象对比来看：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RangeIterator</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(start, stop)&#123;</span><br><span class="line">    <span class="keyword">this</span>.value = start;</span><br><span class="line">    <span class="keyword">this</span>.stop = stop;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  [<span class="built_in">Symbol</span>.iterator]() &#123; <span class="keyword">return</span> <span class="keyword">this</span>; &#125;</span><br><span class="line"></span><br><span class="line">  next() &#123;</span><br><span class="line">    <span class="keyword">var</span> value = <span class="keyword">this</span>.value;</span><br><span class="line">    <span class="keyword">if</span>(value &lt; <span class="keyword">this</span>.stop)&#123;</span><br><span class="line">      <span class="keyword">this</span>.value ++;</span><br><span class="line">      <span class="keyword">return</span> &#123; <span class="attr">value</span>: value, <span class="attr">done</span>: <span class="literal">false</span> &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">value</span>: <span class="literal">undefined</span>, <span class="attr">done</span>: <span class="literal">true</span> &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">range</span>(<span class="params">start, stop</span>)</span>&#123;</span><br><span class="line">  <span class="comment">//隐藏细节</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> RangeIterator(start, stop);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span>( <span class="keyword">var</span> value <span class="keyword">of</span> range(<span class="number">0</span>, <span class="number">3</span>) )&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(value);   <span class="comment">// 0, 1, 2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="for-of循环"><a href="#for-of循环" class="headerlink" title="for..of循环"></a>for..of循环</h2><p>一个数据结构只要部署了<code>Symbol.iterator</code>属性，就被视为具有<code>iterator</code>接口，就可以用<code>for..of</code>循环遍历它的成员。也就是说，<code>for..of</code>循环内部调用的是数据结构的<code>Symbol.iterator</code>方法。<br><code>for..of</code>循环可以使用的范围包括<code>数组</code>、<code>Set</code> 和<code>Map</code>结构、某些<code>类似数组的对象</code>（比如<code>arguments对象</code>、DOM <code>NodeList对象</code>）、后文的 <code>Generator对象</code>，以及<code>字符串</code>。</p>
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p><code>JavaScript</code>原有的<code>for..in</code>循环，只能获得对象的键名，不能直接获取键值。ES6提供<code>for..of</code>循环，允许遍历获得键值。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> k <span class="keyword">in</span> arr) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(k); <span class="comment">// 0 1 2 3</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> v <span class="keyword">of</span> arr) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(v); <span class="comment">// a b c d</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>for..of</code>循环调用遍历器接口，数组的遍历器接口只返回具有<code>数字索引</code>的属性。这一点跟<code>for..in</code>循环也不一样。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>];</span><br><span class="line">arr.foo = <span class="string">'hello'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> k <span class="keyword">in</span> arr) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(k); <span class="comment">// "0", "1", "2", "foo"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> v <span class="keyword">of</span> arr) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(v); <span class="comment">//  "3", "5", "7"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，<code>for..of</code>循环不会返回数组arr的foo属性。</p>
+<h3 id="类似数组的对象"><a href="#类似数组的对象" class="headerlink" title="类似数组的对象"></a>类似数组的对象</h3><p>类似数组的对象包括好几类。下面是<code>for..of</code>循环用于<code>字符串</code>、DOM <code>NodeList对象</code>、<code>arguments对象</code>的例子。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//字符串</span></span><br><span class="line"><span class="keyword">let</span> str = <span class="string">'hello'</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> s <span class="keyword">of</span> str)&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(s);  <span class="comment">// h e l l o</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//DOM NodeList对象</span></span><br><span class="line"><span class="keyword">let</span> paras = <span class="built_in">document</span>.querySelectorAll(<span class="string">"p"</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">let</span> p <span class="keyword">of</span> paras)&#123;</span><br><span class="line">  p.classList.add(<span class="string">'test'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// arguments对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printArgs</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> x <span class="keyword">of</span> <span class="built_in">arguments</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(x);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">printArgs(<span class="string">'a'</span>, <span class="string">'b'</span>);</span><br><span class="line"><span class="comment">// 'a'</span></span><br><span class="line"><span class="comment">// 'b'</span></span><br></pre></td></tr></table></figure></p>
+<p>对于字符串来说，<code>for..of</code>循环还有一个特点，就是会正确识别 32 位 UTF-16 字符。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> x <span class="keyword">of</span> <span class="string">'a\uD83D\uDC0A'</span>) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(x);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 'a'</span></span><br><span class="line"><span class="comment">// '\uD83D\uDC0A'</span></span><br></pre></td></tr></table></figure></p>
+<p>并不是所有类似数组的对象都具有<code>Iterator</code>接口，一个简便的解决方法，就是使用<code>Array.from</code>方法将其转为数组。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arrayLike = &#123; <span class="attr">length</span>: <span class="number">2</span>, <span class="number">0</span>: <span class="string">'a'</span>, <span class="number">1</span>: <span class="string">'b'</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 报错</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> x <span class="keyword">of</span> arrayLike) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(x);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> x <span class="keyword">of</span> <span class="built_in">Array</span>.from(arrayLike)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>对于普通的对象，<code>for..of</code>结构不能直接使用，会报错，必须部署了<code>Iterator</code>接口后才能使用。但是，这样情况下，<code>for..in</code>循环依然可以用来遍历键名。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> es6 = &#123;</span><br><span class="line">  edition: <span class="number">6</span>,</span><br><span class="line">  committee: <span class="string">"TC39"</span>,</span><br><span class="line">  standard: <span class="string">"ECMA-262"</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> e <span class="keyword">in</span> es6) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// edition</span></span><br><span class="line"><span class="comment">// committee</span></span><br><span class="line"><span class="comment">// standard</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> e <span class="keyword">of</span> es6) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Uncaught TypeError: es6 is not iterable</span></span><br></pre></td></tr></table></figure></p>
+<p>一种解决方法是，使用<code>Object.keys</code>方法将对象的键名生成一个数组，然后遍历这个数组。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">of</span> <span class="built_in">Object</span>.keys(someObject)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(key + <span class="string">': '</span> + someObject[key]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另一个方法是使用<code>Generator</code>函数将对象重新包装一下。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">entries</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">of</span> <span class="built_in">Object</span>.keys(obj)) &#123;</span><br><span class="line">    <span class="keyword">yield</span> [key, obj[key]];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> [key, value] <span class="keyword">of</span> entries(obj)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(key, <span class="string">'-&gt;'</span>, value);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// a -&gt; 1</span></span><br><span class="line"><span class="comment">// b -&gt; 2</span></span><br><span class="line"><span class="comment">// c -&gt; 3</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="与其他遍历语法的比较"><a href="#与其他遍历语法的比较" class="headerlink" title="与其他遍历语法的比较"></a>与其他遍历语法的比较</h3><p>以数组为例，<code>JavaScript</code>提供多种遍历语法。最原始的写法就是for循环:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> index = <span class="number">0</span>; index &lt; myArray.length; index++) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(myArray[index]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种写法比较麻烦，因此数组提供内置的<code>forEach</code>方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">myArray.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(value);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>这种写法的问题在于，无法中途跳出<code>forEach</code>循环，<code>break</code>命令或<code>return</code>命令都不能奏效。</p>
+<p><code>for..in</code>循环可以遍历数组的键名。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> index <span class="keyword">in</span> myArray) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(myArray[index]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>for..in</code>循环有几个缺点：</p>
+<ul>
+<li>数组的键名是数字，但是for…in循环是以字符串作为键名“0”、“1”、“2”等等；</li>
+<li><code>for..in</code>循环不仅遍历数字键名，还会遍历手动添加的其他键，甚至包括原型链上的键；</li>
+<li>某些情况下，<code>for..in</code>循环会以任意顺序遍历键名。</li>
+</ul>
+<p>总之，<code>for..in</code>循环主要是为遍历对象而设计的，不适用于遍历数组。<br>而<code>for..of</code>循环相比上面几种做法，有一些显著的优点:</p>
+<ul>
+<li>有着同<code>for..in</code>一样的简洁语法，但是没有<code>for..in</code>那些缺点。</li>
+<li>不同于<code>forEach</code>方法，它可以与<code>break</code>、<code>continue</code>和<code>return</code>配合使用，如上面的<code>Fib</code>对象</li>
+<li>提供了遍历所有数据结构的统一操作接口。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/ES6/" rel="tag"># ES6</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/11/《ES6总结之Generator与Iterator上》/" rel="next" title="《ES6总结之Generator与Iterator上》">
+                <i class="fa fa-chevron-left"></i> 《ES6总结之Generator与Iterator上》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/25/《ES6总结之解构赋值》/" rel="prev" title="《ES6总结之解构赋值》">
+                《ES6总结之解构赋值》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Iterator-迭代器"><span class="nav-number">1.</span> <span class="nav-text">Iterator 迭代器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#接口"><span class="nav-number">1.1.</span> <span class="nav-text">接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接口要求"><span class="nav-number">1.1.1.</span> <span class="nav-text">接口要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口目的"><span class="nav-number">1.1.2.</span> <span class="nav-text">接口目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据结构"><span class="nav-number">1.1.3.</span> <span class="nav-text">数据结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用场合"><span class="nav-number">1.2.</span> <span class="nav-text">使用场合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解构赋值"><span class="nav-number">1.2.1.</span> <span class="nav-text">解构赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展预算符"><span class="nav-number">1.2.2.</span> <span class="nav-text">扩展预算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield"><span class="nav-number">1.2.3.</span> <span class="nav-text">yield*</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他场合"><span class="nav-number">1.2.4.</span> <span class="nav-text">其他场合</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可选的return-和throw"><span class="nav-number">1.3.</span> <span class="nav-text">可选的return(..)和throw(..)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器循环"><span class="nav-number">1.4.</span> <span class="nav-text">迭代器循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for-of循环"><span class="nav-number">1.5.</span> <span class="nav-text">for..of循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数组"><span class="nav-number">1.5.1.</span> <span class="nav-text">数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类似数组的对象"><span class="nav-number">1.5.2.</span> <span class="nav-text">类似数组的对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象"><span class="nav-number">1.5.3.</span> <span class="nav-text">对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与其他遍历语法的比较"><span class="nav-number">1.5.4.</span> <span class="nav-text">与其他遍历语法的比较</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

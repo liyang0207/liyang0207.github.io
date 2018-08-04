@@ -1,0 +1,931 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,ES6," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在ES6之前，JavaSript中默认来讲，一个函数一旦开始执行，就会一直运行到函数结束，期间不会有其他代码能够打断它并插入其间。虽然JavaScript是单线程运行，但是如果如果有多个函数“并行”运行，基于运行环境的复杂性及函数异步同步问题，相同的代码在多次运行中可能会出现不同的运行顺序，导致运行结果的不确定。这种函数的不确定性就是通常所说的竞态条件，两个函数相互竞争，看谁先运行。好在ES6为我">
+<meta name="keywords" content="JavaScript,ES6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《ES6总结之Generator与Iterator上》">
+<meta property="og:url" content="http://yoursite.com/2018/03/11/《ES6总结之Generator与Iterator上》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="在ES6之前，JavaSript中默认来讲，一个函数一旦开始执行，就会一直运行到函数结束，期间不会有其他代码能够打断它并插入其间。虽然JavaScript是单线程运行，但是如果如果有多个函数“并行”运行，基于运行环境的复杂性及函数异步同步问题，相同的代码在多次运行中可能会出现不同的运行顺序，导致运行结果的不确定。这种函数的不确定性就是通常所说的竞态条件，两个函数相互竞争，看谁先运行。好在ES6为我">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.860Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《ES6总结之Generator与Iterator上》">
+<meta name="twitter:description" content="在ES6之前，JavaSript中默认来讲，一个函数一旦开始执行，就会一直运行到函数结束，期间不会有其他代码能够打断它并插入其间。虽然JavaScript是单线程运行，但是如果如果有多个函数“并行”运行，基于运行环境的复杂性及函数异步同步问题，相同的代码在多次运行中可能会出现不同的运行顺序，导致运行结果的不确定。这种函数的不确定性就是通常所说的竞态条件，两个函数相互竞争，看谁先运行。好在ES6为我">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/11/《ES6总结之Generator与Iterator上》/"/>
+
+
+
+
+
+  <title> 《ES6总结之Generator与Iterator上》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/《ES6总结之Generator与Iterator上》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《ES6总结之Generator与Iterator上》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T17:12:29+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在ES6之前，JavaSript中默认来讲，一个函数一旦开始执行，就会一直运行到函数结束，期间不会有其他代码能够打断它并插入其间。虽然JavaScript是单线程运行，但是如果如果有多个函数“并行”运行，基于运行环境的复杂性及函数异步同步问题，相同的代码在多次运行中可能会出现不同的运行顺序，导致运行结果的不确定。这种函数的不确定性就是通常所说的<strong>竞态条件</strong>，两个函数相互竞争，看谁先运行。好在ES6为我们带来了<code>Generator</code>和<code>Iterator</code>,也就是所谓的<strong>生成器</strong>和<strong>迭代器（遍历器）</strong>，使我们能够实现函数的启停控制，遍历数据等等新的操作。<br><a id="more"></a></p>
+<h2 id="Generator生成器"><a href="#Generator生成器" class="headerlink" title="Generator生成器"></a>Generator生成器</h2><h3 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h3><p><code>Generator</code>形式上就是一个普通的函数，不过有两个特征：一是<code>function</code>关键字与函数名之间有个<code>*</code>号，<code>*</code>的位置可以靠左也可以靠右；二是函数体内会使用<code>yield</code>表达式，定义不同的内部状态，函数运行到<code>yield</code>处会暂停，同时<code>yield</code>也实现了生成器内外的消息通讯功能。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> y = x * (<span class="keyword">yield</span>);</span><br><span class="line">  <span class="keyword">return</span> y;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo(<span class="number">6</span>);   <span class="comment">//构造一个迭代器it，同时传入参数6</span></span><br><span class="line">it.next();   <span class="comment">//启动生成器</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> res = it.next(<span class="number">7</span>);   <span class="comment">//将参数7传入*foo内的yield处，继续运行，直到下一个yield或者return</span></span><br><span class="line">res.value;   <span class="comment">// 42</span></span><br></pre></td></tr></table></figure></p>
+<ol>
+<li><code>it = foo(6)</code>并没有执行生成器<code>*foo()</code>，只是构造了一个<strong>迭代器</strong>，迭代器控制它的执行；</li>
+<li>第一次调用迭代器的<code>next()</code>方法，启动生成器，一直运行到<code>yield</code>处；</li>
+<li>再次调用<code>next()</code>方法，同时传入参数7至yield处，继续运行；</li>
+<li><code>next()</code>的调用结果返回一个对象<code>{value: str, done: boolean}</code>,其中的value属性保存着从<code>*foo()</code>返回的值（如果有的话）；</li>
+</ol>
+<p><strong>有几个需要注意的点：</strong></p>
+<ol>
+<li>消息是双向传递的，<code>yield..</code>作为一个表达式可以发出消息响应<code>next(..)</code>的调用，<code>next(..)</code>也可以向暂停的<code>yield</code>表达式发送值。</li>
+<li>只有暂停的<code>yield</code>才能接收一个通过<code>next(..)</code>传递的值，也就是说作为启动的第一个<code>next()</code>还没有<code>yield</code>来接收它传入的值，所以浏览器会默默丢弃传递给第一个<code>next()</code>的任何东西，所以一定不要给迭代器的一个<code>next()</code>方法传入值。</li>
+</ol>
+<h3 id="多个迭代器"><a href="#多个迭代器" class="headerlink" title="多个迭代器"></a>多个迭代器</h3><p>每次构建一个迭代器，实际上就隐式的创建了生成器的一个实例，通过这个迭代器来控制的是这个生成器的实例。同一个生成器的实例可以同时运行，也可以彼此交互运行：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> x = <span class="keyword">yield</span> <span class="number">2</span>;</span><br><span class="line">  z++;</span><br><span class="line">  <span class="keyword">var</span> y = <span class="keyword">yield</span>( x * z );</span><br><span class="line">  <span class="built_in">console</span>.log( x, y, z);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> z = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it1 = foo();</span><br><span class="line"><span class="keyword">var</span> it2 = foo();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> val1 = it1.next().value;      <span class="comment">//启动生成器，返回的是第一个yield处的值：2</span></span><br><span class="line"><span class="keyword">var</span> val2 = it2.next().value;      <span class="comment">//启动生成器，返回的是第一个yield处的值：2</span></span><br><span class="line"></span><br><span class="line">val1 = it1.next( val2 * <span class="number">10</span> ).value;    <span class="comment">//将 val2 * 10 也就是20传入第一个yield处，将x赋值为20，z++为2，返回x*z 40</span></span><br><span class="line">val2 = it2.next( val1 * <span class="number">5</span> ).value;     <span class="comment">//将 val1 * 5 也就是200传入第一个yield处，将x赋值为200，z++为3，返回x*z 600</span></span><br><span class="line"></span><br><span class="line">it1.next( val2 / <span class="number">2</span> );    <span class="comment">//继续运行，将val2 / 2也就是300传入第二个yield处，将y赋值为300，打印出来 20，300，3</span></span><br><span class="line">it2.next( val1 / <span class="number">4</span> );    <span class="comment">//继续运行，将val1 / 2也就是10传入第二个yield处，将y赋值为300，打印出来 200，10，3</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="yield表达式"><a href="#yield表达式" class="headerlink" title="yield表达式"></a>yield表达式</h3><p><code>yield</code>表达式在生成器函数中表示暂停，只有继续调用迭代器的<code>next()</code>方法才会遍历下一个内部状态，迭代器的<code>next()</code>方法运行逻辑如下：</p>
+<ol>
+<li>遇到<code>yield</code>表达式，就暂停执行后面的操作，并将紧跟在<code>yield</code>后面的那个表达式的值，作为返回的对象的value属性值。</li>
+<li>下一次调用<code>next</code>方法时，再继续往下执行，直到遇到下一个<code>yield</code>表达式。</li>
+<li>如果没有再遇到新的<code>yield</code>表达式，就一直运行到函数结束，直到return语句为止，并将return语句后面的表达式的值，作为返回的对象的value属性值。</li>
+<li>如果该函数没有return语句，则返回的对象的value属性值为<code>undefined</code>。</li>
+</ol>
+<p><code>yield</code>表达式与<code>return</code>语句既有相似之处，也有区别。相似之处在于，都能返回紧跟在语句后面的那个表达式的值。区别在于每次遇到<code>yield</code>，函数暂停执行，下一次再从该位置继续向后执行，而<code>return</code>语句不具备位置记忆的功能。一个函数里面，只能执行一次（或者说一个）<code>return</code>语句，但是可以执行多次（或者说多个）<code>yield</code>表达式。正常函数只能返回一个值，因为只能执行一次<code>return</code>；<strong>Generator</strong> 函数可以返回一系列的值，因为可以有任意多个<code>yield</code>。从另一个角度看，也可以说<strong>Generator</strong> 生成了一系列的值，这也就是它的名称的来历（英语中，<code>generator</code> 这个词是“生成器”的意思）。</p>
+<p><code>Generator</code>函数如果不使用<code>yield</code>表达式，就变成了一个暂缓执行函数：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> *<span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'执行'</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> it = foo();</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  it.next();</span><br><span class="line">&#125;, <span class="number">2000</span>)</span><br></pre></td></tr></table></figure></p>
+<p>如果<code>foo</code>为普通函数，那么在为<code>it</code>赋值时就会执行，但是<code>foo</code>是一个<code>generator</code>函数，只有调用it的<code>next()</code>方法时，函数才会执行。<br>注意：<code>yield</code>表达式只能用在<code>generator</code>函数中，用在其它地方都会报错。</p>
+<h3 id="Generator-prototype-throw"><a href="#Generator-prototype-throw" class="headerlink" title="Generator.prototype.throw()"></a>Generator.prototype.throw()</h3><p><code>Generator</code> 函数返回的迭代器对象，都有一个<code>throw</code>方法，可以在函数体外抛出错误，然后在<code>Generator</code>函数体内捕获。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span>;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'内部捕获'</span>, e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = g();</span><br><span class="line">it.next();</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  it.throw(<span class="string">'a'</span>);</span><br><span class="line">  it.throw(<span class="string">'b'</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'外部捕获'</span>, e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 内部捕获 a</span></span><br><span class="line"><span class="comment">// 外部捕获 b</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，迭代器对象it连续抛出两个错误。第一个错误被 <code>Generator</code> 函数体内的<code>catch</code>语句捕获。it第二次抛出错误，由于 <code>Generator</code>函数内部的<code>catch</code>语句已经执行过了，不会再捕捉到这个错误了，所以这个错误就被抛出了<code>Generator</code>函数体，被函数体外的<code>catch</code>语句捕获。<br><code>throw</code>方法可以接受一个参数，该参数会被<code>catch</code>语句接收，建议抛出<code>Error</code>对象的实例。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span>;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = g();</span><br><span class="line">it.next();</span><br><span class="line">it.throw(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'出错了！'</span>));</span><br><span class="line"><span class="comment">// Error: 出错了！(…)</span></span><br></pre></td></tr></table></figure></p>
+<p>注意，不要混淆迭代器对象的<code>throw</code>方法和全局的<code>throw</code>命令。上面代码的错误，是用迭代器对象的<code>throw</code>方法抛出的，而不是用<code>throw</code>命令抛出的。后者只能被函数体外的<code>catch</code>语句捕获。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">yield</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="keyword">if</span> (e != <span class="string">'a'</span>) <span class="keyword">throw</span> e;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'内部捕获'</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = g();</span><br><span class="line">it.next();</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'a'</span>);</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'b'</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'外部捕获'</span>, e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 外部捕获 [Error: a]</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码之所以只捕获了a，是因为函数体外的<code>catch</code>语句块，捕获了抛出的a错误以后，就不会再继续<code>try</code>代码块里面剩余的语句了。</p>
+<p>如果<code>Generator</code>函数内部没有部署<code>try...catch</code>代码块，那么<code>throw</code>方法抛出的错误，将被外部<code>try...catch</code>代码块捕获。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> g = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">yield</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'内部捕获'</span>, e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> it = g();</span><br><span class="line">it.next();</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  it.throw(<span class="string">'a'</span>);</span><br><span class="line">  it.throw(<span class="string">'b'</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'外部捕获'</span>, e);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 外部捕获 a</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，<code>Generator</code>函数g内部没有部署<code>try...catch</code>代码块，所以抛出的错误直接被外部<code>catch</code>代码块捕获。</p>
+<p>如果<code>Generator</code>函数内部和外部，都没有部署<code>try...catch</code>代码块，那么程序将报错，直接中断执行。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> gen = <span class="function"><span class="keyword">function</span>* <span class="title">gen</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="built_in">console</span>.log(<span class="string">'hello'</span>);</span><br><span class="line">  <span class="keyword">yield</span> <span class="built_in">console</span>.log(<span class="string">'world'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> g = gen();</span><br><span class="line">g.next();</span><br><span class="line">g.throw();</span><br><span class="line"><span class="comment">// hello</span></span><br><span class="line"><span class="comment">// Uncaught undefined</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，g.throw抛出错误以后，没有任何try…catch代码块可以捕获这个错误，导致程序报错，中断执行。</p>
+<p>throw方法被捕获以后，会附带执行下一条yield表达式。也就是说，会附带执行一次next方法。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> gen = <span class="function"><span class="keyword">function</span>* <span class="title">gen</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="built_in">console</span>.log(<span class="string">'a'</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">yield</span> <span class="built_in">console</span>.log(<span class="string">'b'</span>);</span><br><span class="line">  <span class="keyword">yield</span> <span class="built_in">console</span>.log(<span class="string">'c'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> g = gen();</span><br><span class="line">g.next() <span class="comment">// a</span></span><br><span class="line">g.throw() <span class="comment">// b</span></span><br><span class="line">g.next() <span class="comment">// c</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，<code>g.throw</code>方法被捕获以后，自动执行了一次<code>next</code>方法，所以会打印b。另外，也可以看到，只要<code>Generator</code> 函数内部部署了<code>try...catch</code>代码块，那么遍历器的<code>throw</code>方法抛出的错误，不影响下一次遍历。</p>
+<h3 id="Generator-prototype-return"><a href="#Generator-prototype-return" class="headerlink" title="Generator.prototype.return()"></a>Generator.prototype.return()</h3><p><code>Generator</code>函数返回的遍历器对象，还有一个<code>return</code>方法，可以返回给定的值，并且终结遍历<code>Generator</code>函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">gen</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> g = gen();</span><br><span class="line"></span><br><span class="line">g.next()        <span class="comment">// &#123; value: 1, done: false &#125;</span></span><br><span class="line">g.return(<span class="string">'foo'</span>) <span class="comment">// &#123; value: "foo", done: true &#125;</span></span><br><span class="line">g.next()        <span class="comment">// &#123; value: undefined, done: true &#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，遍历器对象g调用<code>return</code>方法后，返回值的value属性就是return方法的参数foo。并且，<code>Generator</code>函数的遍历就终止了，返回值的done属性为true，以后再调用<code>next</code>方法，done属性总是返回true。</p>
+<p>如果return方法调用时，不提供参数，则返回值的value属性为undefined。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function* gen() &#123;</span><br><span class="line">  yield 1;</span><br><span class="line">  yield 2;</span><br><span class="line">  yield 3;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var g = gen();</span><br><span class="line"></span><br><span class="line">g.next()        // &#123; value: 1, done: false &#125;</span><br><span class="line">g.return() // &#123; value: undefined, done: true &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果<code>Generator</code>函数内部有<code>try...finally</code>代码块，那么return方法会推迟到finally代码块执行完再执行。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">numbers</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">3</span>;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">5</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">yield</span> <span class="number">6</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> g = numbers();</span><br><span class="line">g.next() <span class="comment">// &#123; value: 1, done: false &#125;</span></span><br><span class="line">g.next() <span class="comment">// &#123; value: 2, done: false &#125;</span></span><br><span class="line">g.return(<span class="number">7</span>) <span class="comment">// &#123; value: 4, done: false &#125;</span></span><br><span class="line">g.next() <span class="comment">// &#123; value: 5, done: false &#125;</span></span><br><span class="line">g.next() <span class="comment">// &#123; value: 7, done: true &#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，调用return方法后，就开始执行finally代码块，然后等到finally代码块执行完，再执行return方法。</p>
+<h3 id="next-、throw-、return-的共同点"><a href="#next-、throw-、return-的共同点" class="headerlink" title="next()、throw()、return() 的共同点"></a>next()、throw()、return() 的共同点</h3><p><code>next()</code>、<code>throw()</code>、<code>return()</code>这三个方法本质上是同一件事，可以放在一起理解。它们的作用都是让<code>Generator</code> 函数恢复执行，并且使用不同的语句替换<code>yield</code>表达式。</p>
+<p><code>next()</code>是将<code>yield</code>表达式替换成一个值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> g = <span class="function"><span class="keyword">function</span>* (<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> result = <span class="keyword">yield</span> x + y;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gen = g(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">gen.next();         <span class="comment">// Object &#123;value: 3, done: false&#125;</span></span><br><span class="line"></span><br><span class="line">gen.next(<span class="number">1</span>);        <span class="comment">// Object &#123;value: 1, done: true&#125;</span></span><br><span class="line"><span class="comment">// 相当于将 let result = yield x + y</span></span><br><span class="line"><span class="comment">// 替换成 let result = 1;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面代码中，第二个<code>next(1)</code>方法就相当于将<code>yield</code>表达式替换成一个值1。如果next方法没有参数，就相当于替换成undefined。</p>
+<p><code>throw()</code>是将yield表达式替换成一个throw语句。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gen.throw(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'出错了'</span>));           <span class="comment">// Uncaught Error: 出错了</span></span><br><span class="line"><span class="comment">// 相当于将 let result = yield x + y</span></span><br><span class="line"><span class="comment">// 替换成 let result = throw(new Error('出错了'));</span></span><br></pre></td></tr></table></figure></p>
+<p><code>return()</code>是将yield表达式替换成一个return语句。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gen.return(<span class="number">2</span>);          <span class="comment">// Object &#123;value: 2, done: true&#125;</span></span><br><span class="line"><span class="comment">// 相当于将 let result = yield x + y</span></span><br><span class="line"><span class="comment">// 替换成 let result = return 2;</span></span><br></pre></td></tr></table></figure></p>
+<p>未完待续…</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/ES6/" rel="tag"># ES6</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/03/宽松相等和严格相等/" rel="next" title="宽松相等和严格相等">
+                <i class="fa fa-chevron-left"></i> 宽松相等和严格相等
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/17/《ES6总结之Generator与Iterator下》/" rel="prev" title="《ES6总结之Generator与Iterator下》">
+                《ES6总结之Generator与Iterator下》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Generator生成器"><span class="nav-number">1.</span> <span class="nav-text">Generator生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#总览"><span class="nav-number">1.1.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个迭代器"><span class="nav-number">1.2.</span> <span class="nav-text">多个迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield表达式"><span class="nav-number">1.3.</span> <span class="nav-text">yield表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generator-prototype-throw"><span class="nav-number">1.4.</span> <span class="nav-text">Generator.prototype.throw()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generator-prototype-return"><span class="nav-number">1.5.</span> <span class="nav-text">Generator.prototype.return()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#next-、throw-、return-的共同点"><span class="nav-number">1.6.</span> <span class="nav-text">next()、throw()、return() 的共同点</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

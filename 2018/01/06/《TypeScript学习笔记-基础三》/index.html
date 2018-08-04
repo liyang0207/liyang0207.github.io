@@ -1,0 +1,910 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,TypeScript," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="今天来说一下基础篇剩下的一些内容：类型断言、声明文件和内置对象 类型断言类型断言（Type Assertion）可以用来手动指定一个值的类型。语法：&amp;lt;类型&amp;gt;值或者值 as 类型 将一个联合类型的变量指定为一个更加具体的类型之前说，当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法：1234function getL">
+<meta name="keywords" content="知识积累,TypeScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《TypeScript学习笔记-基础三》">
+<meta property="og:url" content="http://yoursite.com/2018/01/06/《TypeScript学习笔记-基础三》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="今天来说一下基础篇剩下的一些内容：类型断言、声明文件和内置对象 类型断言类型断言（Type Assertion）可以用来手动指定一个值的类型。语法：&amp;lt;类型&amp;gt;值或者值 as 类型 将一个联合类型的变量指定为一个更加具体的类型之前说，当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法：1234function getL">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-04T14:33:44.861Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《TypeScript学习笔记-基础三》">
+<meta name="twitter:description" content="今天来说一下基础篇剩下的一些内容：类型断言、声明文件和内置对象 类型断言类型断言（Type Assertion）可以用来手动指定一个值的类型。语法：&amp;lt;类型&amp;gt;值或者值 as 类型 将一个联合类型的变量指定为一个更加具体的类型之前说，当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法：1234function getL">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/06/《TypeScript学习笔记-基础三》/"/>
+
+
+
+
+
+  <title> 《TypeScript学习笔记-基础三》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/06/《TypeScript学习笔记-基础三》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《TypeScript学习笔记-基础三》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T20:17:45+08:00">
+                2018-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天来说一下基础篇剩下的一些内容：类型断言、声明文件和内置对象</p>
+<h3 id="类型断言"><a href="#类型断言" class="headerlink" title="类型断言"></a>类型断言</h3><p>类型断言（Type Assertion）可以用来手动指定一个值的类型。<br>语法：<code>&lt;类型&gt;值</code>或者<code>值 as 类型</code></p>
+<h4 id="将一个联合类型的变量指定为一个更加具体的类型"><a href="#将一个联合类型的变量指定为一个更加具体的类型" class="headerlink" title="将一个联合类型的变量指定为一个更加具体的类型"></a>将一个联合类型的变量指定为一个更加具体的类型</h4><p>之前说，当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLenth</span>(<span class="params">something: string | number</span>): <span class="title">number</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> something.length;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//编译错误</span></span><br></pre></td></tr></table></figure></p>
+<p>而有时候，我们确实需要在还不确定类型的时候就访问其中一个类型的属性或方法，比如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLength</span>(<span class="params">something: string | number</span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (something.length) &#123;</span><br><span class="line">        <span class="keyword">return</span> something.length;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> something.toString().length;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//编译错误</span></span><br></pre></td></tr></table></figure>
+<p>此时，可以使用类型断言，将<code>something</code>断言成<code>string</code>:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLength</span>(<span class="params">something: string | number</span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((<span class="xml"><span class="tag">&lt;<span class="name">string</span>&gt;</span>something).length)&#123;</span></span><br><span class="line">        return (&lt;string&gt;something).length;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return something.toString().length;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的："><a href="#类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的：" class="headerlink" title="类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的："></a>类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的：</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">toBoolean</span>(<span class="params">something: string | number</span>): <span class="title">boolean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">boolean</span>&gt;</span>something;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"><span class="xml">//编译错误，Type 'string | number' cannot be converted to type 'boolean'.</span></span><br></pre></td></tr></table></figure>
+<h3 id="声明文件"><a href="#声明文件" class="headerlink" title="声明文件"></a>声明文件</h3><p>当使用第三方库时，我们需要引入它的声明文件。</p>
+<h4 id="声明语句"><a href="#声明语句" class="headerlink" title="声明语句"></a>声明语句</h4><p>假如我们想使用第三方库，比如jQuery，我们通常这样获取一个<code>id</code>是<code>foo</code>的元素：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="string">'#foo'</span>);</span><br><span class="line"><span class="comment">//or</span></span><br><span class="line">jQuery(<span class="string">'#foo'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>但TS并不知道<code>$</code>或者<code>jQuery</code>是什么东西，这时候我们就需要使用<code>declare</code>关键字来定义它的类型，帮助<code>TypeScript</code>判断我们的传入的参数类型对不对：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">declare <span class="keyword">var</span> jQuery:<span class="function">(<span class="params">string</span>) =&gt;</span> any;</span><br><span class="line">jQuery(<span class="string">'#foo'</span>);</span><br></pre></td></tr></table></figure></p>
+<p><code>declare</code>定义的类型只会用于编译时的检查，编译结果中会被删除。上面编译结果为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jQuery(<span class="string">'#foo'</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="声明文件-1"><a href="#声明文件-1" class="headerlink" title="声明文件"></a>声明文件</h4><p>通常我们会把类型声明放到一个单独的文件中，这就是声明文件：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// jQuery.d.ts</span></span><br><span class="line">declare <span class="keyword">var</span> jQuery: <span class="function">(<span class="params">string</span>) =&gt;</span> any;</span><br></pre></td></tr></table></figure></p>
+<p>我们约定声明文件以<code>.d.ts</code>为后缀。<br>然后在使用到的文件开头，用<code>三斜线指令</code>表示引用了声明文件：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;reference path="./jQuery.d.ts" /&gt;</span></span><br><span class="line">jQuery(<span class="string">'#foo'</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="第三方声明文件"><a href="#第三方声明文件" class="headerlink" title="第三方声明文件"></a>第三方声明文件</h4><p>当然，jQuery 的声明文件不需要我们定义了，已经有人帮我们定义好了：<a href="https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/jquery/index.d.ts" target="_blank" rel="noopener">jQuery in DefinitelyTyped</a>。<br>我们可以直接下载下来使用，但是更推荐的是使用工具统一管理第三方库的声明文件。<br>社区已经有多种方式引入声明文件，不过 TypeScript 2.0 推荐使用 @types 来管理。<br>@types 的使用方式很简单，直接用 npm 安装对应的声明模块即可，以 jQuery 举例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install @types/jquery --save-dev</span><br></pre></td></tr></table></figure></p>
+<p>可以在<a href="http://microsoft.github.io/TypeSearch/" target="_blank" rel="noopener">这个页面</a>搜索你需要的声明文件。</p>
+<h3 id="内置对象"><a href="#内置对象" class="headerlink" title="内置对象"></a>内置对象</h3><p>JavaScript 中有很多<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects" target="_blank" rel="noopener">内置对象</a>，它们可以直接在 TypeScript 中当做定义好了的类型。<br>内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。</p>
+<h4 id="ECMAScript-的内置对象"><a href="#ECMAScript-的内置对象" class="headerlink" title="ECMAScript 的内置对象"></a>ECMAScript 的内置对象</h4><p>ECMAScript 标准提供的内置对象有：<code>Boolean</code>、<code>Error</code>、<code>Date</code>、<code>RegExp</code> 等。我们可以在 TypeScript 中将变量定义为这些类型：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> b: <span class="built_in">Boolean</span> = <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="number">1</span>);</span><br><span class="line"><span class="keyword">let</span> e: <span class="built_in">Error</span> = <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Error occurred'</span>);</span><br><span class="line"><span class="keyword">let</span> d: <span class="built_in">Date</span> = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line"><span class="keyword">let</span> r: <span class="built_in">RegExp</span> = <span class="regexp">/[a-z]/</span>;</span><br></pre></td></tr></table></figure></p>
+<p>更多的内置对象，可以查看<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects" target="_blank" rel="noopener">MDN的文档</a>。<br>而他们的定义文件，则在<a href="https://github.com/Microsoft/TypeScript/tree/master/src/lib" target="_blank" rel="noopener">TypeScript核心库的定义文件</a>中。</p>
+<h4 id="DOM-和-BOM-的内置对象"><a href="#DOM-和-BOM-的内置对象" class="headerlink" title="DOM 和 BOM 的内置对象"></a>DOM 和 BOM 的内置对象</h4><p>DOM 和 BOM 提供的内置对象有：<code>Document</code>、<code>HTMLElement</code>、<code>Event</code>、<code>NodeList</code> 等。TypeScript 中会经常用到这些类型：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> body: HTMLElement = <span class="built_in">document</span>.body;</span><br><span class="line"><span class="keyword">let</span> allDiv: NodeList = <span class="built_in">document</span>.querySelectorAll(<span class="string">'div'</span>);</span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">'click'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e: MouseEvent</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// Do something</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h4 id="TypeScript-核心库的定义文件"><a href="#TypeScript-核心库的定义文件" class="headerlink" title="TypeScript 核心库的定义文件"></a>TypeScript 核心库的定义文件</h4><p>TypeScript 核心库的定义文件中定义了所有浏览器环境需要用到的类型，并且是预置在 TypeScript 中的。当你在使用一些常用的方法的时候，TypeScript实际上已经帮你做了很多类型判断的工作了，比如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Math</span>.pow(<span class="number">10</span>, <span class="string">'2'</span>);</span><br><span class="line"><span class="comment">// index.ts(1,14): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的例子中，Math.pow 必须接受两个 number 类型的参数。事实上 Math.pow 的类型定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">interface Math &#123;</span><br><span class="line">  /**</span><br><span class="line">   * Returns the value of a base expression taken to a specified power.</span><br><span class="line">   * @param x The base value of the expression.</span><br><span class="line">   * @param y The exponent value of the expression.</span><br><span class="line">   */</span><br><span class="line">  pow(x: number, y: number): number;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="用-TypeScript-写-Node-js"><a href="#用-TypeScript-写-Node-js" class="headerlink" title="用 TypeScript 写 Node.js"></a>用 TypeScript 写 Node.js</h4><p>Node.js 不是内置对象的一部分，如果想用 TypeScript 写 Node.js，则需要引入第三方声明文件：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install @types/node --save-dev</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/04/《TypeScript学习笔记-基础二》/" rel="next" title="《TypeScript学习笔记-基础二》">
+                <i class="fa fa-chevron-left"></i> 《TypeScript学习笔记-基础二》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/07/《TypeScript学习笔记-进阶一》/" rel="prev" title="《TypeScript学习笔记-进阶一》">
+                《TypeScript学习笔记-进阶一》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#类型断言"><span class="nav-number">1.</span> <span class="nav-text">类型断言</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#将一个联合类型的变量指定为一个更加具体的类型"><span class="nav-number">1.1.</span> <span class="nav-text">将一个联合类型的变量指定为一个更加具体的类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的："><span class="nav-number">1.2.</span> <span class="nav-text">类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#声明文件"><span class="nav-number">2.</span> <span class="nav-text">声明文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#声明语句"><span class="nav-number">2.1.</span> <span class="nav-text">声明语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#声明文件-1"><span class="nav-number">2.2.</span> <span class="nav-text">声明文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三方声明文件"><span class="nav-number">2.3.</span> <span class="nav-text">第三方声明文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内置对象"><span class="nav-number">3.</span> <span class="nav-text">内置对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ECMAScript-的内置对象"><span class="nav-number">3.1.</span> <span class="nav-text">ECMAScript 的内置对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOM-和-BOM-的内置对象"><span class="nav-number">3.2.</span> <span class="nav-text">DOM 和 BOM 的内置对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TypeScript-核心库的定义文件"><span class="nav-number">3.3.</span> <span class="nav-text">TypeScript 核心库的定义文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用-TypeScript-写-Node-js"><span class="nav-number">3.4.</span> <span class="nav-text">用 TypeScript 写 Node.js</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
