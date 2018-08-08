@@ -1,0 +1,966 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="随写,Webpack," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上两篇博客简单总结了webpack4.0的一些基础配置，写完之后对webpack有了一个入门的认识。这两天又继续对遗留的几个知识点进行了梳理，如两种开发模式的配置流程，path和publicPath的区别与作用等。但是看一些关于webpack运行原理的博客时还是会一脸懵逼，完全不知所云，而且目前来讲我并没有真正的从0配置一个webpack的项目，所有的这些知识点还都没进入实践去检验。接下来写完这一">
+<meta name="keywords" content="随写,Webpack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webpack4.0 从入门到进阶三">
+<meta property="og:url" content="http://yoursite.com/2018/08/08/webpack4-0-从入门到进阶三/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="上两篇博客简单总结了webpack4.0的一些基础配置，写完之后对webpack有了一个入门的认识。这两天又继续对遗留的几个知识点进行了梳理，如两种开发模式的配置流程，path和publicPath的区别与作用等。但是看一些关于webpack运行原理的博客时还是会一脸懵逼，完全不知所云，而且目前来讲我并没有真正的从0配置一个webpack的项目，所有的这些知识点还都没进入实践去检验。接下来写完这一">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/wp9.png">
+<meta property="og:image" content="http://yoursite.com/images/wp10.png">
+<meta property="og:image" content="http://yoursite.com/images/wp11.png">
+<meta property="og:image" content="http://yoursite.com/images/wp12.png">
+<meta property="og:image" content="http://yoursite.com/images/wp13.png">
+<meta property="og:image" content="http://yoursite.com/images/wp14.png">
+<meta property="og:updated_time" content="2018-08-08T13:01:13.606Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webpack4.0 从入门到进阶三">
+<meta name="twitter:description" content="上两篇博客简单总结了webpack4.0的一些基础配置，写完之后对webpack有了一个入门的认识。这两天又继续对遗留的几个知识点进行了梳理，如两种开发模式的配置流程，path和publicPath的区别与作用等。但是看一些关于webpack运行原理的博客时还是会一脸懵逼，完全不知所云，而且目前来讲我并没有真正的从0配置一个webpack的项目，所有的这些知识点还都没进入实践去检验。接下来写完这一">
+<meta name="twitter:image" content="http://yoursite.com/images/wp9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/08/08/webpack4-0-从入门到进阶三/"/>
+
+
+
+
+
+  <title> webpack4.0 从入门到进阶三 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/08/webpack4-0-从入门到进阶三/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                webpack4.0 从入门到进阶三
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-08T20:58:16+08:00">
+                2018-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上两篇博客简单总结了webpack4.0的一些基础配置，写完之后对webpack有了一个入门的认识。这两天又继续对遗留的几个知识点进行了梳理，如两种开发模式的配置流程，<code>path</code>和<code>publicPath</code>的区别与作用等。但是看一些关于webpack运行原理的博客时还是会一脸懵逼，完全不知所云，而且目前来讲我并没有真正的从0配置一个webpack的项目，所有的这些知识点还都没进入实践去检验。接下来写完这一两篇博客后，会着手开始<code>react</code>框架的学习，到时候结合项目，再去深入的理解<code>webpack</code>。</p>
+<h3 id="生产模式-amp-amp-开发模式"><a href="#生产模式-amp-amp-开发模式" class="headerlink" title="生产模式&amp;&amp;开发模式"></a>生产模式&amp;&amp;开发模式</h3><p>现代前端工程项目，不管是使用<code>angular-cli</code>还是<code>vue-cli</code>来搭建，都会有本地开发和线上生产两种模式，命令行运行<code>npm run dev</code>即可在本地起一个服务，方便本地开发调试。之前讲<code>webpack4.0</code>新增了<code>mode</code>模式，之后会简化两种模式的配置，但是我们还是先来看一下4.0之前是如何配置两种模式的配置文件的，这里以<code>vue</code>为例。</p>
+<h4 id="vue的最佳实践"><a href="#vue的最佳实践" class="headerlink" title="vue的最佳实践"></a>vue的最佳实践</h4><p><code>vue-cli</code>脚手架生成的工程项目结构非常清晰，值得反复看，反复理解，它关于生产和开发模式的配置主要是这些文件：</p>
+<p><img src="/images/wp9.png" alt=""></p>
+<p><code>webpack.base.conf.js</code>中是一些公共的配置，然后通过<code>webpack-merge</code>把这些公共配置项和环境特定的配置项 merge 起来，成为一个完整的配置项。比如在<code>webpack.dev.conf.js</code>中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span></span><br><span class="line"><span class="keyword">const</span> merge = <span class="built_in">require</span>(<span class="string">'webpack-merge'</span>)</span><br><span class="line"><span class="keyword">const</span> baseWebpackConfig = <span class="built_in">require</span>(<span class="string">'./webpack.base.conf'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> devWebpackConfig = merge(baseWebpackConfig, &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>通过这种方式，开发和生产两种模式就可以有各种独有的wenpack配置项，更关键的是，每个配置中用 <code>webpack.DefinePlugin</code> 向代码注入了 <code>NODE\_ENV</code> 这个环境变量。这个变量在不同环境下有不同的值，比如 dev 环境下就是 development。这些环境变量的值是在 config 文件夹下的配置文件中定义的。Webpack 首先从配置文件中读取这个值，然后注入。比如这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//webpack.dev.conf.js</span></span><br><span class="line">plugins: [</span><br><span class="line">  <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">    <span class="string">'process.env'</span>: <span class="built_in">require</span>(<span class="string">'../config/dev.env.js'</span>)</span><br><span class="line">  &#125;),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//dev.env.js</span></span><br><span class="line"><span class="meta">'use strict'</span></span><br><span class="line"><span class="keyword">const</span> merge = <span class="built_in">require</span>(<span class="string">'webpack-merge'</span>)</span><br><span class="line"><span class="keyword">const</span> prodEnv = <span class="built_in">require</span>(<span class="string">'./prod.env'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = merge(prodEnv, &#123;</span><br><span class="line">  NODE_ENV: <span class="string">'"development"'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这样我们就可以根据当前环境做判断，执行不同逻辑的代码，比如这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//utils.js</span></span><br><span class="line"><span class="comment">// 根据环境使用不同资源地址assetsSubDirectory</span></span><br><span class="line">exports.assetsPath = <span class="function"><span class="keyword">function</span> (<span class="params">_path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> assetsSubDirectory = process.env.NODE_ENV === <span class="string">'production'</span></span><br><span class="line">    ? config.build.assetsSubDirectory</span><br><span class="line">    : config.dev.assetsSubDirectory</span><br><span class="line">  <span class="keyword">return</span> path.posix.join(assetsSubDirectory, _path)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种区分不同的环境，并给环境变量设置不同的值的实践，让我们开启了编译时按环境对代码进行针对性优化的可能。 </p>
+<h4 id="模拟4-0之前"><a href="#模拟4-0之前" class="headerlink" title="模拟4.0之前"></a>模拟4.0之前</h4><p>看的再多不如手写一遍。我们先来手动实现vue的模式。首先我们安装两个依赖：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i webpack-merge uglifyjs-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+<p>然后新建<code>webpack.dev.conf.js</code>和<code>webpack.prod.conf.js</code>两个文件，同时将<code>webpack.conf.js</code>修改为<code>webpack.base.conf.js</code>:</p>
+<p><img src="/images/wp10.png" alt=""></p>
+<p>我们将<code>devServer</code>配置移动到<code>webpack.dev.conf.js</code>中，同时新增一个<code>devtool</code>配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> merge = <span class="built_in">require</span>(<span class="string">'webpack-merge'</span>);</span><br><span class="line"><span class="keyword">const</span> baseWebpackConfig = <span class="built_in">require</span>(<span class="string">'./webpack.base.conf'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = merge(baseWebpackConfig, &#123;</span><br><span class="line">  mode: <span class="string">'development'</span>,</span><br><span class="line">  devServer: &#123;<span class="comment">//配置此静态文件服务器，可以用来预览打包后项目</span></span><br><span class="line">    inline:<span class="literal">true</span>,<span class="comment">//打包后加入一个websocket客户端</span></span><br><span class="line">    contentBase: path.resolve(__dirname, <span class="string">'dist'</span>),<span class="comment">//开发服务运行时的文件根目录</span></span><br><span class="line">    host: <span class="string">'localhost'</span>,<span class="comment">//主机地址</span></span><br><span class="line">    port: <span class="number">4200</span>,<span class="comment">//端口号</span></span><br><span class="line">    compress: <span class="literal">true</span>,<span class="comment">//开发服务器是否启动gzip等压缩</span></span><br><span class="line">    open:<span class="literal">true</span>, <span class="comment">// 自动打开浏览器</span></span><br><span class="line">  &#125;,</span><br><span class="line">  devtool: <span class="string">'cheap-module-eval-source-map'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>使用<code>webpack-merge</code>合并基础配置和开发配置，这里就简单这么配置。接下来配置一下<code>webpack.prod.conf.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> merge = <span class="built_in">require</span>(<span class="string">'webpack-merge'</span>);</span><br><span class="line"><span class="keyword">const</span> baseWebpackConfig = <span class="built_in">require</span>(<span class="string">'./webpack.base.conf.js'</span>);</span><br><span class="line"><span class="keyword">const</span> UglifyJsPlugin = <span class="built_in">require</span>(<span class="string">'uglifyjs-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = merge(baseWebpackConfig, &#123;</span><br><span class="line">  mode: <span class="string">'production'</span>,</span><br><span class="line">  devtool: <span class="string">'#source-map'</span>,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> UglifyJsPlugin(&#123;</span><br><span class="line">      uglifyOptions: &#123;</span><br><span class="line">        compress: &#123;</span><br><span class="line">          warnings: <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      sourceMap: <span class="literal">true</span>,</span><br><span class="line">      parallel: <span class="literal">true</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这里我们配置了一个不同的<code>devtool</code>配置，然后新引入一个<code>uglifyjs-webpack-plugin</code>插件，用来压缩混淆js文件。最后我们为了方便测试效果，将<code>package.json</code>中的命令这么修改：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...  </span><br><span class="line">"scripts": &#123;</span><br><span class="line">   "dev": "webpack --config webpack.dev.conf.js",</span><br><span class="line">   "build": "webpack --config webpack.prod.conf.js"</span><br><span class="line"> &#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>接下来我们分别运行<code>npm run dev</code>和<code>npm run build</code>，观察生成的<code>dist</code>文件夹有什么不同：</p>
+<p><img src="/images/wp11.png" alt="npm run dev"></p>
+<p><img src="/images/wp12.png" alt="npm run build"></p>
+<p>从这个简单的实践我们就实现了一个很粗糙的运行模式拆分。剩下的就是针对具体的项目需求来编写更加强大的<code>webpack</code>配置了，当然还是强烈推荐去看<code>vue</code>脚手架生成的项目结构，越看越觉得有收获。</p>
+<h4 id="webpack4-0模式初探"><a href="#webpack4-0模式初探" class="headerlink" title="webpack4.0模式初探"></a>webpack4.0模式初探</h4><p><code>webpack4.0</code>新增了<code>mode</code>配置，可选值有<code>development</code>/<code>production</code>/<code>none</code>，借用官方文档：</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>development</td>
+<td>会将 <code>process.env.NODE_ENV</code> 的值设为 <code>development</code>。启用 <code>NamedChunksPlugin</code> 和 <code>NamedModulesPlugin</code>。</td>
+</tr>
+<tr>
+<td>production</td>
+<td>会将 <code>process.env.NODE_ENV</code> 的值设为 <code>production</code>。启用 <code>FlagDependencyUsagePlugin</code>, <code>FlagIncludedChunksPlugin</code>, <code>ModuleConcatenationPlugin</code>, <code>NoEmitOnErrorsPlugin</code>, <code>OccurrenceOrderPlugin</code>, <code>SideEffectsFlagPlugin</code> 和 <code>UglifyJsPlugin</code>.</td>
+</tr>
+<tr>
+<td>none</td>
+<td>不选用任何默认优化选项</td>
+</tr>
+</tbody>
+</table>
+<p>在不同的模式下，<code>webpack</code>会自动执行不同的插件：</p>
+<p>mode: development</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.dev.conf.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">+ mode: <span class="string">'development'</span></span><br><span class="line">- plugins: [</span><br><span class="line">-   <span class="keyword">new</span> webpack.NamedModulesPlugin(),</span><br><span class="line">-   <span class="keyword">new</span> webpack.NamedChunksPlugin(),</span><br><span class="line">-   <span class="keyword">new</span> webpack.DefinePlugin(&#123; <span class="string">"process.env.NODE_ENV"</span>: <span class="built_in">JSON</span>.stringify(<span class="string">"development"</span>) &#125;),</span><br><span class="line">- ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>mode: production</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.production.config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">+  mode: <span class="string">'production'</span>,</span><br><span class="line">-  plugins: [</span><br><span class="line">-    <span class="keyword">new</span> UglifyJsPlugin(<span class="comment">/* ... */</span>),</span><br><span class="line">-    <span class="keyword">new</span> webpack.DefinePlugin(&#123; <span class="string">"process.env.NODE_ENV"</span>: <span class="built_in">JSON</span>.stringify(<span class="string">"production"</span>) &#125;),</span><br><span class="line">-    <span class="keyword">new</span> webpack.optimize.ModuleConcatenationPlugin(),</span><br><span class="line">-    <span class="keyword">new</span> webpack.NoEmitOnErrorsPlugin()</span><br><span class="line">-  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>mode: none</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.custom.config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">+  mode: <span class="string">'none'</span>,</span><br><span class="line">-  plugins: [</span><br><span class="line">-  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果你想要根据 <em>webpack.config.js</em> 中的 <strong>mode</strong> 变量去影响编译行为，那你必须将导出对象，改为导出一个函数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> config = &#123;</span><br><span class="line">  entry: <span class="string">'./app.js'</span></span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function">(<span class="params">env, argv</span>) =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (argv.mode === <span class="string">'development'</span>) &#123;</span><br><span class="line">    config.devtool = <span class="string">'source-map'</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (argv.mode === <span class="string">'production'</span>) &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> config;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>但是这个选项的加入，如何优雅的跟之前拆分文件的形式结合，还得看社区大神们的整合方式，不管怎样，以后遇到心里就有底了。</p>
+<h3 id="path-amp-amp-publicPath"><a href="#path-amp-amp-publicPath" class="headerlink" title="path &amp;&amp; publicPath"></a>path &amp;&amp; publicPath</h3><p>先来看一下现在我们<code>output</code>配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">"[chunkhash].bundle.js"</span>,</span><br><span class="line">    publicPath: <span class="string">'/'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>output</code>配置中<code>path</code>指定了<code>webpack</code>打包后生成的文件输入到哪里，我们之前运行<code>npm run build</code>的时候，文件都是打包到了这里，这个比较好理解，不过需要注意的是，该路径必须为绝对路径，所以我们使用了<code>path.resolve</code>来输出。</p>
+<p>简单了说完了，比较迷惑的<code>publicPath</code>来了，这个路径指什么呢？刚开始我也比较迷惑，<code>path</code>已经配置了，还要这个<code>publicPath</code>干什么？反正你静态资源（<code>css</code>、<code>image</code>）都是以此为基准嘛，等等，真的是这样吗？</p>
+<p>我们先来运行一下<code>npm run dev</code>，注意，这时候我们把命令调回到<code>webpack-dev-server</code>，同时，我们设置<code>output</code>内<code>publicPath</code>的值为<code>&quot;/&quot;</code>，该值不设置的话默认为空字符串。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"dev": "webpack-dev-server --config webpack.dev.conf.js"</span><br></pre></td></tr></table></figure>
+<p>服务启动后，打开控制台，观察<code>html</code>、<code>css</code>和<code>image</code>的加载路径：</p>
+<p><img src="/images/wp13.png" alt=""></p>
+<p>这里无法一次看完，手动写一下，第一个<code>localhost</code>即<code>document</code>文件路径是<code>http://localhost:4200/</code>，第二个<code>style.css</code>即<code>stylesheet</code>文件路径是<code>http://localhost:4200/static/css/style.css?4cb..</code>，第三个<code>wp7.png</code>即<code>png</code>文件路径是<code>http://localhost:4200/static/img/wp7.png</code>。</p>
+<p>这里我们发现，所有的静态资源文件路径都是基于<code>/</code>，即我们设置的<code>publicPath</code>，这个配置指定了你上传所有打包文件的位置（相对于服务器根目录），不过要注意，有时候我们的项目可不一定就是在网站根目录下配置的啊，有时候我们做的项目可能在<code>xxx.com/project/</code>下面部署，如果你不相应的修改<code>publicPath</code>值为<code>/project/</code>，你会发现静态资源路径依然会基于<code>/</code>，即根目录，从而导致资源无法访问到。</p>
+<p>我们来试一试，现在将<code>publicPath</code>改为<code>&quot;/project/&quot;</code>，再来运行<code>npm run dev</code>，发现页面空白，显示<code>Cannot GET/</code>，控制台内也是404，这时候我们访问<code>http://localhost:4200/project/</code>，页面加载成功，再看控制台：</p>
+<p><img src="/images/wp14.png" alt=""></p>
+<p>所有的资源路径都是在<code>/project/</code>下。</p>
+<p>这里面其实涉及到了项目打包部署的问题，我对这方面了解的比较少，所以前面才会一直搞不明白这个<code>publicPath</code>是干什么的，最近翻了翻<code>vue</code>脚手架项目，又反复测试，才渐渐有点理解。不过这里面确实需要不断的实践才能更好的理解，就如官方文档中举的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  output: &#123;</span><br><span class="line">    <span class="comment">// One of the below</span></span><br><span class="line">    publicPath: <span class="string">'https://cdn.example.com/assets/'</span>, <span class="comment">// CDN（总是 HTTPS 协议）</span></span><br><span class="line">    publicPath: <span class="string">'//cdn.example.com/assets/'</span>, <span class="comment">// CDN（协议相同）</span></span><br><span class="line">    publicPath: <span class="string">'/assets/'</span>, <span class="comment">// 相对于服务(server-relative)</span></span><br><span class="line">    publicPath: <span class="string">'assets/'</span>, <span class="comment">// 相对于 HTML 页面</span></span><br><span class="line">    publicPath: <span class="string">'../assets/'</span>, <span class="comment">// 相对于 HTML 页面</span></span><br><span class="line">    publicPath: <span class="string">''</span>, <span class="comment">// 相对于 HTML 页面（目录相同）</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>上面还涉及到了资源在CDN的情况，理解了这些，以后就可以愉快的配合运维同学一起部署上线了，再遇到问题，查看官方文档就有迹可循了。</p>
+<p><code>webpack</code>系列暂时告一段落，但是绝不是结束，后续的运行原理还等着我去研究和学习，到现在为止，感觉继续单纯的纸上谈兵已经不能有较大的提升了，接下来就是到项目中去，结合项目进行学习，巩固和调整。</p>
+<p>参考文章：<a href="https://webpack.docschina.org/configuration/output/#output-path" target="_blank" rel="noopener">官方中文文档</a>，<a href="https://juejin.im/post/5b304f1f51882574c72f19b0" target="_blank" rel="noopener">Webpack 4 配置最佳实践</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/随写/" rel="tag"># 随写</a>
+          
+            <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/06/webpack4-0-从入门到进阶二/" rel="next" title="webpack4.0 从入门到进阶二">
+                <i class="fa fa-chevron-left"></i> webpack4.0 从入门到进阶二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#生产模式-amp-amp-开发模式"><span class="nav-number">1.</span> <span class="nav-text">生产模式&amp;&amp;开发模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#vue的最佳实践"><span class="nav-number">1.1.</span> <span class="nav-text">vue的最佳实践</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟4-0之前"><span class="nav-number">1.2.</span> <span class="nav-text">模拟4.0之前</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#webpack4-0模式初探"><span class="nav-number">1.3.</span> <span class="nav-text">webpack4.0模式初探</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#path-amp-amp-publicPath"><span class="nav-number">2.</span> <span class="nav-text">path &amp;&amp; publicPath</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
