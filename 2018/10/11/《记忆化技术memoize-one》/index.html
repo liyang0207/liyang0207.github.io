@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,react," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近在努力学习react中，各种工具概念应接不暇：react-redux、dva、umi、redux-saga、ant design pro…每一个都需要耗费时间去接触熟悉。上个月常刷的leetCode刷到中等难度题也开始屡屡碰壁，果然罗马不是一天建成的，还是要不断跳出舒适区，不断折腾才能前进。 引入场景平时在开发中，少不了前端对服务器传来的数据进行处理整合，然后丢给框架去render。react">
+<meta name="keywords" content="知识积累,react">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《记忆化技术memoize-one》">
+<meta property="og:url" content="http://yoursite.com/2018/10/11/《记忆化技术memoize-one》/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="最近在努力学习react中，各种工具概念应接不暇：react-redux、dva、umi、redux-saga、ant design pro…每一个都需要耗费时间去接触熟悉。上个月常刷的leetCode刷到中等难度题也开始屡屡碰壁，果然罗马不是一天建成的，还是要不断跳出舒适区，不断折腾才能前进。 引入场景平时在开发中，少不了前端对服务器传来的数据进行处理整合，然后丢给框架去render。react">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-10-11T13:08:39.851Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《记忆化技术memoize-one》">
+<meta name="twitter:description" content="最近在努力学习react中，各种工具概念应接不暇：react-redux、dva、umi、redux-saga、ant design pro…每一个都需要耗费时间去接触熟悉。上个月常刷的leetCode刷到中等难度题也开始屡屡碰壁，果然罗马不是一天建成的，还是要不断跳出舒适区，不断折腾才能前进。 引入场景平时在开发中，少不了前端对服务器传来的数据进行处理整合，然后丢给框架去render。react">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/11/《记忆化技术memoize-one》/"/>
+
+
+
+
+
+  <title> 《记忆化技术memoize-one》 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/11/《记忆化技术memoize-one》/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                《记忆化技术memoize-one》
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-11T20:54:03+08:00">
+                2018-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在努力学习react中，各种工具概念应接不暇：<code>react-redux</code>、<code>dva</code>、<code>umi</code>、<code>redux-saga</code>、<code>ant design pro</code>…每一个都需要耗费时间去接触熟悉。上个月常刷的<code>leetCode</code>刷到中等难度题也开始屡屡碰壁，果然罗马不是一天建成的，还是要不断跳出舒适区，不断折腾才能前进。</p>
+<h3 id="引入场景"><a href="#引入场景" class="headerlink" title="引入场景"></a>引入场景</h3><p>平时在开发中，少不了前端对服务器传来的数据进行处理整合，然后丢给框架去<code>render</code>。<code>react</code>配合<code>redux</code>开发时，外层容器组件的<code>props</code>改变时，都会调用<code>render()</code>去<code>diff</code>渲染。假如我们在<code>render()</code>内进行了复杂的数据处理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; PureComponent &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TableList</span> <span class="keyword">extends</span> <span class="title">PureComponent</span> </span>&#123;</span><br><span class="line">  state = &#123; <span class="attr">filterText</span>: <span class="string">""</span> &#125;;</span><br><span class="line">  handleChange = <span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">filterText</span>: event.target.value &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> filteredList = <span class="keyword">this</span>.props.list.filter(</span><br><span class="line">      item =&gt; item.text.includes(<span class="keyword">this</span>.state.filterText)</span><br><span class="line">    )</span><br><span class="line">    <span class="comment">//过滤数据</span></span><br><span class="line">    <span class="keyword">const</span> filteredList = list.filter(<span class="function"><span class="params">item</span> =&gt;</span> item.name === <span class="keyword">this</span>.state.filterName)</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;Fragment&gt;</span><br><span class="line">        &lt;input onChange=&#123;<span class="keyword">this</span>.handleChange&#125; value=&#123;<span class="keyword">this</span>.state.filterText&#125; /&gt;</span><br><span class="line">        &lt;ul&gt;&#123;filteredList.map(<span class="function"><span class="params">item</span> =&gt;</span> &lt;li key=&#123;item.id&#125;&gt;&#123;item.text&#125;&lt;<span class="regexp">/li&gt;)&#125;&lt;/u</span>l&gt;</span><br><span class="line">      &lt;<span class="regexp">/Fragment&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>每一次<code>render()</code>都会去过滤一次数据，假如我们这个组件的<code>title</code>经常变化，但是<code>list</code>数据不变，就会消耗大量计算时间，导致性能问题。</p>
+<p>而在实际的开发中，数据结构往往更加复杂，有时候甚至会有多次的循环。有时候组件的更新<strong>并不是</strong>因为从服务器拿来的这一段数据结构发生变化造成的（组件中的其他部分更新造成的），但是这一段很重的逻辑因为是写在 render 中的，所以不可避免的在每次 render 会调用一次。如果这段逻辑在两次调用的时候，输入参数是一样的，那么输出结果必然一样，所以再次计算是一种十分浪费资源的行为。</p>
+<p>接下来我们使用<code>记忆化技术</code>来优化。</p>
+<h3 id="记忆化库-memoize-one"><a href="#记忆化库-memoize-one" class="headerlink" title="记忆化库-memoize-one"></a>记忆化库-memoize-one</h3><p>根据<code>memoize-one</code>名字中的<code>one</code>可以知道，这个库的每个实例都缓存了一个结果，下一次不同的结果将覆盖上一次的。虽然只能缓存一个数据，但是用到合适的地方却能发挥很大的作用。</p>
+<p>使用<code>npm</code>安装：<code>$ npm install memoize-one</code>，先看一下官方例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> memoizeOne <span class="keyword">from</span> <span class="string">'memoize-one'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> add = <span class="function">(<span class="params">a, b</span>) =&gt;</span> a + b;</span><br><span class="line"><span class="keyword">const</span> memoizedAdd = memoizeOne(add);</span><br><span class="line"> </span><br><span class="line">memoizedAdd(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line"> </span><br><span class="line">memoizedAdd(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line"><span class="comment">// Add 函数并没有执行: 前一次执行的结果被返回</span></span><br><span class="line"> </span><br><span class="line">memoizedAdd(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">// 5</span></span><br><span class="line"><span class="comment">// Add 函数再次被调用以获得新的结果</span></span><br><span class="line"> </span><br><span class="line">memoizedAdd(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">// 5</span></span><br><span class="line"><span class="comment">// Add 函数并没有执行: 前一次执行的结果被返回</span></span><br><span class="line"> </span><br><span class="line">memoizedAdd(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// 3</span></span><br><span class="line"><span class="comment">// Add 函数再次被调用以获得新的结果</span></span><br><span class="line"><span class="comment">// 虽然之前调用过</span></span><br><span class="line"><span class="comment">// 但是不是上一次调用的，所以结果丢失了</span></span><br></pre></td></tr></table></figure>
+<p><code>memoizeOne(resultFn, isEqual)</code>接收一个结果函数和一个对比函数，对比函数为空则默认使用<code>===</code>来进行入参的比较。</p>
+<p>简单来讲就是，<code>memoizeOne()</code>在原来<code>resultFn()</code>函数外面包了一层，返回一个函数，然后每次调用的时候看新入参<code>newArgs</code>是否和上一次的入参<code>lastArgs</code>一致，参数不变，则直接返回缓存的结果，否则重新执行<code>resultFn(newArgs)</code>，缓存新结果。</p>
+<p>简单改造一下上面的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; Component &#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> memoizeOne <span class="keyword">from</span> <span class="string">'memoize-one'</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TableList</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  state = &#123; <span class="attr">filterText</span>: <span class="string">""</span> &#125;;</span><br><span class="line">  handleChange = <span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123; <span class="attr">filterText</span>: event.target.value &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line">  filter = memoize(</span><br><span class="line">    (list, filterText) =&gt; list.filter(<span class="function"><span class="params">item</span> =&gt;</span> item.text.includes(filterText))</span><br><span class="line">  );</span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; list, title &#125; = <span class="keyword">this</span>.props;</span><br><span class="line">    <span class="comment">//当list和filterName不变时，filteredList返回值不变</span></span><br><span class="line">    <span class="keyword">const</span> filteredList = <span class="keyword">this</span>.filter(list, <span class="keyword">this</span>.state.filterText);</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;Fragment&gt;</span><br><span class="line">        &lt;input onChange=&#123;<span class="keyword">this</span>.handleChange&#125; value=&#123;<span class="keyword">this</span>.state.filterText&#125; /&gt;</span><br><span class="line">      	&lt;ul&gt;&#123;filteredList.map(<span class="function"><span class="params">item</span> =&gt;</span> &lt;li key=&#123;item.id&#125;&gt;&#123;item.text&#125;&lt;<span class="regexp">/li&gt;)&#125;&lt;/u</span>l&gt;</span><br><span class="line">      &lt;<span class="regexp">/Fragment&gt;</span></span><br><span class="line"><span class="regexp">    )</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>这样就简单的实现了一个记忆优化。</p>
+<h3 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h3><p><code>memoize-one</code>记忆库巧妙的使用了<code>闭包</code>来实现，一般我是不看源码的，但是这个库的源码只有不到40行的代码，简单易懂，这里就简单看一下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//isEqual比较函数，用来判断参数是否一致，默认使用全等来判断</span></span><br><span class="line"><span class="keyword">var</span> simpleIsEqual = <span class="function"><span class="keyword">function</span> <span class="title">simpleIsEqual</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a === b;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">index</span> (<span class="params">resultFn, isEqual</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//不传isEqual，使用默认的内置函数</span></span><br><span class="line">  <span class="keyword">if</span> (isEqual === <span class="keyword">void</span> <span class="number">0</span>) &#123;</span><br><span class="line">    isEqual = simpleIsEqual;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> lastThis;</span><br><span class="line">  <span class="keyword">var</span> lastArgs = [];  <span class="comment">//上一次的入参</span></span><br><span class="line">  <span class="keyword">var</span> lastResult;     <span class="comment">//缓存的结果</span></span><br><span class="line">  <span class="keyword">var</span> calledOnce = <span class="literal">false</span>;  <span class="comment">//是否调用过，区分第一次</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">//判断两次入参是否相等，使用了every方法，这个是every方法的函数</span></span><br><span class="line">  <span class="keyword">var</span> isNewArgEqualToLast = <span class="function"><span class="keyword">function</span> <span class="title">isNewArgEqualToLast</span>(<span class="params">newArg, index</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> isEqual(newArg, lastArgs[index]);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> result = <span class="function"><span class="keyword">function</span> <span class="title">result</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//将入参arguments按顺序一个个存入newArgs内</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> _len = <span class="built_in">arguments</span>.length, newArgs = <span class="keyword">new</span> <span class="built_in">Array</span>(_len), _key = <span class="number">0</span>; _key &lt; _len; _key++) &#123;</span><br><span class="line">      newArgs[_key] = <span class="built_in">arguments</span>[_key];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//入参不变，直接返回缓存的结果lastResult</span></span><br><span class="line">    <span class="keyword">if</span> (calledOnce &amp;&amp; lastThis === <span class="keyword">this</span> &amp;&amp; newArgs.length === lastArgs.length &amp;&amp; newArgs.every(isNewArgEqualToLast)) &#123;</span><br><span class="line">      <span class="keyword">return</span> lastResult;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    lastResult = resultFn.apply(<span class="keyword">this</span>, newArgs);  <span class="comment">//apply到resultFn,传入参数newArgs，缓存结果</span></span><br><span class="line">    calledOnce = <span class="literal">true</span>;</span><br><span class="line">    lastThis = <span class="keyword">this</span>;  <span class="comment">//this？</span></span><br><span class="line">    lastArgs = newArgs;  <span class="comment">//新入参替换缓存的参数</span></span><br><span class="line">    <span class="keyword">return</span> lastResult;   <span class="comment">//返回新计算的结果</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> result;   <span class="comment">//返回一个函数，闭包，不被GC</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> index;</span><br></pre></td></tr></table></figure>
+<p>源码还是比较容易看懂的。</p>
+<h3 id="isEqual函数"><a href="#isEqual函数" class="headerlink" title="isEqual函数"></a>isEqual函数</h3><p>因为对相等的理解，不同场景不一样，而且参数有时候是复杂的对象，所以我们不能仅仅通过比较操作符 <code>==</code> 或者 <code>===</code> 来判断。<code>memoize-one</code> 允许用户自定义传入判断是否相等的函数，比如我们可以使用 lodash 的 isEqual 来判断两次参数是否相等。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> memoizeOne <span class="keyword">from</span> <span class="string">'memoize-one'</span>;</span><br><span class="line"><span class="keyword">import</span> deepEqual <span class="keyword">from</span> <span class="string">'lodash/isEqual'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> identity = <span class="function"><span class="params">x</span> =&gt;</span> x;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> defaultMemoization = memoizeOne(identity);</span><br><span class="line"><span class="keyword">const</span> customMemoization = memoizeOne(identity, deepEqual);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> result1 = defaultMemoization(&#123;<span class="attr">foo</span>: <span class="string">'bar'</span>&#125;);</span><br><span class="line"><span class="keyword">const</span> result2 = defaultMemoization(&#123;<span class="attr">foo</span>: <span class="string">'bar'</span>&#125;);</span><br><span class="line"> </span><br><span class="line">result1 === result2 <span class="comment">// false - 索引不同</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> result3 = customMemoization(&#123;<span class="attr">foo</span>: <span class="string">'bar'</span>&#125;);</span><br><span class="line"><span class="keyword">const</span> result4 = customMemoization(&#123;<span class="attr">foo</span>: <span class="string">'bar'</span>&#125;);</span><br><span class="line"> </span><br><span class="line">result3 === result4 <span class="comment">// true - 参数通过 lodash 的 isEqual 判断是相等的</span></span><br></pre></td></tr></table></figure>
+<p>参考链接：<a href="https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization" target="_blank" rel="noopener">what-about-memoization</a>，<a href="https://zhuanlan.zhihu.com/p/37913276" target="_blank" rel="noopener">记忆化技术介绍——使用闭包提升你的 React 性能</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/react/" rel="tag"># react</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/09/《git常用操作命令总结》/" rel="next" title="《git常用操作命令总结》">
+                <i class="fa fa-chevron-left"></i> 《git常用操作命令总结》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引入场景"><span class="nav-number">1.</span> <span class="nav-text">引入场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#记忆化库-memoize-one"><span class="nav-number">2.</span> <span class="nav-text">记忆化库-memoize-one</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码解读"><span class="nav-number">3.</span> <span class="nav-text">源码解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#isEqual函数"><span class="nav-number">4.</span> <span class="nav-text">isEqual函数</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
