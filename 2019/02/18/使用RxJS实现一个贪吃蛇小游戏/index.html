@@ -1,0 +1,957 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,RxJS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近几周趁年底年初工作事情少，把RxJS的基础知识学习了一下，算是简单入了个门，近期准备写几篇博客总结一下RxJS的相关知识点，给自己找点事情做。 概述什么是RxJS？简单来说RxJS是响应式编程技术的JavaScript实现。响应式编程Reactive Extension，也叫ReactiveX，简称Rx，用官网上的一句话解释就是：    An API for asynchronous prog">
+<meta name="keywords" content="知识积累,RxJS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用RxJS实现一个贪吃蛇小游戏">
+<meta property="og:url" content="http://yoursite.com/2019/02/18/使用RxJS实现一个贪吃蛇小游戏/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="最近几周趁年底年初工作事情少，把RxJS的基础知识学习了一下，算是简单入了个门，近期准备写几篇博客总结一下RxJS的相关知识点，给自己找点事情做。 概述什么是RxJS？简单来说RxJS是响应式编程技术的JavaScript实现。响应式编程Reactive Extension，也叫ReactiveX，简称Rx，用官网上的一句话解释就是：    An API for asynchronous prog">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake.gif">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake-streams.png">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake01.png">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake02.png">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake03.png">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake04.png">
+<meta property="og:image" content="http://yoursite.com/images/snake/snake05.png">
+<meta property="og:updated_time" content="2019-02-18T07:10:27.138Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用RxJS实现一个贪吃蛇小游戏">
+<meta name="twitter:description" content="最近几周趁年底年初工作事情少，把RxJS的基础知识学习了一下，算是简单入了个门，近期准备写几篇博客总结一下RxJS的相关知识点，给自己找点事情做。 概述什么是RxJS？简单来说RxJS是响应式编程技术的JavaScript实现。响应式编程Reactive Extension，也叫ReactiveX，简称Rx，用官网上的一句话解释就是：    An API for asynchronous prog">
+<meta name="twitter:image" content="http://yoursite.com/images/snake/snake.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/02/18/使用RxJS实现一个贪吃蛇小游戏/"/>
+
+
+
+
+
+  <title> 使用RxJS实现一个贪吃蛇小游戏 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/18/使用RxJS实现一个贪吃蛇小游戏/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用RxJS实现一个贪吃蛇小游戏
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T14:57:11+08:00">
+                2019-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近几周趁年底年初工作事情少，把<code>RxJS</code>的基础知识学习了一下，算是简单入了个门，近期准备写几篇博客总结一下<code>RxJS</code>的相关知识点，给自己找点事情做。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>什么是<code>RxJS</code>？简单来说<code>RxJS</code>是响应式编程技术的<code>JavaScript</code>实现。响应式编程<code>Reactive Extension</code>，也叫<code>ReactiveX</code>，简称<code>Rx</code>，用官网上的一句话解释就是： </p>
+<blockquote>
+<p> An API for asynchronous programming with observable streams</p>
+</blockquote>
+<p>其中，<code>Observable</code>是一种模式，有点像<code>Observer Pattern观察者模式</code>和<code>Iterator Pattern迭代器模式</code>的结合，而<code>streams</code>指的是数据流。Rx最早的实现是<code>Rx.NET</code>，之后又陆陆续续有了<code>RxJava</code>、<code>RxPy</code>等语言的实现。那<code>RxJS</code>当然就是Rx的<code>JavaScript</code>实现了。</p>
+<p>不过今天先不细说<code>RxJS</code>的一些具体细节，这两天在网上找到一篇比较有趣的博客：使用<code>RxJS</code>来简单实现一个“贪吃蛇”小游戏，感觉很有趣，就由此作为<code>RxJS</code>入门学习的引子，看看如何用<code>RxJS</code>的思维方式去思考这个游戏的实现。先看一下游戏运行的预览图：</p>
+<p><img src="/images/snake/snake.gif" alt=""></p>
+<h2 id="设计-amp-思考"><a href="#设计-amp-思考" class="headerlink" title="设计&amp;思考"></a>设计&amp;思考</h2><p>首先可以确定的是整个游戏界面都是使用<code>canvas</code>来进行绘制的，游戏中的“蛇”、“苹果”(红色块儿)和分数(动图未展示)都是<code>canvas</code>用进来的数据流<code>streams</code>来进行绘制的，而这些流的产生及走向就是我们要思考的。在响应式编程中，编程无外乎数据流及输入数据流。从概念上来说，当响应式编程执行时，它会建立一套可观察的管道，可以根据变化采取行动。我们需要理清数据源头，找到它，生成它，进而处理整合它。先来概览一下这个游戏的“流”：</p>
+<p><img src="/images/snake/snake-streams.png" alt="snake流"></p>
+<p>我们反向来进行思考。首先，canvas绘制的数据流来自于<code>scene$流</code>，这个流是由<code>snake$蛇</code>、<code>apples$苹果</code>和<code>score$分数</code>三个流合成的，但其中<code>apples$</code>流又来源于<code>snake$</code>。其次，<code>snake$</code>流受到键盘的操作输入<code>direction$</code>、蛇本身的速度<code>ticks$</code>和蛇长度<code>snakeLength$</code>的影响，这三者构成了<code>snake$</code>流的数据。再看<code>score$</code>分数流，每当蛇的长度改变时，<code>score$</code>就会改变，发出数据；最后，当我们判断到蛇吃到了苹果，<code>apples$</code>流就会发出数据，同时通过<code>appleEaten$</code>使<code>length$</code>执行<code>length$.next(point)</code>，让蛇长度<code>snakeLength$</code>进行改变，进而触发一系列的数据发出。</p>
+<p>仔细看，里面的源头只有<code>direction$键盘方向事件</code>、<code>snakeLength$</code>和<code>ticks$定时器</code>三个流。</p>
+<h2 id="实际操作"><a href="#实际操作" class="headerlink" title="实际操作"></a>实际操作</h2><h3 id="canvas游戏布局"><a href="#canvas游戏布局" class="headerlink" title="canvas游戏布局"></a>canvas游戏布局</h3><p>这部分主要涉及到使<code>canvas</code>绘制一个游戏区域，细节略过，简单贴一下代码，博客最后有超链接指向源博客，有详细的说明。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// html</span></span><br><span class="line"><span class="comment">// &lt;div id="snake"&gt;&lt;/div&gt;</span></span><br><span class="line"><span class="keyword">const</span> COLS = <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> ROWS = <span class="number">30</span>;</span><br><span class="line"><span class="keyword">const</span> GAP_SIZE = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">const</span> CELL_SIZE = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> CANVAS_WIDTH = COLS * (CELL_SIZE + GAP_SIZE);</span><br><span class="line"><span class="keyword">const</span> CANVAS_HEIGHT = ROWS * (CELL_SIZE + GAP_SIZE);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createCanvasElement</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> canvas = <span class="built_in">document</span>.createElement(<span class="string">'canvas'</span>);</span><br><span class="line">  canvas.width = CANVAS_WIDTH;</span><br><span class="line">  canvas.height = CANVAS_HEIGHT;</span><br><span class="line">  <span class="keyword">return</span> canvas;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> canvas = createCanvasElement();</span><br><span class="line"><span class="keyword">let</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">'snake'</span>).appendChild(canvas);</span><br></pre></td></tr></table></figure>
+<h3 id="键盘事件direction-流"><a href="#键盘事件direction-流" class="headerlink" title="键盘事件direction$流"></a>键盘事件direction$流</h3><p><code>RxJS</code>提供了一个<code>fromEvent()</code>操作符用来将事件转换为数据流，我们就用它来将玩家按键输入转为流数据，同时使用一些<code>map()</code>、<code>filter()</code>等操作符，来处理一下，确保只输出上下左右按键的值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; fromEvent &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; map, filter &#125; <span class="keyword">from</span> <span class="string">'rxjs/operators'</span>;</span><br><span class="line">interface Point2D &#123;</span><br><span class="line">  x: number;</span><br><span class="line">  y: number;</span><br><span class="line">&#125;</span><br><span class="line">interface Directions &#123;</span><br><span class="line">  [key: number]: Point2D;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> DIRECTIONS: Directions = &#123;</span><br><span class="line">  <span class="number">37</span>: &#123; <span class="attr">x</span>: <span class="number">-1</span>, <span class="attr">y</span>: <span class="number">0</span> &#125;,</span><br><span class="line">  <span class="number">39</span>: &#123; <span class="attr">x</span>: <span class="number">1</span>, <span class="attr">y</span>: <span class="number">0</span> &#125;,</span><br><span class="line">  <span class="number">38</span>: &#123; <span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">-1</span> &#125;,</span><br><span class="line">  <span class="number">40</span>: &#123; <span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">1</span> &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> keydown$ = fromEvent(<span class="built_in">document</span>, <span class="string">'keydown'</span>);</span><br><span class="line"><span class="keyword">let</span> direction$ = keydown$.pipe(</span><br><span class="line">  map(<span class="function">(<span class="params">event: KeyboardEvent</span>) =&gt;</span> DIRECTIONS[event.keyCode]),</span><br><span class="line">  filter(<span class="function"><span class="params">direction</span> =&gt;</span> !!direction),</span><br><span class="line">)</span><br><span class="line"><span class="comment">// 临时订阅一下direction$，简单在console里看下效果</span></span><br><span class="line">direction$.subscribe(<span class="built_in">console</span>.log);</span><br></pre></td></tr></table></figure>
+<p>页面中现在什么也没有，随便点按键盘按键，上下左右会输出值，其他键的输入会被忽略：</p>
+<p><img src="/images/snake/snake01.png" alt=""></p>
+<p>这里有个问题，我们的蛇是不能进行反方向运动的，所以我们需要忽略掉反向的输入；同时对于连续相同方向的输入，我们也应该忽略掉。这样的话我们就需要记录下键盘最后的输入状态，不过这里最好还是不要引入外部变量，全部交由Observable管道去处理，这里就要用到<code>scan</code>操作符，类似于js中的<code>reduce()</code>方法。同时对于相同方向的输入，我们使用<code>distinctUntilChangede()</code>来处理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">nextDirection</span>(<span class="params">previous, next</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> isOpposite = <span class="function">(<span class="params">previous: Point2D, next: Point2D</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> next.x === previous.x * <span class="number">-1</span> || next.y === previous.y * <span class="number">-1</span>;</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">return</span> isOpposite(previous, next) ? previous : next;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> direction$ = keydown$.pipe(</span><br><span class="line">  map(<span class="function">(<span class="params">event: KeyboardEvent</span>) =&gt;</span> DIRECTIONS[event.keyCode]),</span><br><span class="line">  filter(<span class="function"><span class="params">direction</span> =&gt;</span> !!direction),</span><br><span class="line">  startWith(INITIAL_DIRECTION),    <span class="comment">// 这里给direction$一个初始方向值</span></span><br><span class="line">  scan(nextDirection),						 <span class="comment">// 使用处理函数处理方向流</span></span><br><span class="line">  distinctUntilChanged()					 <span class="comment">// 当本次发出的数据跟前一个不同时，才会发出这个值</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这次，相同方向或者相反方向的输入都已经被处理（忽略）掉了。看一下<code>direction$</code>的<code>Marbles</code>图：</p>
+<p><img src="/images/snake/snake02.png" alt=""></p>
+<h3 id="snakeLength-蛇长流"><a href="#snakeLength-蛇长流" class="headerlink" title="snakeLength$蛇长流"></a>snakeLength$蛇长流</h3><p>我们再回头看一下上面的<code>snake流图</code>，<code>snakeLength$</code>记录的是蛇当前的长度，发出的是蛇的长度的数字流。这个流基于（或者说来源于）<code>length$</code>流，<code>length$</code>记录的是蛇每次吃到苹果时增加的长度（也是增加的分数），这时候我们需要手动把值emit出去，使用<code>BehaviorSubject()</code>来实现。当<code>length$</code>发出值，即使用<code>length$.next()</code>来给<code>Subject()</code>提供值，这个值就会在<code>snakeLength$</code>上发出。我们需要<code>snakeLength$</code>的值累加上<code>length$</code>的值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SNAKE_LENGTH = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">let</span> length$ = <span class="keyword">new</span> BehaviorSubject&lt;number&gt;(SNAKE_LENGTH);  <span class="comment">// SNAKE_LENGTH为蛇长的初始值</span></span><br><span class="line"><span class="keyword">let</span> snakeLength$ = length$.pipe(</span><br><span class="line">  scan(<span class="function">(<span class="params">snakeLength, step</span>) =&gt;</span> snakeLength + step),</span><br><span class="line">  share()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>注意，这里使用<code>share()</code>来允许多次订阅<code>Observable</code>，否则每次订阅都会重新创建源<code>Observable</code>。我们的<code>snakeLength$</code>同时被<code>snake$</code>流和<code>score$</code>流订阅，需要确保这两个流的获取的数据是同步的。</p>
+<h3 id="snake-流"><a href="#snake-流" class="headerlink" title="snake$流"></a>snake$流</h3><p>到目前，<code>direction$</code>和<code>snakeLength$</code>都已确定，还差一个<code>ticks$</code>就可以组成<code>snake$</code>流。<code>ticks$</code>是一个类计时器的东西，限定蛇的移动速度，抽象来讲就是我们需要一个按时间规律发出值的<code>Observable</code>，<code>interval()</code>操作符可以完成这个任务：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SPEED = <span class="number">120</span>;</span><br><span class="line"><span class="keyword">let</span> ticks$ = interval(SPEED);     <span class="comment">// 每隔120ms依次发出...0...1...2...</span></span><br></pre></td></tr></table></figure>
+<p>从<code>ticks$</code>到最终的<code>snake$</code>，我们需要继续思考：每当<code>ticks</code>发出值，蛇继续前进还是增加身长，取决于是否吃到了苹果，我们可以使用<code>scan()</code>操作符去积累蛇身的长度。但接下来如何组合<code>direction$</code>、<code>snakeLength$</code>和<code>ticks$</code>？</p>
+<p><code>withLatestFrom()</code>可以完美实现我们的需求，我这里直接贴上官方文档的英文释义，通俗易懂：</p>
+<blockquote>
+<p>Combines the source Observable with other Observables to create an Observable whose values are calculated from the latest values of each, only when the source emits.</p>
+</blockquote>
+<p><code>withLatestFrom()</code>组合多个<code>Observables</code>，并且具有主从关系，非常适合这里当蛇移动的时候去组合<code>direction$</code>和<code>snakeLength$</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; move, generateSnake &#125; <span class="keyword">from</span> <span class="string">'./utils'</span>;</span><br><span class="line"><span class="keyword">let</span> snake$ = ticks$.pipe(</span><br><span class="line">	withLatestFrom(direction$, snakeLength$, (_, direction, snakeLength) =&gt; [direction,snakeLength]),</span><br><span class="line">  scan(move, generateSnake()),   <span class="comment">// 根据方向流和蛇身长流来产生蛇流，最终发出[&#123;x: 1, y: 2&#125;, ...]数组对象形式的蛇流</span></span><br><span class="line">  share()  <span class="comment">// snake$被scene$和apples$使用，需要保持一致性，使用Subject()多播</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// utils.ts</span></span><br><span class="line"><span class="comment">// 处理数据，积累蛇身的数组</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">move</span>(<span class="params">snake, [direction, snakeLength]</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> nx = snake[<span class="number">0</span>].x;</span><br><span class="line">  <span class="keyword">let</span> ny = snake[<span class="number">0</span>].y;</span><br><span class="line">  nx += <span class="number">1</span> * direction.x;</span><br><span class="line">  ny += <span class="number">1</span> * direction.y;</span><br><span class="line">  <span class="keyword">let</span> tail;</span><br><span class="line">  <span class="keyword">if</span> (snakeLength &gt; snake.length) &#123;</span><br><span class="line">    tail = &#123; <span class="attr">x</span>: nx, <span class="attr">y</span>: ny &#125;;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    tail = snake.pop();</span><br><span class="line">    tail.x = nx;</span><br><span class="line">    tail.y = ny;</span><br><span class="line">  &#125;</span><br><span class="line">  snake.unshift(tail);</span><br><span class="line">  <span class="keyword">return</span> snake;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成初始蛇数据，数组对象形式</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">generateSnake</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> snake: <span class="built_in">Array</span>&lt;Point2D&gt; = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = SNAKE_LENGTH - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">    snake.push(&#123; <span class="attr">x</span>: i, <span class="attr">y</span>: <span class="number">0</span> &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> snake;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们主要的源 <code>Observable</code> 是 <code>ticks$</code>，每当管道上有新值发出，我们就取 <code>direction$</code> 和 <code>snakeLength$</code> 的最新值。注意，即使辅助流频繁地发出值(例如,玩家头撞键盘上)，也只会在每次定时器发出值时处理数据。</p>
+<p>此外，我们给 <code>withLatestFrom</code> 传入了选择器函数，当主要的流产生值时才会调用此函数。此函数是可选的，如果不传，将会生成包含所有元素的列表。来看下<code>Marbles</code>图：</p>
+<p><img src="/images/snake/snake03.png" alt=""></p>
+<p>可以看到，使用了<code>withLatestFrom()</code>后，只有当<code>ticks$</code>发出值时，才会去<code>direction$</code>和<code>snakeLength$</code>中取最近的值一起发出，然后经过<code>scan()</code>处理，生成蛇身的数组对象形式的流。</p>
+<h3 id="score-流"><a href="#score-流" class="headerlink" title="score$流"></a>score$流</h3><p>玩家的比分比较好处理，有了<code>snakeLength$</code>我们直接使用<code>scan()</code>积累一下分数即可，每当<code>snakeLength$</code>发出值，累加一次分数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> POINTS_PER_APPLE = <span class="number">1</span>;     <span class="comment">// 每次一分</span></span><br><span class="line"><span class="keyword">let</span> score$ = snakeLength$.pipe(</span><br><span class="line">  startWith(<span class="number">0</span>),  <span class="comment">// 初始0分</span></span><br><span class="line">  scan(<span class="function">(<span class="params">score, _</span>) =&gt;</span> score + POINTS_PER_APPLE)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>来看下<code>Marbles</code>图：</p>
+<p><img src="/images/snake/snake04.png" alt=""></p>
+<p>这里看似简单，其实有点小坑。可以看到<code>score$</code>中没有出现<code>snakeLength$</code>流中数据<code>5</code>对应的分数，这是因为<code>snakeLength$</code>使用了<code>share()</code>来允许多次订阅它，同时<code>snake$</code>已经先行订阅了<code>snakeLength$</code>，这时候<code>score$</code>的订阅就只会先发出<code>startWith(0)</code>初始化的数据<code>0</code>，只有等到<code>length$.next(POINT)</code>发出值，<code>snakeLength$</code>发出<code>6</code>，<code>score$</code>才会同步发出分数<code>1</code>，仔细体会一下。</p>
+<h3 id="apples-流"><a href="#apples-流" class="headerlink" title="apples$流"></a>apples$流</h3><p><code>snake$</code>和<code>score$</code>已经搞定，剩下的就是<code>apples$</code>流。先确定一下<code>apples$</code>的数据格式，我们需要在<code>canvas</code>中同时显示两个苹果，同时，如果蛇吃到了苹果，则会在页面中<code>非蛇身</code>的位置随机产生另外一个苹果。所以我们使用<code>[{x: *, y: *}, {x: **, y: **}]</code>数组对象的格式来表示苹果。每次蛇移动时都检查是否有碰撞。如果有碰撞，我们就生成一个新的苹果并返回一个<strong>新的</strong>数组。这样的话我们便可以利用 <code>distinctUntilChanged()</code> 来过滤掉完全相同的值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> apples$ = snake$.pipe(</span><br><span class="line">  scan(eat, generateApples()),</span><br><span class="line">  distinctUntilChanged(),  <span class="comment">// apples$会随着snake$发出值而发出，过滤重复值</span></span><br><span class="line">  share()  <span class="comment">// apples$也会被applesEaten$和scene$订阅，使用share()保持数据一致</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// utils.ts</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">eat</span>(<span class="params">apples: Array&lt;Point2D&gt;, snake</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> head = snake[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; apples.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (checkCollision(apples[i], head)) &#123;</span><br><span class="line">      apples.splice(i, <span class="number">1</span>);</span><br><span class="line">      <span class="keyword">return</span> [...apples, getRandomPosition(snake)];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> apples;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">generateApples</span>(<span class="params"></span>): <span class="title">Array</span>&lt;<span class="title">Point2D</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> apples = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; APPLE_COUNT; i++) &#123;</span><br><span class="line">    apples.push(getRandomPosition());</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> apples;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 获取随机位置</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">getRandomPosition</span>(<span class="params">snake: Array&lt;Point2D&gt; = []</span>): <span class="title">Point2D</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> position = &#123;</span><br><span class="line">    x: getRandomNumber(<span class="number">0</span>, COLS - <span class="number">1</span>),</span><br><span class="line">    y: getRandomNumber(<span class="number">0</span>, ROWS - <span class="number">1</span>)</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">if</span> (isEmptyCell(position, snake)) &#123;</span><br><span class="line">    <span class="keyword">return</span> position;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> getRandomPosition(snake);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 检测是否碰撞，即两点是否一致</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">checkCollision</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a.x === b.x &amp;&amp; a.y === b.y;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isEmptyCell</span>(<span class="params">position: Point2D, snake: Array&lt;Point2D&gt;</span>): <span class="title">boolean</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> !snake.some(<span class="function"><span class="params">segment</span> =&gt;</span> checkCollision(segment, position));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getRandomNumber</span>(<span class="params">min, max</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random() * (max - min + <span class="number">1</span>) + min);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每当 <code>apples$</code> 产生一个新值时，我们就可以假定蛇吞掉了一个苹果。剩下要做的就是增加比分，还要将此事件通知给其他流，比如 <code>snake$</code>，它从 <code>snakeLength$</code> 中获取最新值，以确定是否将蛇的身体变长。</p>
+<h3 id="appleEaten-流"><a href="#appleEaten-流" class="headerlink" title="appleEaten$流"></a>appleEaten$流</h3><p>我们在上面的<code>eat</code>方法中检测到了“碰撞”，即蛇吃到了苹果。这时候我们应该调用<code>length$.next(POINTS_PER_APPLE)</code>去增加蛇的长度<code>snakeLength$</code>，但是我们把<code>eat</code>工具方法整合到了<code>utils.ts</code>文件内，无法调用到<code>length$.next()</code>，这个时候我们可以引入一个中间流，让它帮我们通知。</p>
+<p><code>appleEaten$</code>扮演了这个角色，首先，因为<code>appleEaten$</code>订阅的是<code>apples$</code>流，<code>apples$</code>刚开始就有一个初始值发出，我们需要跳过这个初始值，不然一开局比分就会增加，显然不行；其次，<code>appleEaten$</code>只负责扮演通知者的角色，它只负责通知其他的流，而不会有观察者来订阅它。因此，我们需要<strong>手动</strong>订阅。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> appleEaten$ = apples$.pipe(</span><br><span class="line">  skip(<span class="number">1</span>),   <span class="comment">// 跳过第一个apples值，即初始值</span></span><br><span class="line">  tap(<span class="function"><span class="params">()</span> =&gt;</span> length$.next(POINTS_PER_APPLE))   <span class="comment">// 每次apples发出值，都让length$ next出去一分</span></span><br><span class="line">).subscribe();</span><br></pre></td></tr></table></figure>
+<h3 id="scene-流"><a href="#scene-流" class="headerlink" title="scene$流"></a>scene$流</h3><p>回头再看一次上面的<code>snake流图</code>，基本上所有的流都已完成，而且形成了一整套闭环。只差之后的的整合流<code>scene$</code>了。先来看下代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> scene$ = combineLatest(snake$, apples$,score$, (snake, apples, score) =&gt; (&#123; snake, apples, score &#125;));</span><br></pre></td></tr></table></figure>
+<p>与 <code>withLatestFrom</code> 不同的是，我们不会限制辅助流，我们关心每个输入 <code>Observable</code> 产生的新值。最后一个参数还是选择器函数，我们将所有数据组合成一个表示<strong>游戏状态</strong>的对象，并将对象返回。游戏状态包含了 canvas 渲染所需的所有数据。</p>
+<p><img src="/images/snake/snake05.png" alt=""></p>
+<h3 id="性能维护"><a href="#性能维护" class="headerlink" title="性能维护"></a>性能维护</h3><p>无论是游戏，还是 Web 应用，性能都是我们所追求的。性能的意义重大，但就我们的游戏而言，我们希望每秒重绘整个场景 60 次。所以我们需要另外一个定时器去限制渲染频率：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// interval 接收以毫秒为单位的时间周期，这也就是为什么我们要用 1000 来除以 FPS</span></span><br><span class="line"><span class="keyword">const</span> FPS = <span class="number">60</span>;</span><br><span class="line">interval(<span class="number">1000</span> / FPS);</span><br></pre></td></tr></table></figure>
+<p>问题是 JavaScript 是单线程的。最糟糕的情况是，我们阻止浏览器执行任何操作，导致其锁定。换句话说，浏览器可能无法快速处理所有这些更新。原因是浏览器正在尝试渲染一帧，然后立即被要求渲染下一帧。作为结果，它会抛下当前帧以维持速度。这时候动画就开始看上去有些不流畅了。</p>
+<p>幸运的是，我们可以使用 <code>requestAnimationFrame</code> 来允许浏览器对任务进行排队，并在最合适的时间执行任务。但是，我们如何在 Observable 管道中使用呢？好消息是包括 <code>interval()</code> 在内的众多操作符都接收 <code>Scheduler</code> (调度器) 作为最后的参数。总而言之，<code>Scheduler</code> 是一种调度将来要执行的任务的机制。</p>
+<p>虽然 RxJS 提供了多种调度器，但我们关心的是名为 <code>animationFrame</code> 的调度器。此调度器在 <code>window.requestAnimationFrame</code>触发时执行任务。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> game$ = Observable.interval(<span class="number">1000</span> / FPS, animationFrame)</span><br></pre></td></tr></table></figure>
+<p>现在<code>interval</code>大概每 16ms 发出一次值，从而保持 FPS 在 60 左右。</p>
+<h3 id="场景渲染"><a href="#场景渲染" class="headerlink" title="场景渲染"></a>场景渲染</h3><p>最后，我们把<code>game$</code>和<code>scene$</code>组合起来。<code>game$</code>作为主要流，每隔<code>1000/FPS</code>毫秒时，根据<code>scene$</code>数据渲染一次页面，所以使用<code>withLatestFrom()</code>组合：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> game$ = interval(<span class="number">1000</span> / FPS, animationFrame)</span><br><span class="line">  .withLatestFrom(scene$, (_, scene) =&gt; scene)</span><br><span class="line">  .takeWhile(<span class="function"><span class="params">scene</span> =&gt;</span> !isGameOver(scene))  <span class="comment">// 蛇身蛇头相碰，则游戏结束</span></span><br><span class="line">  .subscribe(&#123;</span><br><span class="line">    next: <span class="function">(<span class="params">scene</span>) =&gt;</span> renderScene(ctx, scene),  <span class="comment">// canvas渲染页面</span></span><br><span class="line">    complete: <span class="function"><span class="params">()</span> =&gt;</span> renderGameOver(ctx)   <span class="comment">// 渲染游戏结束页面</span></span><br><span class="line">  &#125;);</span><br><span class="line"><span class="comment">// isGameOver、renderScene和renderGameOver方法在稍后的超链接中可以找到，这里略去</span></span><br></pre></td></tr></table></figure>
+<p>至此，我们就使用<code>RxJS</code>完成了整个游戏的核心部分，完全使用响应式编程，没有依赖任何外部状态。</p>
+<p>这里是在线试玩的 <a href="https://reactive-snake.stackblitz.io/" target="_blank" rel="noopener">demo</a>。</p>
+<h2 id="总结-amp-资料引入"><a href="#总结-amp-资料引入" class="headerlink" title="总结&amp;资料引入"></a>总结&amp;资料引入</h2><p>在花了两三周时间把<code>RxJS</code>的基础概念和操作符都过了一遍之后，急需一个实例demo来将自己所学的<code>RxJS</code>知识进行转化，只有真正的操作过，使用过，才能更深入的理解<code>Observable</code>和响应式编程的理念。最后在知乎上找到了一篇<code>RxJS 游戏之贪吃蛇</code>的专栏文章，自己跟着做了一遍，反复思考其中流的起源、转换和走向。这篇博客基本上是按照<a href="https://zhuanlan.zhihu.com/p/35457418" target="_blank" rel="noopener">RxJS 游戏之贪吃蛇</a>一文中的思路整理的，其中加入了我自己的思考过程，极力推荐阅读原文。以下是本文的参考资料：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/35457418" target="_blank" rel="noopener">RxJS 游戏之贪吃蛇</a>、<a href="https://rxjs.dev/api" target="_blank" rel="noopener">RxJS官方api文档</a>、<a href="https://ithelp.ithome.com.tw/users/20103367/ironman/1199" target="_blank" rel="noopener">30 天精通 RxJS</a>、<a href="https://rxmarbles.com/#from" target="_blank" rel="noopener">RxJS Marbles</a>、<a href="https://rxjs-cn.github.io/learn-rxjs-operators/about/" target="_blank" rel="noopener">学习 RxJS 操作符</a>、<a href="https://github.com/thoughtram/reactive-snake" target="_blank" rel="noopener">贪吃蛇源码</a></p>
+<p>以上的链接也是我最近几周所看所学的来源。接下来会写几篇博客进行知识点的总结，掺杂一些自己的思考，巩固自己所学，加深印象。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/RxJS/" rel="tag"># RxJS</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/11/《记忆化技术memoize-one》/" rel="next" title="《记忆化技术memoize-one》">
+                <i class="fa fa-chevron-left"></i> 《记忆化技术memoize-one》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计-amp-思考"><span class="nav-number">2.</span> <span class="nav-text">设计&amp;思考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实际操作"><span class="nav-number">3.</span> <span class="nav-text">实际操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#canvas游戏布局"><span class="nav-number">3.1.</span> <span class="nav-text">canvas游戏布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键盘事件direction-流"><span class="nav-number">3.2.</span> <span class="nav-text">键盘事件direction$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snakeLength-蛇长流"><span class="nav-number">3.3.</span> <span class="nav-text">snakeLength$蛇长流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#snake-流"><span class="nav-number">3.4.</span> <span class="nav-text">snake$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#score-流"><span class="nav-number">3.5.</span> <span class="nav-text">score$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#apples-流"><span class="nav-number">3.6.</span> <span class="nav-text">apples$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#appleEaten-流"><span class="nav-number">3.7.</span> <span class="nav-text">appleEaten$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scene-流"><span class="nav-number">3.8.</span> <span class="nav-text">scene$流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能维护"><span class="nav-number">3.9.</span> <span class="nav-text">性能维护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景渲染"><span class="nav-number">3.10.</span> <span class="nav-text">场景渲染</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结-amp-资料引入"><span class="nav-number">4.</span> <span class="nav-text">总结&amp;资料引入</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
