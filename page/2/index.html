@@ -291,6 +291,131 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/08/JavaScript中的事件循环/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/08/JavaScript中的事件循环/" itemprop="url">
+                  JavaScript中的事件循环
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-08T22:13:47+08:00">
+                2018-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>作为前端，提起JS，都知道它是一门<code>单线程</code>的语言，只能从上到下顺序执行JS任务，而任务又分为<code>同步任务</code>和<code>异步任务</code>，常见的如<code>Ajax</code>请求、<code>setTimeout</code>、<code>setInterval</code>、点击事件的回调函数等等都是异步任务。当我们的JS逻辑写的越来越复杂，可能会发现一些逻辑的执行顺序跟我们预想的不一样，或者压根就没执行，这时候深入理解一下JS中事件循环的逻辑就显得势在必行了，更不用提现今前端框架如此流行，弄清了事件循环机制，才能对框架的生命周期，数据更新策略等有更深入的理解。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/08/JavaScript中的事件循环/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/15/由-0与NaN的判断来看Array的元素识别/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1411,131 +1536,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/03/宽松相等和严格相等/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="LiYang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Leon's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2018/03/03/宽松相等和严格相等/" itemprop="url">
-                  宽松相等和严格相等
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-03T21:52:23+08:00">
-                2018-03-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>上次总结了一些强制类型转换的问题，今天来讲一讲与之相关的一个知识点：宽松相等和严格相等。<br>一般说法是“<code>==</code>检查值是否相等，<code>===</code>检查值和类型是否相等”，这个说法咋一听没有问题，但是还不够严谨，正确的解释应该是：“<code>==</code>允许在相等比较中进行强制类型转换，而<code>===</code>不允许”。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/03/宽松相等和严格相等/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1585,7 +1585,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-count">46</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1621,7 +1621,7 @@
               </span>
             
               <span class="links-of-author-item">
-                <a href="https://twitter.com/liyang0207" target="_blank" title="Twitter">
+                <a href="https://twitter.com" target="_blank" title="Twitter">
                   
                     <i class="fa fa-fw fa-twitter"></i>
                   
