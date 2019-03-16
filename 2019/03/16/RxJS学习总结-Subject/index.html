@@ -1,0 +1,931 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,RxJS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="这两周拖延症又又又犯了，本来这篇博客是要上周末完结的，结果报了健身房，运动回到家就是懒得开电脑写。这一拖公司开发任务又接踵而来，预感到这个周末是未来一个月最闲的周末了，一大早就赶紧开电脑开始写这篇博客。今天来总结RxJS中最重要的一个知识点—Subject。 概念什么是Subject？Subject能做什么？简单来说，Subject是Observable和Observer的混合体，它既可以作为一个">
+<meta name="keywords" content="知识积累,RxJS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJS学习总结-Subject">
+<meta property="og:url" content="http://yoursite.com/2019/03/16/RxJS学习总结-Subject/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="这两周拖延症又又又犯了，本来这篇博客是要上周末完结的，结果报了健身房，运动回到家就是懒得开电脑写。这一拖公司开发任务又接踵而来，预感到这个周末是未来一个月最闲的周末了，一大早就赶紧开电脑开始写这篇博客。今天来总结RxJS中最重要的一个知识点—Subject。 概念什么是Subject？Subject能做什么？简单来说，Subject是Observable和Observer的混合体，它既可以作为一个">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-16T13:03:05.917Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxJS学习总结-Subject">
+<meta name="twitter:description" content="这两周拖延症又又又犯了，本来这篇博客是要上周末完结的，结果报了健身房，运动回到家就是懒得开电脑写。这一拖公司开发任务又接踵而来，预感到这个周末是未来一个月最闲的周末了，一大早就赶紧开电脑开始写这篇博客。今天来总结RxJS中最重要的一个知识点—Subject。 概念什么是Subject？Subject能做什么？简单来说，Subject是Observable和Observer的混合体，它既可以作为一个">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/16/RxJS学习总结-Subject/"/>
+
+
+
+
+
+  <title> RxJS学习总结-Subject | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/16/RxJS学习总结-Subject/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RxJS学习总结-Subject
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-16T21:02:19+08:00">
+                2019-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这两周拖延症又又又犯了，本来这篇博客是要上周末完结的，结果报了健身房，运动回到家就是懒得开电脑写。这一拖公司开发任务又接踵而来，预感到这个周末是未来一个月最闲的周末了，一大早就赶紧开电脑开始写这篇博客。今天来总结<code>RxJS</code>中最重要的一个知识点—<code>Subject</code>。</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>什么是<code>Subject</code>？<code>Subject</code>能做什么？简单来说，<code>Subject</code>是<code>Observable</code>和<code>Observer</code>的混合体，它既可以作为一个<code>Observable</code>被多个观察者订阅，又可以作为一个观察者(Observer)去订阅一个源<code>Observable</code>。前面我们说的<code>Observable</code>作为数据源，每当它被一个<code>Observer</code>订阅的时候，都会产生一个全新的数据流，多个观察者之间的数据是相互隔离的，互不影响。而<code>Subject</code>的观察者，或者说订阅者，是共享这一个数据源的，称为”多播”。</p>
+<p>举个例子，中央电视台每晚7点播送新闻联播。小明7点准时打开电视机开始收看新闻，而小红7点15分才打开电视机，打开电视机相当于一个订阅<code>subscribe</code>的动作，那么小红看到的新闻必然是从第15分钟开始的，在这之后小明小红收看的新闻(数据)是一样的。转换为代码，如果我们使用普通的<code>Observable</code>去实现，那么所有人不管何时打开电视，看到的都会是7点开始的新闻(类似录像)，就失去了一个同步性和实时性。这个时候我们就可以用<code>Subject</code>来实现。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Subject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> Subject&lt;number&gt;();</span><br><span class="line"></span><br><span class="line">subject.subscribe(<span class="function"><span class="params">val</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val));</span><br><span class="line">subject.next(<span class="number">1</span>);</span><br><span class="line">subject.subscribe(<span class="function"><span class="params">val</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val));</span><br><span class="line">subject.next(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverA: 2</span></span><br><span class="line"><span class="comment">// ObserverB: 2</span></span><br></pre></td></tr></table></figure>
+<p>这个例子中，<code>new Subject()</code>返回一个<code>Observable</code>对象，先被<code>A</code>订阅，随后调用<code>subject.next(1)</code>发出值1，接着被<code>B</code>订阅，然后发出值2。此时<code>B</code>观察者只会收到它订阅<code>subject</code>后发出的值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Subject, <span class="keyword">from</span> &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> Subject&lt;number&gt;();</span><br><span class="line"><span class="keyword">const</span> source = <span class="keyword">from</span>([<span class="number">1</span>, <span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line">subject.subscribe(<span class="function"><span class="params">val</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val));</span><br><span class="line">subject.subscribe(<span class="function"><span class="params">val</span> =&gt;</span> <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val));</span><br><span class="line"></span><br><span class="line">source.subscribe(subject);</span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverB: 1</span></span><br><span class="line"><span class="comment">// ObserverA: 2</span></span><br><span class="line"><span class="comment">// ObserverB: 2</span></span><br></pre></td></tr></table></figure>
+<p>这个例子中，<code>subject</code>作为观察者<code>Observer</code>，订阅了数据源<code>source</code>。然后AB两个观察者都收到了数据，这样就通过<code>Subject</code>实现了<code>多播</code>。</p>
+<h3 id="Hot-和-Cold-数据流"><a href="#Hot-和-Cold-数据流" class="headerlink" title="Hot 和 Cold 数据流"></a>Hot 和 Cold 数据流</h3><p>如果你在网上查阅关于<code>Subject</code>的资料，肯定会注意到两个名词：<code>Hot Observable</code>和<code>Cold Observable</code>。其实这两个名词并没有什么高深的含义，<code>Hot Observable</code>指的是无论多少<code>Observer</code>来订阅，推给<code>Observer</code>数据的都是来自一样的数据源；而<code>Cold Observable</code>则是说每次被订阅的时候都产生一个全新的数据序列数据流。上面的例子就是使用<code>Subject</code>将一个<code>Cold Observable</code>(form([1, 2])转为一个<code>Hot Observable</code>(subject.subscribe())。</p>
+<h3 id="不能重复使用"><a href="#不能重复使用" class="headerlink" title="不能重复使用"></a>不能重复使用</h3><p><code>Subject</code>不像普通的<code>Observable</code>一样每次订阅都会产生一个新的数据流，所以根据订阅<code>Subject</code>的时机不同会有不同的效果。总的来说，当一个<code>Subject</code>调用了<code>complete()</code>或者<code>error()</code>方法，后续再有<code>Observer</code>订阅了这个<code>Subject()</code>，即使再使用<code>subject.next(val)</code>发送值，后续的<code>Observer</code>也收不到了，只会收到<code>complete()</code>或者<code>error()</code>消息。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Subject, <span class="keyword">from</span> &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> Subject&lt;number&gt;();</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val),</span><br><span class="line">  error =&gt; <span class="built_in">console</span>.log(error),</span><br><span class="line">  () =&gt; <span class="built_in">console</span>.log(<span class="string">'Acomplete'</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">subject.next(<span class="number">1</span>);</span><br><span class="line">subject.next(<span class="number">2</span>);</span><br><span class="line">subject.complete();</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val),</span><br><span class="line">  error =&gt; <span class="built_in">console</span>.log(error),</span><br><span class="line">  () =&gt; <span class="built_in">console</span>.log(<span class="string">'Bcomplete'</span>)</span><br><span class="line">);</span><br><span class="line">subject.next(<span class="number">3</span>); <span class="comment">// 即使不调用，也会打印Bcomplete</span></span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverB: 2</span></span><br><span class="line"><span class="comment">// Acomplete</span></span><br><span class="line"><span class="comment">// Bcomplete</span></span><br></pre></td></tr></table></figure>
+<p>以上，观察者B在<code>subject</code>完结之后订阅，只会收到前面<code>subject</code>完结的通知。同样，当<code>subjcet</code>调用<code>error()</code>方法，下面的观察者也只会收到<code>error</code>消息。</p>
+<p>这里顺便提一句，如果<code>Subject</code>有多个订阅者，那么当任一订阅者产生一个错误异常，这个异常没有被正确处理的话，其他订阅者都会失败。相当于这个错误”阻塞”掉了其他<code>Observer</code>正常接收数据。所以最稳妥的方式是每一个<code>Observer</code>都具备处理错误异常的能力。</p>
+<h3 id="三个基类-BehaviorSubject、ReplaySubject、AsyncSubject"><a href="#三个基类-BehaviorSubject、ReplaySubject、AsyncSubject" class="headerlink" title="三个基类 BehaviorSubject、ReplaySubject、AsyncSubject"></a>三个基类 BehaviorSubject、ReplaySubject、AsyncSubject</h3><p><code>BehaviorSubject</code>可以提供一个初始值(默认值)，当第一个<code>Observer</code>订阅它的时候，<code>BehaviorSubject</code>会立即发出这个初始值，并且接下来<code>BehaviorSubject</code>发出的值都会不断替换这个初始值，这样之后新的<code>Observer</code>来订阅时，都会拿到最新的值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; BehaviorSubject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> BehaviorSubject(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">subject.next(<span class="number">2</span>);</span><br><span class="line">subject.next(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val)</span><br><span class="line">);</span><br><span class="line"><span class="comment">// ObserverA: 1     A一订阅，就拿到了默认值1</span></span><br><span class="line"><span class="comment">// ObserverB: 2</span></span><br><span class="line"><span class="comment">// ObserverA: 3</span></span><br><span class="line"><span class="comment">// ObserverB: 3     B一订阅，就拿到了BehaviorSubject的最新值3</span></span><br></pre></td></tr></table></figure>
+<p><code>ReplaySubject</code>接收一个<code>number</code>类型参数，可以缓存<code>N</code>个最新的值同步发送给新的订阅者。好像回放电影一样把指定个数的值发给后续的订阅者。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; ReplaySubject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> ReplaySubject(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">subject.next(<span class="number">1</span>);</span><br><span class="line">subject.next(<span class="number">2</span>);</span><br><span class="line">subject.next(<span class="number">3</span>);</span><br><span class="line">subject.next(<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val)</span><br><span class="line">);</span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverC: '</span> + val)</span><br><span class="line">);</span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverA: 2</span></span><br><span class="line"><span class="comment">// ObserverA: 3</span></span><br><span class="line"><span class="comment">// ObserverA: 4</span></span><br><span class="line"><span class="comment">// ObserverB: 3     B一订阅，就拿到了ReplaySubject缓存的最新两个值3、4</span></span><br><span class="line"><span class="comment">// ObserverB: 4     </span></span><br><span class="line"><span class="comment">// ObserverC: 3     C一订阅，就拿到了ReplaySubject缓存的最新两个值3、4</span></span><br><span class="line"><span class="comment">// ObserverC: 4</span></span><br></pre></td></tr></table></figure>
+<p><code>AsyncSubject</code>只有当数据源<code>complete()</code>的时候，才会把最后一个值发送给订阅者。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; AsyncSubject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> AsyncSubject();</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverA: '</span> + val)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">subject.next(<span class="number">1</span>);</span><br><span class="line">subject.next(<span class="number">2</span>);</span><br><span class="line">subject.next(<span class="number">3</span>);</span><br><span class="line">subject.complete();</span><br><span class="line"></span><br><span class="line">subject.subscribe(</span><br><span class="line">  val =&gt; <span class="built_in">console</span>.log(<span class="string">'ObserverB: '</span> + val)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ObserverA: 3</span></span><br><span class="line"><span class="comment">// ObserverB: 3</span></span><br></pre></td></tr></table></figure>
+<h2 id="多播操作符"><a href="#多播操作符" class="headerlink" title="多播操作符"></a>多播操作符</h2><p><code>RxJS</code>使用当中有很多场景需要将<code>Cold Observable</code>转为<code>Hot Observable</code>，如果都使用上面例子的方法，先新建<code>subject</code>对象，订阅数据源，再用<code>Observer</code>订阅这个<code>subject</code>未免有点麻烦。<code>RxJS</code>提供了几个操作符来简化这个过程。</p>
+<h3 id="multicast"><a href="#multicast" class="headerlink" title="multicast"></a>multicast</h3><p><code>multicast</code>是一个比较底层或者说基础的操作符，一般情况下不会直接使用它。但一些高级的多播操作符都是基于它来实现，还是需要了解一下。<code>multicast()</code>能够将上游<code>Observable</code>转换为<code>Hot Observable</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> hotObservable = coldObservable.pipe(multicast(<span class="keyword">new</span> Subject()));</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，现在订阅<code>hotObservable</code>并不会产生值，还需要调用一个<code>connect()</code>方法才会真正将<code>Hot</code>和<code>Cold</code>连接起来。下面看一个完整的例子。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="keyword">from</span>, Subject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; multicast &#125; <span class="keyword">from</span> <span class="string">'rxjs/operators'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> source = <span class="keyword">from</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);</span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> Subject();</span><br><span class="line"><span class="keyword">const</span> multicasted = source.pipe(multicast(subject));</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 这里相当于 subject.subscribe(&#123;...&#125;)</span></span><br><span class="line"><span class="keyword">let</span> ObservableA = multicasted.subscribe(&#123;</span><br><span class="line">  next: <span class="function">(<span class="params">v</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`observerA: <span class="subst">$&#123;v&#125;</span>`</span>)</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">let</span> ObservableB = multicasted.subscribe(&#123;</span><br><span class="line">  next: <span class="function">(<span class="params">v</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`observerB: <span class="subst">$&#123;v&#125;</span>`</span>)</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 这里相当于 source.subscribe(subject)</span></span><br><span class="line">multicasted.connect();</span><br></pre></td></tr></table></figure>
+<p>以上的例子都没有考虑取消订阅的情况，那么如果我们想取消订阅应该怎么办呢？显然，上面这个例子有<code>multicasted</code>、<code>ObservableA</code>和<code>ObservableB</code>三个<code>Observable</code>。取消订阅时也需要考虑<code>multicasted</code>。但大部分情况下，我们希望这个<code>Observable</code>智能一点：当有<code>Observer</code>订阅它时，<code>multicasted</code>作为中间人，自动去订阅上方源数据，开始发出数据；当最后一个<code>Observer</code>退订时，<code>multicasted</code>也自动退订上方数据源。</p>
+<p>显然，我们需要一个计数器，自动跟踪<code>Observer</code>的数量来进行订阅和退订动作。<code>RxJS</code>提供了<code>refCount()</code>这个方法来实现这个功能。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="keyword">from</span>, Subject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; multicast, refCount &#125; <span class="keyword">from</span> <span class="string">'rxjs/operators'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> source = <span class="keyword">from</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);</span><br><span class="line"><span class="keyword">const</span> subject = <span class="keyword">new</span> Subject();</span><br><span class="line"><span class="keyword">const</span> multicasted = source.pipe(multicast(subject), refCount());</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> ObservableA = multicasted.subscribe(&#123;</span><br><span class="line">  next: <span class="function">(<span class="params">v</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`observerA: <span class="subst">$&#123;v&#125;</span>`</span>)</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">let</span> ObservableB = multicasted.subscribe(</span><br><span class="line">  (v) =&gt; <span class="built_in">console</span>.log(<span class="string">`observerB: <span class="subst">$&#123;v&#125;</span>`</span>),</span><br><span class="line">  error =&gt; <span class="built_in">console</span>.log(error),</span><br><span class="line">  () =&gt; <span class="built_in">console</span>.log(<span class="string">'complete'</span>)</span><br><span class="line">);</span><br><span class="line"><span class="comment">// 不再需要调用connect()方法</span></span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverA: 2</span></span><br><span class="line"><span class="comment">// ObserverA: 3</span></span><br><span class="line"><span class="comment">// complete</span></span><br></pre></td></tr></table></figure>
+<p>以上，我们直接在<code>multicast()</code>后使用了<code>refCount()</code>方法，下面就不需要再调用<code>connect()</code>，<code>ObserverA</code>就可以正常的收到值。但是这个例子又引入了另外一个问题：<code>ObserverB</code>呢？</p>
+<p>首先，<code>ObserverA</code>可以正常收到数据是没有疑问的，因为源数据是同步发出的，故在<code>ObserverA</code>订阅<code>multicasted</code>后，3个值同时发了出来，然后就<code>complete()</code>了，所以之后<code>ObserverB</code>的订阅将收不到任何值，只会收到<code>complete()</code>的消息。其次我们来想一个问题：引入<code>refCount()</code>的初衷就是为了当有<code>Observer</code>订阅的时候发出值，<code>Observer</code>退订的时候自动退订，如果像这个例子一样，<code>ObserverA</code>订阅了一次数据，过了相当久的一段时间，<code>ObserverB</code>又来订阅取值，却发现无值可取，这样来看，<code>refCount()</code>存在的意义是不是太弱了？倘若我们想要<code>ObserverB</code>也能订阅到值呢？</p>
+<p>其实，<code>multicast()</code>除了可以直接接收一个<code>new Subject()</code>对象外，还可以接收一个返回<code>Subject</code>对象的函数作为参数，即<code>multicast(() =&gt; new Subject())</code>。如果接受一个<code>Subject()</code>工厂函数(就是<code>() =&gt; new Subject()</code>)，则可以实现上面说的效果，因为源数据<code>complete()</code>之后，<code>ObserverB</code>再来订阅，<code>multicast()</code>使用工厂函数重新创建了一个新的<code>Subject()</code>，相当于重新订阅了源数据。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="keyword">from</span>, Subject &#125; <span class="keyword">from</span> <span class="string">'rxjs'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; multicast, refCount &#125; <span class="keyword">from</span> <span class="string">'rxjs/operators'</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">const</span> source = <span class="keyword">from</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);</span><br><span class="line"><span class="keyword">const</span> subject = <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">new</span> Subject();   <span class="comment">// 注意这里</span></span><br><span class="line"><span class="keyword">const</span> multicasted = source.pipe(multicast(subject), refCount());</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> ObservableA = multicasted.subscribe(&#123;</span><br><span class="line">  next: <span class="function">(<span class="params">v</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">`observerA: <span class="subst">$&#123;v&#125;</span>`</span>)</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">let</span> ObservableB = multicasted.subscribe(</span><br><span class="line">  v =&gt; <span class="built_in">console</span>.log(<span class="string">`observerB: <span class="subst">$&#123;v&#125;</span>`</span>),</span><br><span class="line">  err =&gt; <span class="built_in">console</span>.log(err),</span><br><span class="line">  () =&gt; <span class="built_in">console</span>.log(<span class="string">'complete'</span>)</span><br><span class="line">);</span><br><span class="line"><span class="comment">// ObserverA: 1</span></span><br><span class="line"><span class="comment">// ObserverA: 2</span></span><br><span class="line"><span class="comment">// ObserverA: 3</span></span><br><span class="line"><span class="comment">// ObserverB: 1</span></span><br><span class="line"><span class="comment">// ObserverB: 2</span></span><br><span class="line"><span class="comment">// ObserverB: 3</span></span><br><span class="line"><span class="comment">// complete</span></span><br></pre></td></tr></table></figure>
+<p>简单总结：<code>multicast()</code>接收<code>new Subject()</code>或者<code>() =&gt; new Subject()</code>工厂函数，区别在于源数据<code>complete()</code>之后能否重新订阅数据源；<code>refCount()</code>是一个计数器，使”中间件”<code>Subject</code>自动订阅或取消订阅上游数据源。一般情况下，如果同时使用<code>.pipe(multicast(subject), refCount())</code>，则<code>subject</code>一般会表现为工厂函数形式。</p>
+<h3 id="publish"><a href="#publish" class="headerlink" title="publish"></a>publish</h3><p><code>publish()</code>其实是<code>multicast(subject)</code>的简写，接收一个可选参数<code>selector</code>，这个<code>selector</code>是干什么的，我也没太搞懂，这里提一下这个可选参数的原因在于，它决定了<code>multicast(subject)</code>中<code>subject</code>的形式：</p>
+<ul>
+<li><p><code>publish() --&gt;  multicast(new Subject())</code></p>
+</li>
+<li><p><code>publish(selector) --&gt;  multicast(() =&gt; new Subject())</code></p>
+</li>
+</ul>
+<p>这里注意，<code>publish()</code>只是<code>multicast(subject)</code>的简写，可没有<code>refCount()</code>。</p>
+<p>上面我们讲，<code>Subject()</code>有三个基类：<code>BehaviorSubject()</code>、<code>ReplaySubject()</code>和<code>AsyncSubject()</code>。于此对应，<code>publish()</code>也有三个增强方法：</p>
+<ol>
+<li><code>publishBehavior</code>就是<code>multicast(new BehaviorSubject())</code>的组合。</li>
+<li><code>publishReplay</code>就是<code>multicast(new ReplaySubject())</code>的组合。</li>
+<li><code>publishLast</code>就是<code>multicast(new AsyncSubject())</code>的组合。</li>
+</ol>
+<h3 id="share"><a href="#share" class="headerlink" title="share"></a>share</h3><p><code>share()</code>是<code>multicast(() =&gt; new Subject()), refCount()</code>的简写。</p>
+<p>注意，这里<code>multicast</code>接收的是<code>subject</code>的工厂函数。而且，最最重要的一点，<code>share()</code>不是<code>publish(), refCount()</code>的组合，这是很多教程犯的一个错误。不要将<code>share()</code>和<code>publish()</code>联系到一块儿就好。</p>
+<p>另外一个需要注意的点是，<code>share()</code>的内部使用了<code>Subject()</code>，如果需要<code>BehaviorSubject()</code>等其他<code>subject</code>类，则需要使用与之对应的<code>publish</code>方法。</p>
+<p>好了，今天总结了一下<code>Subject</code>的相关知识点，在实际开发中经常会使用到这些思想和方法。接下来会找时间简单总结一下<code>Scheduler</code>的知识点，虽说它和<code>Observable</code>、<code>Subject</code>并称为三大知识点，但感觉门槛高，用的比较少。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/RxJS/" rel="tag"># RxJS</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/03/RxJS学习总结-合并过滤转化操作符/" rel="next" title="RxJS学习总结-合并过滤转化操作符">
+                <i class="fa fa-chevron-left"></i> RxJS学习总结-合并过滤转化操作符
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-和-Cold-数据流"><span class="nav-number">1.1.</span> <span class="nav-text">Hot 和 Cold 数据流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不能重复使用"><span class="nav-number">1.2.</span> <span class="nav-text">不能重复使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三个基类-BehaviorSubject、ReplaySubject、AsyncSubject"><span class="nav-number">1.3.</span> <span class="nav-text">三个基类 BehaviorSubject、ReplaySubject、AsyncSubject</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多播操作符"><span class="nav-number">2.</span> <span class="nav-text">多播操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#multicast"><span class="nav-number">2.1.</span> <span class="nav-text">multicast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#publish"><span class="nav-number">2.2.</span> <span class="nav-text">publish</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#share"><span class="nav-number">2.3.</span> <span class="nav-text">share</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
