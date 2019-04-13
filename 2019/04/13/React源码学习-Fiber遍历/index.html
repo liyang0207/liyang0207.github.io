@@ -1,0 +1,931 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="知识积累,react," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="react在自己的v16版本中将底层的reconciliation过程进行了重大更改，之前v15中使用同步递归算法进行组件的diff，我们知道，浏览器需要一定的刷新帧率(大概16ms渲染一次，FPS为60)才能确保页面不会可见的卡顿，而react一旦同步遍历的组件过多，将会引起页面掉帧，应用就会显得卡顿。因此，react花了大概两年时间优化，提出了Fiber结构，以链表的形式实现了操作树的新算法，">
+<meta name="keywords" content="知识积累,react">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React源码学习-Fiber遍历">
+<meta property="og:url" content="http://yoursite.com/2019/04/13/React源码学习-Fiber遍历/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="react在自己的v16版本中将底层的reconciliation过程进行了重大更改，之前v15中使用同步递归算法进行组件的diff，我们知道，浏览器需要一定的刷新帧率(大概16ms渲染一次，FPS为60)才能确保页面不会可见的卡顿，而react一旦同步遍历的组件过多，将会引起页面掉帧，应用就会显得卡顿。因此，react花了大概两年时间优化，提出了Fiber结构，以链表的形式实现了操作树的新算法，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/react/react-fiber-structure01.png">
+<meta property="og:image" content="http://yoursite.com/images/react/react-fiber-structure02.gif">
+<meta property="og:updated_time" content="2019-04-13T07:47:26.787Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React源码学习-Fiber遍历">
+<meta name="twitter:description" content="react在自己的v16版本中将底层的reconciliation过程进行了重大更改，之前v15中使用同步递归算法进行组件的diff，我们知道，浏览器需要一定的刷新帧率(大概16ms渲染一次，FPS为60)才能确保页面不会可见的卡顿，而react一旦同步遍历的组件过多，将会引起页面掉帧，应用就会显得卡顿。因此，react花了大概两年时间优化，提出了Fiber结构，以链表的形式实现了操作树的新算法，">
+<meta name="twitter:image" content="http://yoursite.com/images/react/react-fiber-structure01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/13/React源码学习-Fiber遍历/"/>
+
+
+
+
+
+  <title> React源码学习-Fiber遍历 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/13/React源码学习-Fiber遍历/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                React源码学习-Fiber遍历
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-13T15:41:23+08:00">
+                2019-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><code>react</code>在自己的<code>v16</code>版本中将底层的<code>reconciliation</code>过程进行了重大更改，之前<code>v15</code>中使用<code>同步递归算法</code>进行组件的<code>diff</code>，我们知道，浏览器需要一定的刷新帧率(大概16ms渲染一次，FPS为60)才能确保页面不会<code>可见</code>的卡顿，而<code>react</code>一旦同步遍历的组件过多，将会引起页面掉帧，应用就会显得卡顿。因此，<code>react</code>花了大概两年时间优化，提出了<code>Fiber</code>结构，以<code>链表</code>的形式实现了操作树的新算法，提供了包括非阻塞渲染，按优先级更新，预渲染等强大的新特性。</p>
+<p>最近正在研究学习这个新的<code>fiber</code>结构，今天不深入讲(毕竟自己也是刚刚开始深入学习)，只单单聊一下<code>fiber</code>进行节点遍历的简单实现，这个抽象方法十分的精巧，浅显易懂，感觉可以用在很多地方。</p>
+<h2 id="抽象链表遍历"><a href="#抽象链表遍历" class="headerlink" title="抽象链表遍历"></a>抽象链表遍历</h2><p>如何使用单链表遍历一个组件树？<code>react</code>内的<code>fiber</code>数据结构包含了三个特殊字段：</p>
+<ul>
+<li>child 指向第一个子节点</li>
+<li>sibling 指向第一个兄弟节点</li>
+<li>return 指向父节点</li>
+</ul>
+<p>如下图：</p>
+<p><img src="/images/react/react-fiber-structure01.png" alt=""></p>
+<p>对于这样一个树形结构，每个节点都是一个<code>node</code>，构造函数简写如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(instance) &#123;</span><br><span class="line">    <span class="keyword">this</span>.instance = instance;</span><br><span class="line">    <span class="keyword">this</span>.child = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">this</span>.sibling = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">this</span>.return = <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>要遍历这样一个树，同时对每个节点都进行一些操作，我们需要先想一下需要如何处理。首先，我们需要用<code>while()</code>循环这个结构，对于循环到的每一个<code>node</code>调用一个函数<code>doWork()</code>做操作；其次，操作的同时需要把这个<code>node</code>跟他的子节点进行联系；最后，我们依然(同<code>v15</code>)采用<code>深度优先搜索(DFS)</code>算法，在遍历完后退出<code>while</code>循环。</p>
+<p>我们先用来实现一个<code>link</code>函数来链接父节点和子节点：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">link</span>(<span class="params">parent, elements</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (elements === <span class="literal">null</span>) elements = [];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//从右侧开始reduce，将子节点的return链接到parent，sibling链接到右侧兄弟节点，最后一个节点的sibling是null</span></span><br><span class="line">  parent.child = elements.reduceRight(<span class="function">(<span class="params">previous, current</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> node = <span class="keyword">new</span> Node(current);</span><br><span class="line">    node.return = parent;</span><br><span class="line">    node.sibling = previous;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">  &#125;, <span class="literal">null</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> parent.child;  <span class="comment">// 返回第一个子节点</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来实现<code>doWork()</code>函数，用来操作节点，同时调用<code>link</code>函数链接节点和子节点：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">doWork</span>(<span class="params">node</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(node.instance.name);   <span class="comment">//随便做点什么</span></span><br><span class="line">  <span class="keyword">const</span> children = node.instance.render();   <span class="comment">// 由render方法取到组件？节点的子节点</span></span><br><span class="line">  <span class="keyword">return</span> link(node, children);  <span class="comment">//链接父子节点，同时返回第一个子节点</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>准备工作完成，接下来就重头戏，深度优先遍历：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">walk</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> root = o;</span><br><span class="line">  <span class="keyword">let</span> current = o;</span><br><span class="line">  <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> child = doWork(current);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//如果存在子节点，将其设为active node，走下一次循环</span></span><br><span class="line">    <span class="keyword">if</span> (child) &#123;</span><br><span class="line">      current = child;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//如果返回到了顶端，退出函数</span></span><br><span class="line">    <span class="keyword">if</span> (current === root) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//没有子节点，也没有兄弟节点，向上走</span></span><br><span class="line">    <span class="keyword">while</span>(!current.sibling) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!current.return || current.return === root) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">//向上走，直到找兄弟节点</span></span><br><span class="line">     	current = current.return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//找到了兄弟节点，将其设为active node，走下一次循环</span></span><br><span class="line">    current = current.sibling;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不断遍历当前节点的第一个子节点，直到到达分支的末尾，然后遍历<code>sibling</code>，然后<code>return</code>回父节点。</p>
+<p>如果我们用这种方法遍历上方的树形结构，函数调用顺序将会是：<code>work(a1) =&gt; doWork(a1) =&gt; doWork(b1) =&gt; doWork(b2) =&gt; doWork(c1) =&gt; doWork(d1) =&gt; doWork(d2) =&gt; doWork(b3) =&gt; doWork(c2) =&gt; return</code>。</p>
+<h2 id="一撇React源码"><a href="#一撇React源码" class="headerlink" title="一撇React源码"></a>一撇React源码</h2><p><code>React</code>把一次渲染分成了两个阶段：<code>render</code>和<code>commit</code>。<code>render</code>阶段，如果是第一次渲染，<code>react</code>为<code>render</code>返回的每一个<code>react元素</code>创建一个<code>fiber</code>节点，随后的更新中会重用和更新这些现有的<code>fiber</code>节点，生成一个<code>部分节点标记了side effects的fiber节点树</code>。<code>v16</code>的重点在于，这个<code>render</code>过程可以是异步执行的，所以某些生命周期方法可能被重复调用(不细展开)。而<code>commit</code>阶段则必须是同步的执行，<code>react</code>将变化一次性更新到页面中。</p>
+<p>在<code>render</code>阶段中就用到了<code>fiber</code>树的深度优先遍历。我们来简单看一下<code>react</code>源码是如何做的。</p>
+<p>首先，<code>fiber</code>从<code>workLoop()</code>函数进入：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">workLoop</span>(<span class="params">isYieldy</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!isYieldy) &#123;</span><br><span class="line">    <span class="comment">// Flush work without yielding</span></span><br><span class="line">    <span class="keyword">while</span> (nextUnitOfWork !== <span class="literal">null</span>) &#123;</span><br><span class="line">      nextUnitOfWork = performUnitOfWork(nextUnitOfWork);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// Flush asynchronous work until there's a higher priority event</span></span><br><span class="line">    <span class="keyword">while</span> (nextUnitOfWork !== <span class="literal">null</span> &amp;&amp; !shouldYield()) &#123;</span><br><span class="line">      nextUnitOfWork = performUnitOfWork(nextUnitOfWork);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>nextUnitOfWork</code>从<code>workInProgress</code>树中保存了对<code>fiber</code>节点的引用，可以认为是当前正在处理的节点？处理完当前<code>fiber</code>后，变量将包含对树中下一个<code>fiber</code>节点的引用或<code>null</code>。</p>
+<p>这里有4个函数用于遍历树并启动或完成工作：</p>
+<ul>
+<li>performUnitOfWork</li>
+<li>beginWork</li>
+<li>completeUnitOfWork</li>
+<li>completeWork</li>
+</ul>
+<p>这里有一个动画，注意观察算法的调用和分支的跳转，它首先完成<code>child</code>节点的工作，然后转移到<code>parent</code>身边。</p>
+<p><img src="/images/react/react-fiber-structure02.gif" alt=""></p>
+<p>先来看下<code>performUnitOfWork</code>和<code>beginWork</code>函数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">workInProgress: Fiber</span>): <span class="title">Fiber</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> next = beginWork(workInProgress);  <span class="comment">// 启动工作</span></span><br><span class="line">  <span class="keyword">if</span> (next === <span class="literal">null</span>) &#123;</span><br><span class="line">    next = completeUnitOfWork(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> next;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">workInProgress: Fiber</span>): <span class="title">Fiber</span> </span>&#123;</span><br><span class="line">  <span class="comment">//主要函数，这里根据fiber节点的tag来进行不同的操作，以后详细分析</span></span><br><span class="line">  <span class="built_in">console</span>.log(workInProgress.name);</span><br><span class="line">  <span class="keyword">return</span> workInProgress.child;   <span class="comment">// 返回下一个子节点或者null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果有下一个子节点，它将被赋值给<code>workLoop</code>函数中的<code>nextUnitOfWork</code>变量，继续往下遍历；如果没有子节点，则代表这个分支的遍历到达了末尾，因此就完成了当前节点，之后，就需要找到这个完成节点的兄弟节点开始下一个分支的遍历，最后再回溯到父节点。这些在<code>completeUnitOfWork</code>函数中完成：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">completeUnitOfWork</span>(<span class="params">workInProgress: Fiber</span>): <span class="title">Fiber</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> siblingFiber = workInProgress.sibling;</span><br><span class="line">    <span class="keyword">let</span> returnFiber = workInProgress.return;</span><br><span class="line">    </span><br><span class="line">    nextUnitOfWork = completeWork(workInProgress);</span><br><span class="line">    <span class="keyword">if</span> (siblingFiber !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">//有兄弟节点，返回给perform work这个节点</span></span><br><span class="line">      <span class="keyword">return</span> siblingFiber;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (returnFiber !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">//有父节点，一层一层上去完成父节点</span></span><br><span class="line">      workInProgress = returnFiber;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 到达了root</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">completeWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="comment">//主要函数，这里根据fiber节点的tag来进行不同的操作，以后详细分析</span></span><br><span class="line">  <span class="built_in">console</span>.log(workInProgress.name);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当<code>workInProgress</code>没有子节点的时候，进入此函数，走<code>completeWork</code>完成当前节点的工作。然后寻找它是否有兄弟节点，如果找到，<code>react</code>退出<code>completeUnitOfWork</code>并返回这个兄弟节点，交给<code>nextUnitOfWork</code>去进行下一个分支的工作。这里，<code>react</code>只是完成了第一个子分支的工作，父节点的工作还没有完成，只有在完成所有子分支节点的工作后，才会向上去完成父节点的工作。</p>
+<p>上面的4个函数，<code>performUnitOfWork</code>和<code>completeUnitOfWork</code>主要用于迭代工作，主要的活动则在<code>beginWork</code>和<code>completeWork</code>函数中进行(react源码为这两个方法各自分配了单个文件来写)。</p>
+<p>这篇博客只是简单总结了一点点<code>fiber</code>构建的知识，源码的学习实在太过复杂太难以理解，只能一个点一个点的去突破和理解，正如乔布斯在斯坦福大学中的演讲所说：</p>
+<blockquote>
+<p>Again, you can’t connect the dots looking forward; you can only connect them looking backwards. So you have to trust that the dots will somehow connect in your future. </p>
+</blockquote>
+<p>点点碎片知识的堆积，都是我们日后豁然开朗的根源。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/知识积累/" rel="tag"># 知识积累</a>
+          
+            <a href="/tags/react/" rel="tag"># react</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/30/POST提交数据的几种方式/" rel="next" title="POST提交数据的几种方式">
+                <i class="fa fa-chevron-left"></i> POST提交数据的几种方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象链表遍历"><span class="nav-number">1.</span> <span class="nav-text">抽象链表遍历</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一撇React源码"><span class="nav-number">2.</span> <span class="nav-text">一撇React源码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
