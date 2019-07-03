@@ -93,21 +93,21 @@
 
 
 
-<meta name="description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects toJS">
+<meta name="description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects to J">
 <meta name="keywords" content="随写,HTTP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="POST提交数据的几种方式">
 <meta property="og:url" content="http://yoursite.com/2019/03/30/POST提交数据的几种方式/index.html">
 <meta property="og:site_name" content="Leon&#39;s Blog">
-<meta property="og:description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects toJS">
+<meta property="og:description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects to J">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/http-post-01.png">
 <meta property="og:image" content="http://yoursite.com/images/http-post-02.png">
 <meta property="og:image" content="http://yoursite.com/images/http-post-03.jpg">
-<meta property="og:updated_time" content="2019-03-30T08:01:06.470Z">
+<meta property="og:updated_time" content="2019-07-03T03:02:11.401Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="POST提交数据的几种方式">
-<meta name="twitter:description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects toJS">
+<meta name="twitter:description" content="提到HTTP使用POST请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成formData形式提交。除此之外好像还有个一长串的x-www-form-urlencoded，可这全是碎片化的知识点，毫无章法。最近做项目时用到了axios，详细的翻看了一下文档，有个地方引起了我的兴趣：By default, axios serializes JavaScript objects to J">
 <meta name="twitter:image" content="http://yoursite.com/images/http-post-01.png">
 
 
@@ -372,7 +372,7 @@
       
 
       
-        <p>提到HTTP使用<code>POST</code>请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成<code>formData</code>形式提交。除此之外好像还有个一长串的<code>x-www-form-urlencoded</code>，可这全是碎片化的知识点，毫无章法。最近做项目时用到了<code>axios</code>，详细的翻看了一下文档，有个地方引起了我的兴趣：<code>By default, axios serializes JavaScript objects to</code>JSON<code>. To send data in the</code>application/x-www-form-urlencoded<code>format instead, you can use one of the following options</code>。等等，这里说<code>axios</code>默认使用序列化的<code>JSON</code>发送数据，但如果你要使用<code>application/x-www-form-urlencoded</code>格式的话，可以使用<code>qs</code>库或者<code>new URLSearchParams()</code>。赶紧网上查阅资料，才发现自己遇到了知识盲点，现系统的总结一下这个小知识点。</p>
+        <p>提到HTTP使用<code>POST</code>请求提交数据的方式，第一反应就是以对象形式提交，如果是文件，则换成<code>formData</code>形式提交。除此之外好像还有个一长串的<code>x-www-form-urlencoded</code>，可这全是碎片化的知识点，毫无章法。最近做项目时用到了<code>axios</code>，详细的翻看了一下文档，有个地方引起了我的兴趣：<code>By default, axios serializes JavaScript objects to JSON. To send data in the application/x-www-form-urlencoded format instead, you can use one of the following options</code>。等等，这里说<code>axios</code>默认使用序列化的<code>JSON</code>发送数据，但如果你要使用<code>application/x-www-form-urlencoded</code>格式的话，可以使用<code>qs</code>库或者<code>new URLSearchParams()</code>。赶紧网上查阅资料，才发现自己遇到了知识盲点，现系统的总结一下这个小知识点。</p>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>常用的HTTP请求方法有<code>GET</code>、<code>POST</code>、<code>PUT</code>、<code>DELETE</code>、<code>HEAD</code>、<code>OPTIONS</code>等。客户端发送一个HTTP请求到服务器，这个请求消息包括：请求行、请求头部、空行和请求数据：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;method&gt; &lt;request-url&gt; &lt;version&gt;</span><br><span class="line">&lt;headers&gt;</span><br><span class="line"></span><br><span class="line">&lt;entity-body&gt;</span><br></pre></td></tr></table></figure>
 <p>我们使用<code>POST</code>发送的数据必须放在消息主体(entity-body)中，但是HTTP协议并没有规定使用什么样的编码方式来传送数据。这个编码方式前端可以自己来决定，但是数据发出去，还要服务端能解析成功才有意义。服务端自有不同的方法来解析不同编码格式的数据，而且服务端可以根据请求头(headers)内的<code>Content-Type</code>字段去获知编码方式，然后去解析数据。</p>
