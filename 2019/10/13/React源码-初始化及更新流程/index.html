@@ -1,0 +1,984 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript,React," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="准备工作这篇文章本来准备作为一篇笔记，不准备发到博客中来。但简单写完后想起自己初次接触react源码时像无头苍蝇一样到处乱撞，中间绕了很大的圈子才渐渐找到感觉，这里把自己近期看到的好文章及心得总结出来，希望能让像我一样的react源码“初学者”少走一些弯路。 精品文章 react-in-depth系列，这个是目前为止我看到的关于react 源码写的最好的几篇文章，值得反复阅读。原文需要翻墙才能打开">
+<meta name="keywords" content="JavaScript,React">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React源码学习-初始化及更新流程">
+<meta property="og:url" content="http://yoursite.com/2019/10/13/React源码-初始化及更新流程/index.html">
+<meta property="og:site_name" content="Leon&#39;s Blog">
+<meta property="og:description" content="准备工作这篇文章本来准备作为一篇笔记，不准备发到博客中来。但简单写完后想起自己初次接触react源码时像无头苍蝇一样到处乱撞，中间绕了很大的圈子才渐渐找到感觉，这里把自己近期看到的好文章及心得总结出来，希望能让像我一样的react源码“初学者”少走一些弯路。 精品文章 react-in-depth系列，这个是目前为止我看到的关于react 源码写的最好的几篇文章，值得反复阅读。原文需要翻墙才能打开">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-13T09:39:22.721Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="React源码学习-初始化及更新流程">
+<meta name="twitter:description" content="准备工作这篇文章本来准备作为一篇笔记，不准备发到博客中来。但简单写完后想起自己初次接触react源码时像无头苍蝇一样到处乱撞，中间绕了很大的圈子才渐渐找到感觉，这里把自己近期看到的好文章及心得总结出来，希望能让像我一样的react源码“初学者”少走一些弯路。 精品文章 react-in-depth系列，这个是目前为止我看到的关于react 源码写的最好的几篇文章，值得反复阅读。原文需要翻墙才能打开">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/13/React源码-初始化及更新流程/"/>
+
+
+
+
+
+  <title> React源码学习-初始化及更新流程 | Leon's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Leon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">just do it</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/13/React源码-初始化及更新流程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiYang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Leon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                React源码学习-初始化及更新流程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-13T17:36:21+08:00">
+                2019-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">本文总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>这篇文章本来准备作为一篇笔记，不准备发到博客中来。但简单写完后想起自己初次接触react源码时像无头苍蝇一样到处乱撞，中间绕了很大的圈子才渐渐找到感觉，这里把自己近期看到的好文章及心得总结出来，希望能让像我一样的<code>react</code>源码“初学者”少走一些弯路。</p>
+<h4 id="精品文章"><a href="#精品文章" class="headerlink" title="精品文章"></a>精品文章</h4><ol>
+<li><p><a href="https://medium.com/react-in-depth" target="_blank" rel="noopener">react-in-depth系列</a>，这个是目前为止我看到的关于<code>react 源码</code>写的最好的几篇文章，值得反复阅读。原文需要翻墙才能打开，知乎里也有人翻译了这几篇文章。</p>
+<p><a href="https://medium.com/react-in-depth/the-how-and-why-on-reacts-usage-of-linked-list-in-fiber-67f1014d0eb7?source=collection_home---4------2-----------------------" target="_blank" rel="noopener">The how and why on React’s usage of linked list in Fiber to walk the component’s tree</a>，<a href="https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e?source=collection_home---4------0-----------------------" target="_blank" rel="noopener">Inside Fiber: in-depth overview of the new reconciliation algorithm in React</a>，<a href="https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311" target="_blank" rel="noopener">In-depth explanation of state and props update in React</a></p>
+</li>
+<li><p>知乎文章，暂时推荐一篇，也可以搜索其他文章看一看。</p>
+<p><a href="https://zhuanlan.zhihu.com/p/60307571" target="_blank" rel="noopener">深入剖析 React Concurrent</a></p>
+</li>
+<li><p>Dan Abramov的博客，这个人不用说是谁了吧。</p>
+<p><a href="https://overreacted.io/" target="_blank" rel="noopener">Dan Abramov的博客</a>，<a href="https://overreacted.io/how-does-setstate-know-what-to-do/" target="_blank" rel="noopener">How Does setState Know What to Do?</a>，等等都值得反复读</p>
+</li>
+<li><p>其他。</p>
+<p><a href="https://yuchengkai.cn/react/" target="_blank" rel="noopener">前端进阶之道</a>，不错的一个入门解析</p>
+</li>
+</ol>
+<h4 id="阅读本篇"><a href="#阅读本篇" class="headerlink" title="阅读本篇"></a>阅读本篇</h4><p>阅读本篇文章之前，最好先阅读以上推荐文章，先对<code>Fiber</code>、<code>ExpirationTime</code>、<code>workLoop</code>等等概念有个大致的认识。</p>
+<h3 id="调试代码"><a href="#调试代码" class="headerlink" title="调试代码"></a>调试代码</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//html</span></span><br><span class="line">&lt;div id=<span class="string">"root"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//App组件</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">App</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;</span><br><span class="line">      count: <span class="number">1</span>,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  handleClick = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;</span><br><span class="line">      count: <span class="number">2</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> getDerivedStateFromProps(props, state) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getSnapshotBeforeUpdate(prevProps, prevState) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(prevState);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"this"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidUpdate(prevProps, prevState, snapshot) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(prevState);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentWillUnmount() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"haha"</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;div className=<span class="string">"container"</span>&gt;</span><br><span class="line">        &lt;button key=<span class="string">"1"</span> onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;</span><br><span class="line">          点击</span><br><span class="line">        &lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">        &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;</span><br><span class="line">      &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/渲染入口</span></span><br><span class="line"><span class="regexp">ReactDOM.render(&lt;App /</span>&gt;, <span class="built_in">document</span>.getElementById(<span class="string">"root"</span>));</span><br></pre></td></tr></table></figure>
+<h3 id="初始化流程"><a href="#初始化流程" class="headerlink" title="初始化流程"></a>初始化流程</h3><h4 id="render阶段"><a href="#render阶段" class="headerlink" title="render阶段"></a>render阶段</h4><ol>
+<li><p><code>ReactDOM.render(&lt;App /&gt;, &#39;root&#39;)</code>最终返回了<code>HostRootFiber</code>下的第一个子节点的实例，即<code>App组件</code>的<code>instance</code>。但在返回实例之前，react先创建了一个基础<code>数据结构</code>，挂载在了<code>root DOM节点</code>上。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">root._internalRootContainer = &#123;</span><br><span class="line">  _internalRoot: &#123;</span><br><span class="line">    finishedWork: <span class="literal">null</span>,</span><br><span class="line">    current: HostRootFiber,</span><br><span class="line">    containerInfo: div#root,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">ReactNode._internalRoot = FiberRoot;</span><br><span class="line">FiberRoot.current = HostRootFiber;</span><br><span class="line">HostRootFiber.stateNode = FiberRoot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结构有了，需要<code>updateContainer()</code>，把<code>fiber</code>树建立起来。在进入<code>workLoop()</code>之前，都需要从当前操作的<code>fiber</code>节点回溯到<code>FiberRoot</code>，沿途更新<code>父fiber</code>的<code>childExpirationTime</code>，标记<code>子fiber</code>是否需要更新。（<code>ExpirationTimer</code>越大，优先级越高）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> root = markUpdateTimeFromFiberToRoot(fiber, expirationTime);</span><br><span class="line">prepareFreshStack(root, expirationTime);</span><br></pre></td></tr></table></figure>
+<p>同时，还需要通过<code>prepareFreshStack(root, expirationTime)</code>方法，将<code>workInProgress</code>置为<code>HostRootFiber</code>，所以，不论初始化还是更新，<code>workLoop()</code>都是从<code>HostRootFiber</code>开始。</p>
+</li>
+<li><p>第一次循环，<code>workInProgress (又称unitOfWork)</code>是<code>HostRootFiber</code>，从<code>performUnitOfWork()</code>进入<code>beginWork()</code>，当前<code>workInProgress.tag</code>为<code>HostRoot</code>，走<code>updateHostRoot()</code>方法。这里，最重要的是调用了<code>reconcilChildren(current, workInProgress, nextChildren)</code>，<code>nextChildren</code>是代表<code>&lt;App /&gt;</code>的一个<code>ReactElement</code>，就是一个普通的对象，内部的<code>props</code>属性为空。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">nextChildren = &#123;</span><br><span class="line">	$$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element)</span><br><span class="line">	key: <span class="literal">null</span></span><br><span class="line">	props: &#123;&#125;</span><br><span class="line">	ref: <span class="literal">null</span></span><br><span class="line">	type: ƒn App(props)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>reconcilChildren</code>做了一件事，使用传入的<code>ReactElement</code>生成一个<code>fiberNode</code>，并与<code>workInProgress-fiber</code>链接起来。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">workInProgress.child = fiber;</span><br><span class="line">fiber.return = workInProgress;</span><br></pre></td></tr></table></figure>
+<p>最后，本次循环<code>beginWork</code>返回了<code>workInProgress.child</code>，即<code>App-fiber</code>。进入下一个循环。</p>
+</li>
+<li><p>此时，<code>workInProgress</code>指向了<code>App-fiber</code>。这里要明白一点，此时我们并没有<code>div.container、button、span</code>的<code>fiber</code>节点，<code>App-fiber</code>的<code>child</code>为<code>null</code>。循环从<code>performUnitOfWork()</code>进入<code>beginWork()</code>。</p>
+<p>当前<code>workInProgress.tag</code>为<code>ClassComponent</code>，走<code>updateClassComponent()</code>方法。初始化时，<code>Class App</code>还没有实例，要先<code>constructor</code>和<code>mount</code>组件类。</p>
+<p>a. <code>constructClassInstance()</code>，执行类的<code>constructor()</code>创建实例<code>instance</code>，同时<code>super(props)</code>调用父类<code>Component</code>的构造函数，之后将<code>this.updater</code>指向<code>classComponentUpdater</code>对象，内有关键的<code>enqueueSetState</code>方法，用来之后更新组件。将<code>App-fiber</code>的<code>stateNode</code>指向<code>instance</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> instance = <span class="keyword">new</span> ctor(props, context);  <span class="comment">//new App(props, context)</span></span><br><span class="line"></span><br><span class="line">instance.updater = classComponentUpdater;</span><br><span class="line">workInProgress.stateNode = instance;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> classComponentUpdater = &#123;</span><br><span class="line">  enqueueSetState(inst, payload, callback) &#123;</span><br><span class="line">    enqueueUpdate(fiber, update);</span><br><span class="line">    scheduleWork(fiber, expirationTime);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//实例调用this.setState(payload, callback)，实际上调用了Component.prototype.setState，这个原型方法内部直接调用了 this.updater.enqueueSetState()，也就是实例上的updater提供的方法。</span></span><br></pre></td></tr></table></figure>
+<p>b. <code>mountClassInstance()</code>，为<code>instance</code>初始化<code>props、state、refs、context</code>等属性、执行<code>getDerivedStateFromProps()</code>、为<code>componentDidMount</code>标记<code>effectTag</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> instance = workInProgress.stateNode;</span><br><span class="line">instance.props = newProps;</span><br><span class="line">instance.state = workInProgress.memoizedState;   <span class="comment">//&#123; count: 1 &#125;</span></span><br><span class="line">instance.refs = emptyRefsObject;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">const</span> getDerivedStateFromProps = ctor.getDerivedStateFromProps;  <span class="comment">//注意这里，类的static方法</span></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> getDerivedStateFromProps === <span class="string">'function'</span>) &#123;</span><br><span class="line">  applyDerivedStateFromProps(</span><br><span class="line">    workInProgress,</span><br><span class="line">    ctor,</span><br><span class="line">    getDerivedStateFromProps,</span><br><span class="line">    newProps,</span><br><span class="line">  );</span><br><span class="line">  instance.state = workInProgress.memoizedState;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> instance.componentDidMount === <span class="string">'function'</span>) &#123;</span><br><span class="line">  workInProgress.effectTag |= Update;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>c. <code>finishClassComponent()</code>，执行<code>instance.render()</code>，返回<code>嵌套的ReactElement</code>，调用<code>reconcileChildren()</code>方法，链接<code>App-fiber</code>和它的子节点。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> nextUnitOfWork = finishClassComponent();</span><br><span class="line">...</span><br><span class="line"><span class="comment">//finishClassComponent</span></span><br><span class="line"><span class="keyword">const</span> nextChildren = instance.render(); <span class="comment">//调用App定义的render()方法，返回嵌套ReactElement</span></span><br><span class="line"><span class="keyword">let</span> nextChildren = &#123;</span><br><span class="line">  $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">  key: <span class="literal">null</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    children: [</span><br><span class="line">      &#123;</span><br><span class="line">        $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">        key: <span class="string">"1"</span>,</span><br><span class="line">        props: &#123;</span><br><span class="line">          children: <span class="string">"点击"</span>,</span><br><span class="line">          onClick: fn()</span><br><span class="line">        &#125;,</span><br><span class="line">        ref: <span class="literal">null</span>,</span><br><span class="line">        type: <span class="string">"button"</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">        key: <span class="string">"2"</span>,</span><br><span class="line">        props: &#123;</span><br><span class="line">          children: <span class="number">1</span></span><br><span class="line">        &#125;,</span><br><span class="line">        ref: <span class="literal">null</span>,</span><br><span class="line">        type: <span class="string">"span"</span>,</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  ref: <span class="literal">null</span>,</span><br><span class="line">  type: <span class="string">"div"</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//reconcileChildren内部，使用nextChildren生成div.container-fiber，将这个fiber与App-fiber链接起来，注意，此时内部的button和span依然是ReactElement，组成了一个数组挂载在div-fiber的pendingProps.children内。</span></span><br><span class="line">reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);</span><br></pre></td></tr></table></figure>
+<p>最后，本次循环<code>beginWork</code>返回了<code>workInProgress.child</code>，即<code>div-fiber</code>。进入下一个循环。</p>
+</li>
+<li><p>此时，<code>workInProgress</code>指向了<code>div-fiber</code>。循环从<code>performUnitOfWork()</code>进入<code>beginWork()</code>，当前<code>workInProgress.tag</code>为<code>HostComponent</code>，走<code>updateHostComponent()</code>。没有什么特别的处理，直接调用<code>reconcileChildren()</code>进行<code>fiber</code>的创建和链接。</p>
+<p>这次的<code>reconcileChildren</code>有些不同，因为<code>nextChildren</code>是一个数组，里面是<code>button</code>和<code>span</code>的<code>ReactElement</code>形式。react会将数组内的所有元素都创建为<code>fiber</code>节点，然后通过<code>sibling</code>链接起来，同时他们有共同的父<code>fiber</code>节点。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reconcileChildren(current, workInProgress, nextChildren, renderExpirationTime);</span><br><span class="line"><span class="comment">//nextChildren为数组[&#123; $$typeof: ... &#125;, &#123; $$typeof: ... &#125;]</span></span><br></pre></td></tr></table></figure>
+<p>最后，<code>beginWork</code>返回了<code>div-fiber</code>的第一个<code>child</code>，即<code>button-fiber</code>。</p>
+</li>
+<li><p><code>workInProgress</code>指向<code>button-fiber</code>，循环从<code>performUnitOfWork()</code>进入<code>beginWork()</code>，当前<code>workInProgress.tag</code>为<code>HostComponent</code>，走<code>updateHostComponent()</code>。这里，<code>button-fiber</code>没有<code>child</code>要链接，<code>reconcileChildren()</code>不做任何事情，<code>beginWork()</code>完成。</p>
+<p>接下来进入<code>completeUnitOfWork()</code>，这个函数是一个中转函数，负责处理循环的走向（走向<code>sibling</code>还是<code>return</code>），<code>button-fiber</code>先进入<code>completeWork()</code>。</p>
+<p><code>completeWork()</code>内也会根据<code>workInProgress.tag</code>进行不同的处理。对于<code>HostComponent</code>，react会使用原生的<code>document.createElement()</code>为<code>fiber</code>创建真正的DOM元素。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//type为button, rootContainerInstance为rootDOM</span></span><br><span class="line"><span class="keyword">let</span> instance = createInstance(type, newProps, rootContainerInstance, currentHostContext, workInProgress);</span><br><span class="line"><span class="comment">//内部调用react-dom/ReactDOMComponent.js，使用document.createElement()创建DOM</span></span><br><span class="line"></span><br><span class="line">workInProgress.stateNode = instance;</span><br></pre></td></tr></table></figure>
+<p><code>button-fiber</code>的整个<code>workLoop()</code>走完。<code>workInProgress</code>指向其<code>sibling</code>，即<code>span-fiber</code>。</p>
+</li>
+<li><p><code>span-fiber</code>进入<code>beginWork()</code>。与<code>button-fiber</code>的流程一样，在<code>completeWork()</code>内创建了真正的DOM元素，但<code>span-fiber</code>的<code>sibling</code>为<code>null</code>，故返回了<code>return</code>节点，即<code>div-fiber</code>。<code>span-fiber</code>的<code>workLoop()</code>循环完成。</p>
+</li>
+<li><p><code>div-fiber</code>进入<code>completeUnitOfWork()</code>，随后进入<code>completeWork()</code>。同属于<code>HostComponent()</code>，通过<code>createInstance()</code>创建了真正的DOM节点，没有<code>sibling</code>，返回<code>return</code>节点，即<code>App-fiber</code>。<code>div-fiber</code>的<code>workLoop()</code>循环完成。</p>
+</li>
+<li><p><code>App-fiber</code>在<code>completeUnitOfWork()</code>和<code>completeWork()</code>没有什么特别的操作（类组件，无需创建DOM），没有<code>sibling</code>，返回<code>return</code>节点，即<code>HostRootFiber</code>。<code>App-fiber</code>的<code>workLoop()</code>完成。</p>
+</li>
+<li><p><code>HostRootFiber</code>同样在<code>completeUnitOfWork()</code>和<code>completeWork()</code>没有什么特别的操作，<code>workLoop()</code>完成。</p>
+</li>
+</ol>
+<p>至此，初始化的<code>render phase</code>完成。</p>
+<h4 id="commit阶段"><a href="#commit阶段" class="headerlink" title="commit阶段"></a>commit阶段</h4><p>接下来进入<code>commit</code>阶段。<code>render</code>阶段完成时，react会生成一条<code>effect-list</code>链表，记录着需要处理的<code>side-effect</code>（这个链表的生成过程另文总结）。由<code>commitRoot()</code>进入到<code>commitRootImpl()</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitRoot</span>(<span class="params">root, finishedWork</span>) </span>&#123;</span><br><span class="line">  commitBeforeMutationEffects();</span><br><span class="line">  commitMutationEffects();</span><br><span class="line">  root.current = finishedWork;</span><br><span class="line">  commitAllLifeCycles();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>第一阶段称为<code>before mutation phase</code>，这时可以读取DOM，但DOM还未更新，也不可执行<code>side-effect</code>，这个阶段主要用来执行<code>getSnapshotBeforeUpdate()</code>生命周期。需要注意的是，<code>commit</code>阶段的每个子步骤，react都会去遍历整个<code>effect-list</code>，将整个<code>list</code>上所有对应的<code>work</code>完成后再进入下个步骤，继续从头开始遍历。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitBeforeMutationEffects</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (nextEffect !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(workInProgress.tag) &#123;</span><br><span class="line">      <span class="keyword">case</span> ClassComponent: &#123;</span><br><span class="line">        instance.getSnapshotBeforeUpdate();</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">case</span> HostComponent: &#123; ... &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    nextEffect = nextEffect.nextEffect;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第二阶段称为<code>mutation phase</code>，主要是用来进行DOM的更新，注意内部的<code>commitWork()</code>方法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitMutationEffects</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (nextEffect !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> Placement: &#123;</span><br><span class="line">        commitPlacement(nextEffect);</span><br><span class="line">        nextEffect.effectTag &amp;= ~Placement;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">case</span> PlacementAndUpdate: &#123; ... &#125;</span><br><span class="line">    	<span class="keyword">case</span> Update: &#123;</span><br><span class="line">        <span class="keyword">const</span> current = nextEffect.alternate;</span><br><span class="line">        commitWork(current, nextEffect);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">case</span> Deletion: &#123; ... &#125;</span><br><span class="line">    nextEffect = nextEffect.nextEffect;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第三阶段我们需要将<code>workInProgress Tree</code>替换为<code>current Tree</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root.current = finishedWork;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后一个阶段，我们要执行具有<code>side-effect</code>的生命周期函数。这里，指的就是<code>componentDidMount</code>和<code>componentDidUpdate</code>，依据的是<code>effect-list fiber</code>内的<code>effectTag</code>属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitLayoutEffects</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (nextEffect !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> effectTag = nextEffect.effectTag;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (effectTag &amp; (Update | Callback)) &#123;</span><br><span class="line">      <span class="keyword">const</span> current = nextEffect.alternate;</span><br><span class="line">      commitLayoutEffectOnFiber(</span><br><span class="line">        root,</span><br><span class="line">        current,</span><br><span class="line">        nextEffect,</span><br><span class="line">        committedExpirationTime,</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (effectTag &amp; Ref) &#123;</span><br><span class="line">      recordEffect();</span><br><span class="line">      commitAttachRef(nextEffect);</span><br><span class="line">    &#125;</span><br><span class="line">    nextEffect = nextEffect.nextEffect;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitLayoutEffectOnFiber</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (finishedWork.tag) &#123;</span><br><span class="line">    <span class="keyword">case</span> ClassComponent: &#123;</span><br><span class="line">      <span class="keyword">const</span> instance = finishedWork.stateNode;</span><br><span class="line">      <span class="keyword">if</span> (finishedWork.effectTag &amp; Update) &#123;</span><br><span class="line">        <span class="keyword">if</span> (current === <span class="literal">null</span>) &#123;</span><br><span class="line">          instance.componentDidMount();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          ...</span><br><span class="line">          instance.componentDidUpdate();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> HostComponent: &#123; ... &#125;,</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>至此，<code>commit phase</code>完成。</p>
+<h3 id="更新流程"><a href="#更新流程" class="headerlink" title="更新流程"></a>更新流程</h3><p>更新过程大体上与初始化过程一致，比如<code>fiber node</code>依然会走<code>workLoop()</code>循环。但更新过程是由<code>instance.setState()</code>调用触发，对于<code>Class</code>组件来说需要执行不同的生命周期函数，还需要去<code>diffing algorithm</code>标记节点的变化，另外还需要标记<code>effectTag</code>。<code>Fiber Tree</code>的遍历也会跳过没有“变更”的节点，直达需要处理的节点。</p>
+<h4 id="render阶段-1"><a href="#render阶段-1" class="headerlink" title="render阶段"></a>render阶段</h4><ol>
+<li><p>初始化阶段<code>reactDOM</code>为实例绑定了<code>updater</code>属性，在实例调用<code>setState()</code>方法时，就会执行到<code>ReactDOM</code>提供的<code>enqueueSetState</code>方法，继而触发<code>scheduleWork</code>过程。同理，在执行<code>workLoop()</code>之前，react会从当前节点(App组件)回溯到<code>root</code>，沿途更新<code>parent node</code>的<code>childExpirationTime</code>，同时会将<code>workInProgress</code>指向<code>HostRootFiber</code>。不过，更新时react会跳过<code>bails out</code>那些没有任何<code>work</code>的节点，直接达到目标节点，即我们的<code>App-fiber</code>。我们假定的例子中，<code>HostRootFiber</code>下即为<code>App-fiber</code>，所以只跳过了<code>HostRootFiber</code>。这时，<code>App-fiber</code>进入了<code>workLoop()</code>。</p>
+</li>
+<li><p><code>workInProgress</code>指向<code>App-fiber</code>，在<code>beginWork</code>中依据<code>wrokInProgress.tag</code>执行<code>updateClassComponent()</code>，此时我们已经有了<code>App</code>组件的实例，继而进入<code>updateClassInstance()</code>方法。</p>
+<p>a. 依据<code>setState(payload, callback)</code>计算新的<code>state</code>。</p>
+<p>b. 执行<code>getDerivedStateFromProps()</code>和<code>shouldComponentUpdate()</code>生命周期函数。</p>
+<p>c. 为<code>getSnapshotBeforeUpdate</code>和<code>componentDidUpdate</code>标记<code>effectTag</code>。</p>
+<p>d. 更新<code>instance</code>的<code>state</code>、<code>props</code>和<code>context</code>属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateClassInstance</span>(<span class="params">current, workInProgress, ctor, newProps, ...</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> instance = workInProgress.stateNode;</span><br><span class="line">  <span class="comment">//第一步，计算新的state</span></span><br><span class="line">  <span class="keyword">const</span> oldState = workInProgress.memoizedState;  <span class="comment">//&#123; count: 1 &#125;</span></span><br><span class="line">  <span class="keyword">let</span> newState = (instance.state = oldState);   <span class="comment">//&#123; count: 1 &#125;</span></span><br><span class="line">  <span class="keyword">let</span> updateQueue = workInProgress.updateQueue; <span class="comment">//&#123;baseState: 1, firstUpdate:&#123; payload: &#123;count: 2&#125;, callback, &#125;, lastUpdate:&#123; payload: &#123;count: 2&#125;, callback,&#125;&#125;</span></span><br><span class="line">  <span class="keyword">if</span> (updateQueue !== <span class="literal">null</span>) &#123;</span><br><span class="line">    processUpdateQueue(</span><br><span class="line">      workInProgress,</span><br><span class="line">      updateQueue,</span><br><span class="line">      newProps,</span><br><span class="line">      instance,</span><br><span class="line">      renderExpirationTime,</span><br><span class="line">    );</span><br><span class="line">    newState = workInProgress.memoizedState;  <span class="comment">// &#123; count: 2 &#125;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//第二步，执行getDerivedStateFromProps</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> getDerivedStateFromProps === <span class="string">'function'</span>) &#123;</span><br><span class="line">    applyDerivedStateFromProps(</span><br><span class="line">      workInProgress,</span><br><span class="line">      ctor,</span><br><span class="line">      getDerivedStateFromProps,</span><br><span class="line">      newProps,</span><br><span class="line">    );</span><br><span class="line">    newState = workInProgress.memoizedState;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//第三步，标记componentDidUpdate和getSnapshotBeforeUpdate</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> instance.componentDidUpdate === <span class="string">'function'</span>) &#123;</span><br><span class="line">    workInProgress.effectTag |= Update;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> instance.getSnapshotBeforeUpdate === <span class="string">'function'</span>) &#123;</span><br><span class="line">    workInProgress.effectTag |= Snapshot;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//第四步，更新props、state、context属性</span></span><br><span class="line">  instance.props = newProps;</span><br><span class="line">  instance.state = newState;</span><br><span class="line">	instance.context = nextContext;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> shouldUpdate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来进入<code>finishClassComponent()</code>方法。这里，先执行<code>instance.render()</code>获取新的<code>嵌套ReactElement</code>，注意，此时<code>render()</code>内的<code>JSX</code>使用的都是最新的<code>props</code>和<code>state</code>，但DOM还没有更新，页面还没有展示出变化。拿到新的<code>nextChildren</code>后，同样调用<code>reconcileChilder()</code>方法，进行节点的<code>diffing algorithm</code>，实际上通过比较已有的<code>fiber node</code>和新生成的<code>ReactElement</code>，依据<code>key</code>、<code>parent node</code>的类型等属性，决定节点的删除、移动、更新等。这里，我们的<code>span</code>节点进行了内容的变更，前后节点变化为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    memoizedProps: &#123;<span class="attr">children</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    pendingProps: &#123;<span class="attr">children</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    memoizedProps: &#123;<span class="attr">children</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    pendingProps: &#123;<span class="attr">children</span>: <span class="number">2</span>&#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这之后，返回了<code>App-fiber</code>的子节点，进入<code>div-fiber</code>的<code>workLoop()</code>。</p>
+</li>
+<li><p>接下来的<code>div-fiber</code>和<code>button-fiber</code>的<code>workLoop()</code>过程没有什么特别的地方。不过，<code>button-fiber</code>的<code>completeWork()</code>阶段存疑，初始化时创建了DOM，更新时又会如何处理？这里存疑，还需深入研究。我们先跳过，直接进入<code>span-fiber</code>的<code>workLoop()</code>。</p>
+</li>
+<li><p>进入<code>span-fiber</code>的循环后，<code>beginWork</code>、<code>completeUnitOfWork</code>都没什么特别要处理的，直接进入<code>completeWork()</code>。在这里，需要为<code>span-fiber</code>准备好<code>DOM</code>的更新，标记好<code>effectTag</code>，同时，<code>span-fiber</code>的<code>memoizedProps</code>也会被更新为<code>pendingProps</code>。</p>
+</li>
+<li><p>整个更新流程的<code>render phase</code>就完成了，这次的<code>render phase</code>，我们为<code>App</code>组件标记了<code>getSnapshotBeforeUpdate</code>和<code>componentDidUpdate</code>两个<code>effectTag</code>（位运算，叠加），为<code>span-fiber</code>标记了<code>DOM</code>更新的<code>effectTag</code>。而且这两个节点的更新，我们使用<code>firstEffect</code>和<code>nextEffect</code>属性与<code>HostRootFiber</code>进行了链表链接，在接下来的<code>commit phase</code>阶段去处理。</p>
+</li>
+</ol>
+<h4 id="commit阶段-1"><a href="#commit阶段-1" class="headerlink" title="commit阶段"></a>commit阶段</h4><p>这次的<code>commit</code>阶段与初始化时的<code>commit</code>阶段基本一致，可能在DOM更新等地方有所不同，还需深入研究。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>react的源码非常复杂，读起来非常的吃力。上面写了这么多，也只是浅尝即止。内部各任务如何调度、<code>expirationTime</code>如何设置和处理、<code>side-effect</code>链的生成，还有<code>Hooks</code>、<code>ref</code>、<code>context</code>的融合，<code>DOM</code>元素的生成等等都能单独拿出来研究很久。不过大致的流程过了一遍，也算打开了一条门缝，可借以窥探内部的种种奥秘。接下来会去单独研究一下<code>effect-list</code>和<code>expirationTime</code>的相关知识点。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/React/" rel="tag"># React</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/13/React源码学习-Fiber遍历/" rel="next" title="React源码学习-Fiber遍历">
+                <i class="fa fa-chevron-left"></i> React源码学习-Fiber遍历
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="LiYang" />
+          <p class="site-author-name" itemprop="name">LiYang</p>
+           
+              <p class="site-description motion-element" itemprop="description">李阳的JavaScript学习总结</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/liyang0207" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备工作"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#精品文章"><span class="nav-number">1.1.</span> <span class="nav-text">精品文章</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#阅读本篇"><span class="nav-number">1.2.</span> <span class="nav-text">阅读本篇</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试代码"><span class="nav-number">2.</span> <span class="nav-text">调试代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化流程"><span class="nav-number">3.</span> <span class="nav-text">初始化流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#render阶段"><span class="nav-number">3.1.</span> <span class="nav-text">render阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#commit阶段"><span class="nav-number">3.2.</span> <span class="nav-text">commit阶段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新流程"><span class="nav-number">4.</span> <span class="nav-text">更新流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#render阶段-1"><span class="nav-number">4.1.</span> <span class="nav-text">render阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#commit阶段-1"><span class="nav-number">4.2.</span> <span class="nav-text">commit阶段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiYang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      总访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
